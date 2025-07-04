@@ -1,5 +1,6 @@
 import { useUser } from '@/context/userContext';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import config from '../config.json';
@@ -11,9 +12,8 @@ const VerificationScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const { user } = useUser();
-  const route = useRoute() as any;
-  const { email, password} = route.params || {};
+  const [email, setEmail] = useState('');
+  const { setUser } = useUser()
 
   const navigation = useNavigation();
 
@@ -22,10 +22,14 @@ const VerificationScreen = () => {
     setCharCount(text.length);
   };
 
+  const handleEmailChange = (text: React.SetStateAction<string>) => {
+    setEmail(text);
+  };
+
   const sendCode = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code-if-exists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -35,10 +39,17 @@ const VerificationScreen = () => {
       });
       if (!response.ok) throw new Error('Erreur réseau lors de l’envoi du code.');
       const data = await response.json();
-      console.log('Code envoyé par mail :', data);
-      setIsCodeSent(true);
-      setErrorMessage('');
-      setSuccessMessage('Un e-mail de vérification a été envoyé. Pensez à vérifier votre boîte spam !');
+      if(data.success == true)
+      {
+        console.log('Code envoyé par mail :', data);
+        setIsCodeSent(true);
+        setErrorMessage('');
+        setSuccessMessage('Un e-mail de vérification a été envoyé. Pensez à vérifier votre boîte spam !');
+      }
+      else
+      {
+        setErrorMessage('e-mail non valide');
+      }
     } catch (error) {
       setErrorMessage('Erreur lors de l’envoi de l’e-mail. Veuillez réessayer.');
       console.error(error);
@@ -47,6 +58,40 @@ const VerificationScreen = () => {
     }
   };
 
+const getProfile = async (accountId :any) => {
+    try {
+      
+      if (!accountId) return;
+
+      const response = await fetch(`${config.backendUrl}/api/auth/get-account-by-id`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accountId }),
+      });
+
+      if (!response.ok) throw new Error('Erreur de réseau');
+
+      const data = await response.json();
+      console.log('Utilisateur chargé:', data.account);
+      saveData(data.account);
+      setUser(data.account); // Met à jour le contexte utilisateur
+    } catch (error) {
+      console.error('Erreur lors du chargement du profil:', error);
+    }
+};
+const saveData = async (account: any) => {
+    try {
+      console.log(account)
+      await AsyncStorage.setItem('account_id', account['id']);
+      await AsyncStorage.setItem('worker_id', account['worker']);
+      await AsyncStorage.setItem('firstname', account['firstname']);
+      await AsyncStorage.setItem('lastname', account['lastname']);
+    } catch (e) {
+      // gérer les erreurs de stockage ici
+      console.error('Erreur lors de la sauvegarde du type de compte', e);
+    }
+};
+
   const verifyCode = async () => {
     if (verificationCode.length !== 6) {
       setErrorMessage('Le code de vérification doit contenir 6 chiffres.');
@@ -54,7 +99,7 @@ const VerificationScreen = () => {
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/verify-code`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/verify-code-and-id`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: verificationCode, contact_value : email }),
@@ -67,9 +112,10 @@ const VerificationScreen = () => {
       } else {
         setSuccessMessage(data.message || 'Adresse e-mail vérifiée avec succès !');
         setErrorMessage('');
+        getProfile(data.id)
         navigation.navigate({
-          name: 'selectFields',
-          params: { email: email, password: password },
+           name: '(tabs)',
+          params: { screen: 'home' },
         } as never);
       }
     } catch (error) {
@@ -92,10 +138,13 @@ const VerificationScreen = () => {
             Pour sécuriser votre compte, nous avons besoin de vérifier votre adresse e-mail.
           </Text>
 
-          <Text style={styles.label}>
-            {isCodeSent ? 'Vous pouvez renvoyer un e-mail si besoin :' : `Envoyer un e-mail de vérification à ${email}`}
-          </Text>
-
+            <TextInput
+                  style={styles.input}
+                  onChangeText={handleEmailChange}
+                  placeholder="chapter@exemple.com"
+                  placeholderTextColor="#808080"
+                />
+          {<Text style={styles.errorText}>{errorMessage}</Text>}
           {!isCodeSent ? (
             <TouchableOpacity
               style={styles.sendButton}

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
 const CreationScreen = () => {
@@ -35,11 +34,42 @@ const CreationScreen = () => {
       setErrorMessage('Les mots de passe ne correspondent pas.');
       return;
     }
+
+    try 
+    {
+      const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code-if-exists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          
+          email : email,
+        }),
+      });
+      if (!response.ok) throw new Error('Erreur réseau.');
+      const data = await response.json();
+      if(data.success == true)
+      {
+        setErrorMessage('e-mail existe déjà');
+      }
+      else
+      {
+        navigation.navigate(
+                            {
+                            name: 'mailVerificationCode',
+                            params: { email: email, password: password },
+                            } as never
+                          );
+      }
+    } 
+    catch (error) 
+    {
+      setErrorMessage('Erreur lors de l’envoi de l’e-mail. Veuillez réessayer.');
+      console.error(error);
+    } 
+    finally
+    {
+    } 
     
-    navigation.navigate({
-      name: 'mailVerificationCode',
-      params: { email: email, password: password },
-    } as never);
   };
 
   return (

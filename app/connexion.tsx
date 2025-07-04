@@ -15,9 +15,6 @@ const ConnexionScreen = () => {
   const navigation = useNavigation();
   const { setUser } = useUser()
 
-  console.log(123)
-  
-
   const handleEmailChange = (text: React.SetStateAction<string>) => {
     setEmail(text);
   };
@@ -46,7 +43,6 @@ const ConnexionScreen = () => {
       if (!response.ok) throw new Error('Erreur de réseau');
 
       const data = await response.json();
-      console.log('Utilisateur chargé:', data.account);
 
       setUser(data.account); // Met à jour le contexte utilisateur
     } catch (error) {
@@ -55,7 +51,6 @@ const ConnexionScreen = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("test")
     try {
       const response = await fetch(`${config.backendUrl}/api/auth/login`, {
         method: 'POST',
@@ -66,11 +61,8 @@ const ConnexionScreen = () => {
       });
 
       const data = await response.json();
-      console.log(data)
       if (data.success) {
         // Rediriger ou faire autre chose en cas de succès
-        console.log(data.account);
-        console.log(data.account['id'])
         getProfile(data.account['id'])
         saveData(data.account)
        
@@ -120,11 +112,9 @@ const ConnexionScreen = () => {
     setEmail('');
     setPassword('');
     setErrorMessage('');
-    console.log('Navigation focus: reset state');
   });
 
   return () => {
-    console.log('Cleaning up navigation listener');
     unsubscribe();
   };
 }, [navigation]);

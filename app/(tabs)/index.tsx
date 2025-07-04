@@ -4,7 +4,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import config from '../../config.json';
-
+/*
 const profiles = [
   {
     id: '1',
@@ -43,7 +43,7 @@ const profiles = [
     image: 'https://photos.tf1.fr/1280/720/enjoyphoenix-2-49caba-0@3x.webp',
   },
 ];
-
+*/
 const HomeScreen = () => {
   const [search, setSearch] = useState('');
   const [showProfiles, setShowProfiles] = useState(false);
@@ -354,7 +354,7 @@ const HomeScreen = () => {
             />
 
             <FlatList
-              data={profiles}
+              data={null}
               renderItem={renderProfileSuggestion}
               keyExtractor={(item) => item.id}
               style={styles.profileSuggestionList}
