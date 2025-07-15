@@ -31,7 +31,7 @@ const ProfilePhotoScreen = () => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 0.40,
     });
 
     if (result.canceled) {

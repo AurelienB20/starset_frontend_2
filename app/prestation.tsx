@@ -436,7 +436,7 @@ const PrestationScreen = () => {
   
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
+      quality: 0.5,
     });
   
     if (!result.canceled && result.assets && experienceImages.length < 3) {
@@ -456,7 +456,7 @@ const PrestationScreen = () => {
 
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 1,
+    quality: 0.5,
   });
 
   if (!result.canceled && result.assets && certificationImages.length < 3) {
@@ -479,7 +479,7 @@ const PrestationScreen = () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       //allowsEditing: true, // Permet de recadrer l'image si besoin
-      quality: 1, // Qualité maximale
+      quality: 0.5, // Qualité maximale
     });
   
     if (result.canceled) {

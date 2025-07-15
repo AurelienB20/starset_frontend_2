@@ -182,10 +182,10 @@ const acceptConversation = async (conversation_id: string) => {
   return (
     <View style={styles.container}>
       <View style={styles.messagerieContainer}>
-        <Image
-          source={{ uri: 'http://109.176.199.54/images/icon/messagerie.png' }}
-          style={styles.messagerie}
-        />
+         <Image
+                  source={ require('../../assets/images/Messagerie.png') }
+                  style={styles.messagerie}
+                />
       </View>
       <View style={styles.searchContainer}>
       <TextInput
@@ -312,9 +312,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   messagerie: {
-    resizeMode: 'contain',
     height: 80,
-    width: '80%',
+    width: '70%',
   },
   messagerieContainer: {
     width: '100%',
