@@ -170,7 +170,7 @@ const PaymentScreen = () => {
       <TouchableOpacity
         style={[styles.button, isLoading && { backgroundColor: '#666' }]}
         onPress={handlePayment}
-        disabled={isLoading || !ready}
+        disabled={isLoading} // add  || !ready when 
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>

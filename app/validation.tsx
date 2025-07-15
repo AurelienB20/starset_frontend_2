@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 
 
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   topLine: {
     height: 2,
     backgroundColor: '#9B59B6',
-    width: 280,
+    width: 400,
     marginBottom: 5,
   },
   title: {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   bottomLine: {
     height: 2,
     backgroundColor: '#000',
-    width: 280,
+    width: 400,
     marginTop: 5,
   },
   iconContainer: {
@@ -116,9 +116,9 @@ const styles = StyleSheet.create({
   },
   innerCircle: {
     backgroundColor: '#00723F',
-    borderRadius: 95,
-    height: 150,
-    width: 150,
+    borderRadius: 120,
+    height: 250,
+    width: 250,
     justifyContent: 'center',
     alignItems: 'center',
   },

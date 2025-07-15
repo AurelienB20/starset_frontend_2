@@ -56,7 +56,7 @@ const CroissanceScreen = () => {
     <ScrollView contentContainerStyle={styles.container}
     showsVerticalScrollIndicator={false}>
       <View style={styles.croissanceContainer}>
-        <Image style ={styles.tinyLogo}source={require('../../assets/images/starset-icon.png')}/>
+        <Image style ={styles.tinyLogo}source={require('../../assets/images/Croissance.png')}/>
         <Image
           source={{ uri: 'http://109.176.199.54/images/icon/croissance_header.png' }}
           style={styles.croissance}

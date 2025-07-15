@@ -3,7 +3,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
+import { Alert, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+
 import config from '../../config.json';
 
 const dayImages: { [key: number]: any } = {
@@ -54,7 +56,7 @@ const JobsScreen = () => {
   const [selectedPrestationToDelete, setSelectedPrestationToDelete] = useState<any>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
+  const [refreshing, setRefreshing] = useState(false);
 
   const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -98,6 +100,15 @@ const JobsScreen = () => {
     }
   };
   
+const onRefresh = React.useCallback(() => {
+  setRefreshing(true);
+  setTimeout(() => {
+    setRefreshing(false);
+  }, 2000);
+  getAllPrestation();
+  getWorkerPlannedPrestation()
+}, []);
+
   const getAllPrestation = async () => {
     try {
       const account_id = await getAccountId();
@@ -169,8 +180,6 @@ const JobsScreen = () => {
   const getWorkerPlannedPrestation = async () => {
     try {
       const worker_id = await getWorkerId();
-      console.log(worker_id)
-      console.log("worker_id2")
       const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
         method: 'POST',
         headers: {
@@ -265,7 +274,7 @@ const JobsScreen = () => {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => setInProgressModalVisible(true)}>
           <View style={styles.iconCircle}>
@@ -933,3 +942,7 @@ prestationImage: {
 });
 
 export default JobsScreen;
+function setRefreshing(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
