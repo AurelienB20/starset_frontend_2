@@ -1249,7 +1249,7 @@ const styles = StyleSheet.create({
 
   tabContainer: {
     flexDirection: 'row',
-    //justifyContent: 'space-around',
+    justifyContent: 'space-around',
     marginVertical: 20,
     marginLeft : 10
   },

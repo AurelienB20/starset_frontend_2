@@ -57,10 +57,7 @@ const CroissanceScreen = () => {
     showsVerticalScrollIndicator={false}>
       <View style={styles.croissanceContainer}>
         <Image style ={styles.tinyLogo}source={require('../../assets/images/Croissance.png')}/>
-        <Image
-          source={{ uri: 'http://109.176.199.54/images/icon/croissance_header.png' }}
-          style={styles.croissance}
-        />
+        
       </View>
 
       <View style={styles.statsContainer}>
