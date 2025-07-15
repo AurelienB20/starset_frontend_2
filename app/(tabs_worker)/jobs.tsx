@@ -3,9 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-
-import { Alert, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
+import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
 
 const dayImages: { [key: number]: any } = {
@@ -56,7 +54,7 @@ const JobsScreen = () => {
   const [selectedPrestationToDelete, setSelectedPrestationToDelete] = useState<any>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
+
 
   const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -100,15 +98,6 @@ const JobsScreen = () => {
     }
   };
   
-const onRefresh = React.useCallback(() => {
-  setRefreshing(true);
-  setTimeout(() => {
-    setRefreshing(false);
-  }, 2000);
-  getAllPrestation();
-  getWorkerPlannedPrestation()
-}, []);
-
   const getAllPrestation = async () => {
     try {
       const account_id = await getAccountId();
@@ -180,6 +169,8 @@ const onRefresh = React.useCallback(() => {
   const getWorkerPlannedPrestation = async () => {
     try {
       const worker_id = await getWorkerId();
+      console.log(worker_id)
+      console.log("worker_id2")
       const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
         method: 'POST',
         headers: {
@@ -274,7 +265,7 @@ const onRefresh = React.useCallback(() => {
   );
 
   return (
-    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
+    <ScrollView style={styles.container}>
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => setInProgressModalVisible(true)}>
           <View style={styles.iconCircle}>
@@ -298,7 +289,7 @@ const onRefresh = React.useCallback(() => {
         </Text>
       </TouchableOpacity>
 
-      {filteredPrestations.map((prestation: any, index: number) => (
+      {Array.isArray(filteredPrestations) && filteredPrestations.map((prestation: any, index: number) => (
         <TouchableOpacity 
   key={index} 
   style={styles.jobCard}
@@ -328,9 +319,11 @@ const onRefresh = React.useCallback(() => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.jobStats}>({prestation.completedprestation}) Missions effectuées</Text>
+      <Text style={styles.jobStats}>({prestation.completedprestation ?? 0 }) Missions effectuées</Text>
       <Text style={styles.jobStats}>(0) Multimédia</Text>
-      <Text style={styles.jobRequests}>(0) Demandes missions</Text>
+      <Text style={styles.jobRequests}>
+        ({workerPlannedPrestations.filter(p => p.status === 'waiting' && p.prestation_id === prestation.id).length}) Demandes missions
+      </Text>
       <View style={[styles.statusBadge, { backgroundColor: prestation.published ? '#00cc66' : '#cc0000' }]}>
         <Text style={styles.statusText}>{prestation.published ? 'Publié' : 'Not Published'}</Text>
       </View>
@@ -359,38 +352,38 @@ const onRefresh = React.useCallback(() => {
 
             {/* Affichage des infos de la mission */}
             {selectedJob && (
-              <View style={styles.missionInProgressItemContainer}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', width : "100%"  }}>
-                <Image
-                  source={dayImages[new Date(selectedJob.start_date).getUTCDate()]}
-                  style={styles.dayImage}
-                />
-                  <View style={{ marginLeft: 10 }}>
-                    <Text style={styles.missionInProgressText}>{selectedJob.metier}</Text>
-                    <Text style={styles.missionTime}>
-                      {selectedJob.start_time} → {selectedJob.end_time}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.missionPrice}>{selectedJob.remuneration}€</Text>
-              </View>
-            )}
+  <View style={styles.missionInProgressItemContainer}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+      <Image
+        source={dayImages[new Date(selectedJob.start_date).getUTCDate()]}
+        style={styles.dayImage}
+      />
+      <View style={{ marginLeft: 10 }}>
+        <Text style={styles.missionInProgressText}>{selectedJob.metier}</Text>
+        <Text style={styles.missionTime}>
+          {selectedJob.start_time} → {selectedJob.end_time}
+        </Text>
+      </View>
+    </View>
+    <Text style={styles.missionPrice}>{selectedJob.remuneration}€</Text>
 
-            {/* Boutons Accepter & Refuser */}
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'rejected')}
-              >
-                <Text style={styles.modalButtonText}>Refuser</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.acceptButton}
-                onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'inProgress')}
-              >
-                <Text style={styles.modalButtonText}>Accepter</Text>
-              </TouchableOpacity>
-            </View>
+    {/* 👉 Ajout ici des boutons */}
+    <View style={[styles.modalButtons, { marginTop: 20 }]}>
+      <TouchableOpacity
+        style={styles.rejectButton}
+        onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'rejected')}
+      >
+        <Text style={styles.modalButtonText}>Refuser</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.acceptButton}
+        onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'inProgress')}
+      >
+        <Text style={styles.modalButtonText}>Accepter</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+)}
           </View>
         </View>
       </Modal>
@@ -470,64 +463,45 @@ const onRefresh = React.useCallback(() => {
           </Text>
 
           {prestations.map((prestation: any, index: number) => (
-            <View key={index} style={styles.missionItem}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View style={styles.missionItemContainer}>
+            <TouchableOpacity
+              key={index}
+              style={styles.missionItem}
+              onPress={() => {
+                setSelectedJob(prestation);
+                
+              }}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image
-                source={dayImages[new Date(prestation.start_date).getUTCDate()]}
-                style={styles.dayImage}
-              />
-              <View style={{ marginLeft: 10 }}>
-                <Text style={styles.missionInProgressText}>{prestation.metier}</Text>
-                <Text style={styles.missionTime}>
-                  {prestation.start_time} → {prestation.end_time}
-                </Text>
+                  source={dayImages[new Date(prestation.start_date).getUTCDate()]}
+                  style={styles.dayImage}
+                />
+                <View style={{ marginLeft: 10 }}>
+                  <Text style={styles.missionInProgressText}>{prestation.metier}</Text>
+                  <Text style={styles.missionTime}>
+                    {prestation.start_time} → {prestation.end_time}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <Text style={styles.missionPrice}>{prestation.remuneration}€</Text>
-          
-            {/* Boutons Accepter / Refuser */}
+              <Text style={styles.missionPrice}>{prestation.remuneration}€</Text>
+            </TouchableOpacity>
             <View style={[styles.modalButtons, { marginTop: 10 }]}>
-  <TouchableOpacity
-    style={styles.rejectButton}
-    onPress={() =>
-      Alert.alert(
-        "Confirmation",
-        "Voulez-vous vraiment refuser cette mission ?",
-        [
-          { text: "Annuler", style: "cancel" },
-          {
-            text: "Refuser",
-            style: "destructive",
-            onPress: () => handleChangePlannedPrestationStatus(prestation.id, 'rejected'),
-          },
-        ]
-      )
-    }
-  >
-    <Text style={styles.modalButtonText}>Refuser</Text>
-  </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.rejectButton}
+        onPress={() => handleChangePlannedPrestationStatus(prestation.id, 'rejected')}
+      >
+        <Text style={styles.modalButtonText}>Refuser</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.acceptButton}
+        onPress={() => handleChangePlannedPrestationStatus(prestation.id, 'inProgress')}
+      >
+        <Text style={styles.modalButtonText}>Accepter</Text>
+      </TouchableOpacity>
+    </View>
+    </View>
 
-  <TouchableOpacity
-    style={styles.acceptButton}
-    onPress={() =>
-      Alert.alert(
-        "Confirmation",
-        "Voulez-vous vraiment accepter cette mission ?",
-        [
-          { text: "Annuler", style: "cancel" },
-          {
-            text: "Accepter",
-            onPress: () => handleChangePlannedPrestationStatus(prestation.id, 'inProgress'),
-          },
-        ]
-      )
-    }
-  >
-    <Text style={styles.modalButtonText}>Accepter</Text>
-  </TouchableOpacity>
-</View>
-
-          </View>
           ))}
         </View>
       );
@@ -759,6 +733,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: 'center',
+    width : '45%'
   },
 
   acceptButtonText: {
@@ -796,11 +771,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between', // Équilibre entre les éléments
-    marginVertical: 10,
-    padding: 10,
+    marginTop: 10,
+    paddingHorizontal: 10,
     paddingRight : 50,
-    borderBottomWidth: 1,
-    borderColor: '#e0e0e0', // Couleur claire pour la bordure
+   
     position: 'relative',
   },
 
@@ -881,6 +855,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF3B30',
     padding: 12,
     borderRadius: 5,
+    width : '45%',
     
     alignItems: 'center',
     marginHorizontal: 5,
@@ -936,13 +911,16 @@ prestationImage: {
   marginRight: 10,
   
 },
+
+missionItemContainer: {
+   borderBottomWidth: 1,
+    borderColor: '#e0e0e0', // Couleur claire pour la bordure
+    paddingBottom: 10
+  
+},
   
   
   
 });
 
 export default JobsScreen;
-function setRefreshing(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}
-
