@@ -3,7 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
 
 const dayImages: { [key: number]: any } = {
@@ -461,28 +461,64 @@ const JobsScreen = () => {
           </Text>
 
           {prestations.map((prestation: any, index: number) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.missionItem}
-              onPress={() => {
-                setSelectedJob(prestation);
-                setRequestModalVisible(true);
-              }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <View key={index} style={styles.missionItem}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image
-                  source={dayImages[new Date(prestation.start_date).getUTCDate()]}
-                  style={styles.dayImage}
-                />
-                <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.missionInProgressText}>{prestation.metier}</Text>
-                  <Text style={styles.missionTime}>
-                    {prestation.start_time} → {prestation.end_time}
-                  </Text>
-                </View>
+                source={dayImages[new Date(prestation.start_date).getUTCDate()]}
+                style={styles.dayImage}
+              />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={styles.missionInProgressText}>{prestation.metier}</Text>
+                <Text style={styles.missionTime}>
+                  {prestation.start_time} → {prestation.end_time}
+                </Text>
               </View>
-              <Text style={styles.missionPrice}>{prestation.remuneration}€</Text>
-            </TouchableOpacity>
+            </View>
+            <Text style={styles.missionPrice}>{prestation.remuneration}€</Text>
+          
+            {/* Boutons Accepter / Refuser */}
+            <View style={[styles.modalButtons, { marginTop: 10 }]}>
+  <TouchableOpacity
+    style={styles.rejectButton}
+    onPress={() =>
+      Alert.alert(
+        "Confirmation",
+        "Voulez-vous vraiment refuser cette mission ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Refuser",
+            style: "destructive",
+            onPress: () => handleChangePlannedPrestationStatus(prestation.id, 'rejected'),
+          },
+        ]
+      )
+    }
+  >
+    <Text style={styles.modalButtonText}>Refuser</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.acceptButton}
+    onPress={() =>
+      Alert.alert(
+        "Confirmation",
+        "Voulez-vous vraiment accepter cette mission ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Accepter",
+            onPress: () => handleChangePlannedPrestationStatus(prestation.id, 'inProgress'),
+          },
+        ]
+      )
+    }
+  >
+    <Text style={styles.modalButtonText}>Accepter</Text>
+  </TouchableOpacity>
+</View>
+
+          </View>
           ))}
         </View>
       );

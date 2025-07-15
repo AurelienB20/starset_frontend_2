@@ -37,6 +37,11 @@ const JobViewScreen = () => {
   
       const data = await response.json();
       console.log(data);
+
+      if (data?.newPrestation) {
+        // ⬇️ Ajout de la nouvelle prestation dans le contexte global
+        setAllWorkerPrestation((prev: any[]) => [...prev, data.newPrestation]);
+      }
   
       navigation.navigate({
         name: '(tabs_worker)',
