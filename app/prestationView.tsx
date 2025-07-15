@@ -1299,10 +1299,13 @@ const styles = StyleSheet.create({
     margin : 10
   },
   experienceTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#000',
+  flexShrink: 1,
+  flex: 1, // pour occuper l'espace restant
+  marginRight: 8, // petit espace avant la date
+},
   experienceDate: {
     fontSize: 14,
     color: '#666',

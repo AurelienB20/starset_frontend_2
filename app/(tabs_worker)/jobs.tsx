@@ -3,7 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
 
 const dayImages: { [key: number]: any } = {
@@ -368,20 +368,40 @@ const JobsScreen = () => {
     <Text style={styles.missionPrice}>{selectedJob.remuneration}€</Text>
 
     {/* 👉 Ajout ici des boutons */}
-    <View style={[styles.modalButtons, { marginTop: 20 }]}>
-      <TouchableOpacity
-        style={styles.rejectButton}
-        onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'rejected')}
-      >
-        <Text style={styles.modalButtonText}>Refuser</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.acceptButton}
-        onPress={() => handleChangePlannedPrestationStatus(selectedJob.id, 'inProgress')}
-      >
-        <Text style={styles.modalButtonText}>Accepter</Text>
-      </TouchableOpacity>
-    </View>
+<View style={[styles.modalButtons, { marginTop: 20 }]}>
+  <TouchableOpacity
+    style={styles.rejectButton}
+    onPress={() => {
+      Alert.alert(
+        "Confirmation",
+        "Es-tu sûr de vouloir refuser cette mission ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          { text: "Refuser", style: "destructive", onPress: () => handleChangePlannedPrestationStatus(selectedJob.id, 'rejected') }
+        ]
+      );
+    }}
+  >
+    <Text style={styles.modalButtonText}>Refuser</Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    style={styles.acceptButton}
+    onPress={() => {
+      Alert.alert(
+        "Confirmation",
+        "Veux-tu accepter cette mission ?",
+        [
+          { text: "Annuler", style: "cancel" },
+          { text: "Accepter", onPress: () => handleChangePlannedPrestationStatus(selectedJob.id, 'inProgress') }
+        ]
+      );
+    }}
+  >
+    <Text style={styles.modalButtonText}>Accepter</Text>
+  </TouchableOpacity>
+</View>
+
   </View>
 )}
           </View>
