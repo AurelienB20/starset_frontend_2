@@ -333,7 +333,7 @@ const ChatScreen = () => {
                   resizeMode="cover"
                 />
               ) : null}
-              <Text>message.picture_url</Text>
+              
             </View>
           </View>
         ))}
