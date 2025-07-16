@@ -1,20 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Linking,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import config from '../config.json';
 
 const ReceivePayoutScreen = () => {
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [payoutsEnabled, setPayoutsEnabled] = useState(false);
+  const [onboardingUrl, setOnboardingUrl] = useState<string | null>(null);
 
   const getAccountId = async () => {
     try {
@@ -30,19 +31,19 @@ const ReceivePayoutScreen = () => {
     try {
       const accountId = await getAccountId();
       if (!accountId) throw new Error('Utilisateur non identifié');
-  
-      const response = await fetch(`${config.backendUrl}/api/stripe/account-status`, {
+
+      const response = await fetch(`${config.backendUrl}/api/stripe/get-stripe-account-status`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ account_id: accountId }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok || !data.success) {
         throw new Error('Impossible de récupérer le statut Stripe');
       }
-  
+
       setPayoutsEnabled(data.payouts_enabled);
     } catch (err) {
       console.error('Erreur statut Stripe :', err);
@@ -69,7 +70,8 @@ const ReceivePayoutScreen = () => {
         throw new Error('Lien onboarding invalide');
       }
 
-      Linking.openURL(data.url);
+      // Afficher la WebView
+      setOnboardingUrl(data.url);
     } catch (error) {
       console.error('Erreur onboarding :', error);
       Alert.alert('Erreur', 'Impossible de lancer le processus Stripe.');
@@ -79,8 +81,30 @@ const ReceivePayoutScreen = () => {
   };
 
   useEffect(() => {
-    checkStripeStatus();
+    // Supposons que l'utilisateur n'a pas encore de compte Stripe
+    setCheckingStatus(false);
+    setPayoutsEnabled(false); // on suppose qu’il n’a rien activé
+    // checkStripeStatus(); // on désactive l’appel
   }, []);
+
+  // 👉 Affiche WebView si onboarding en cours
+  if (onboardingUrl) {
+    return (
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={{ padding: 10, backgroundColor: 'red' }}
+          onPress={() => setOnboardingUrl(null)}
+        >
+          <Text style={{ color: '#fff', textAlign: 'center' }}>Fermer</Text>
+        </TouchableOpacity>
+        <WebView
+          source={{ uri: onboardingUrl }}
+          startInLoadingState
+          javaScriptEnabled
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

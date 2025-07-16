@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "frontend_starset_2",
+    "name": "starset",
     "slug": "frontend_starset_2",
     "owner": "starset77",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/starset-icon.png",
-    "scheme": "frontendstarset2",
+    "scheme": "starset",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.starset.frontend",
-      "ios.buildNumber" : "0.2",
+      "ios.buildNumber": "0.2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Cette application utilise la caméra pour permettre à l'utilisateur de scanner des codes ou prendre des photos."
@@ -42,7 +42,8 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-tracking-transparency"
     ],
     "experiments": {
       "typedRoutes": true

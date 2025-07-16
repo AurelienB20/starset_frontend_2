@@ -6,6 +6,7 @@ import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, T
 import config from '../config.json';
 import socket from './socket';
 
+
 const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<any>([]);
@@ -13,6 +14,8 @@ const ChatScreen = () => {
   const route = useRoute() as any;
   const { conversation_id, sender_id, sender_type , contact_profile_picture_url, contact_firstname} = route.params || {};
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[] | null>([]);
+  const [isSending, setIsSending] = useState(false);
 
   const getAllMessages = async () => {
     try {
@@ -47,6 +50,28 @@ const ChatScreen = () => {
     }).format(now);
   };
 
+  const handleSelectImages = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission refusée", "Autorisez l'accès à la galerie.");
+      return;
+    }
+  
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+      base64: true,
+      allowsMultipleSelection: true, // ⚠️ uniquement sur certains appareils
+      selectionLimit: 0, // 0 = illimité (iOS)
+    });
+  
+    if (!result.canceled) {
+      const newImages = result.assets.map((img) => `data:image/jpeg;base64,${img.base64}`);
+      setSelectedImages((prev) => [...(prev || []), ...newImages]);
+    }
+  };
+  
+
   const handleSelectImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
@@ -67,92 +92,191 @@ const ChatScreen = () => {
   };
 
   const handleSendImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission refusée", "Autorisez l'accès à la galerie.");
-      return;
+    if (!selectedImage) return;
+  
+    const message_time = getLocalTime();
+  
+    const file = {
+      filename: `image-${Date.now()}.jpg`,
+      mimetype: 'image/jpeg',
+      data: selectedImage, // Contient déjà le préfixe data:image/jpeg;base64,...
+    };
+  
+    const payload = {
+      conversation_id,
+      sender_id,
+      sender_type,
+      file,
+    };
+  
+    try {
+      const response = await fetch(`${config.backendUrl}/api/conversation/send-image-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+  
+      if (!response.ok) throw new Error('Erreur réseau');
+  
+      const data = await response.json();
+  
+      // Émettre via Socket
+      socket.emit('newMessage', {
+        ...data.message,
+        conversation_id,
+      });
+  
+      // Ajouter à l'affichage localement
+      setMessages((prev : any) => [...prev, data.message]);
+      setSelectedImage(null); // Nettoyer l'image sélectionnée
+  
+    } catch (error) {
+      console.error('Erreur envoi image :', error);
+      Alert.alert('Erreur', 'Impossible d\'envoyer l\'image');
+    }
+  };
+
+  const handleSendMessageMultipleImage = async () => {
+    const trimmedMessage = newMessage.trim();
+  
+    if (!trimmedMessage && (!selectedImages || selectedImages.length === 0)) {
+      return; // Rien à envoyer
     }
   
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-      base64: true,
-    });
+    const message_time = getLocalTime();
   
-    if (!result.canceled) {
-      const image = result.assets[0];
-      const message_time = getLocalTime();
+    const newMessageObject = {
+      conversation_id,
+      sender_id,
+      sender_type,
+      message_text: trimmedMessage,
+      timestamp: message_time,
+    };
   
-      const imageMessage = {
-        id: '',
-        conversation_id,
-        sender_id,
-        sender_type,
-        message_text: '', // vide pour image
-        image_base64: image.base64,
-        timestamp: message_time,
-        type: 'image', // pour différencier
+    // ✅ Envoi avec plusieurs images
+    if (selectedImages && selectedImages.length > 0) {
+      const files = selectedImages.map((img: any, index: any) => ({
+        filename: `image-${Date.now()}-${index}.jpg`,
+        mimetype: 'image/jpeg',
+        data: img,
+      }));
+  
+      const payload = {
+        ...newMessageObject,
+        files, // 👈 liste d'images ici
       };
   
       try {
-        const response = await fetch(`${config.backendUrl}/api/conversation/send-image-message`, {
+        const response = await fetch(`${config.backendUrl}/api/conversation/send-multiple-images-message`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(imageMessage),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) throw new Error('Erreur réseau');
+        const data = await response.json();
+  
+        socket.emit('newMessage', { ...data.message, conversation_id });
+        setMessages((prev: any) => [...prev, data.message]);
+      } catch (error) {
+        console.error('Erreur envoi images/message :', error);
+        Alert.alert('Erreur', "Impossible d'envoyer le message.");
+      }
+  
+    } else {
+      // ✅ Envoi texte seul
+      try {
+        const response = await fetch(`${config.backendUrl}/api/conversation/send-message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ newMessageObject }),
         });
   
         if (!response.ok) throw new Error('Erreur réseau');
   
         const data = await response.json();
-        socket.emit('newMessage', { ...imageMessage, conversation_id });
-  
+        socket.emit('newMessage', { ...data.message, conversation_id });
+        setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
-        console.error('Erreur envoi image :', error);
-        Alert.alert('Erreur', 'Impossible d\'envoyer l\'image');
+        console.error('Erreur envoi message texte :', error);
       }
     }
+  
+    // Nettoyage
+    setNewMessage('');
+    setSelectedImages([]);
   };
   
 
   const handleSendMessage = async () => {
-    if (newMessage.trim()) {
-      const message_time = getLocalTime();
-      const newMessageObject = {
-        id: '',
-        conversation_id: conversation_id,
-        sender_id: sender_id,
-        sender_type: sender_type,
-        message_text: newMessage,
-        timestamp: message_time,
+    const trimmedMessage = newMessage.trim();
+    if (!trimmedMessage && !selectedImage) {
+      return; // Rien à envoyer
+    }
+  
+    const message_time = getLocalTime();
+  
+    // Construction du message de base
+    const newMessageObject = {
+      conversation_id,
+      sender_id,
+      sender_type,
+      message_text: trimmedMessage,
+      timestamp: message_time,
+    };
+  
+    // Si une image est présente, on l’ajoute au payload
+    if (selectedImage) {
+      const payload = {
+        ...newMessageObject,
+        file: {
+          filename: `image-${Date.now()}.jpg`,
+          mimetype: 'image/jpeg',
+          data: selectedImage,
+        },
       };
-      //setMessages((prevMessages: any) => [...prevMessages, newMessageObject]);
-      setNewMessage('');
-
+  
+      try {
+        const response = await fetch(`${config.backendUrl}/api/conversation/send-image-message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) throw new Error('Erreur réseau');
+        const data = await response.json();
+  
+        socket.emit('newMessage', { ...data.message, conversation_id });
+        setMessages((prev: any) => [...prev, data.message]);
+      } catch (error) {
+        console.error('Erreur envoi image/message :', error);
+        Alert.alert('Erreur', "Impossible d'envoyer le message.");
+      }
+  
+    } else {
+      // Envoi texte simple
       try {
         const response = await fetch(`${config.backendUrl}/api/conversation/send-message`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ newMessageObject }),
         });
-
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-
+  
+        if (!response.ok) throw new Error('Erreur réseau');
+  
         const data = await response.json();
-        console.log('data : ', data);
-        socket.emit('newMessage', {
-          ...newMessageObject,
-          conversation_id,
-        });
+        socket.emit('newMessage', { ...data.message, conversation_id });
+        setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
-        console.error('An error occurred while fetching messages:', error);
+        console.error('Erreur envoi message texte :', error);
       }
     }
+  
+    // Nettoyage à la fin
+    setNewMessage('');
+    setSelectedImage(null);
   };
 
   useEffect(() => {
@@ -202,6 +326,14 @@ const ChatScreen = () => {
           >
             <View style={message.sender_id === sender_id ? styles.myTextWrapper : styles.otherTextWrapper}>
               <Text style={styles.messageText}>{message.message_text}</Text>
+              {message.picture_url ? (
+                <Image
+                  source={{ uri: message.picture_url }}
+                  style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
+                  resizeMode="cover"
+                />
+              ) : null}
+              <Text>message.picture_url</Text>
             </View>
           </View>
         ))}

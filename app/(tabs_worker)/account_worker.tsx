@@ -31,6 +31,10 @@ const AccountWorkerScreen = () => {
     navigation.navigate('language' as never);
   }
 
+  const goToReceivePayout = async () => {
+    navigation.navigate('receivePayout' as never);
+  }
+
   const goToProfilePicture = async () => {
     navigation.navigate('modifyAccount' as never);
   };
@@ -114,7 +118,7 @@ const AccountWorkerScreen = () => {
         </View>
       </View>
 
-      <View style={styles.balanceContainer}>
+      <TouchableOpacity style={styles.balanceContainer} onPress={goToReceivePayout}>
         <Text style={styles.balanceLabel}>Tirelire</Text>
         <View style={styles.balanceCard}>
           <Text style={styles.balanceAmount}>0,00 €</Text>
@@ -123,7 +127,7 @@ const AccountWorkerScreen = () => {
             style={styles.tirelire} 
           />
         </View>
-      </View>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuItem}>
   <MaterialIcons name="help-outline" size={24} color="#000" style={styles.menuIcon} />
