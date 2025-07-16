@@ -1,9 +1,13 @@
 import { useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
+
+
+
 
 const ProfilePhotoScreen = () => {
   const { user } = useUser();
@@ -11,6 +15,8 @@ const ProfilePhotoScreen = () => {
   const [localPhotoUri, setLocalPhotoUri] = useState<string | null>(null); // pour stocker la nouvelle photo à valider
   const [uploading, setUploading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const MAX_IMAGE_SIZE_MB = 5;
+  const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
   const getAccountId = async () => {
     try {
@@ -23,26 +29,58 @@ const ProfilePhotoScreen = () => {
 
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
+  
     if (!permissionResult.granted) {
       Alert.alert('Permission refusée', "Vous devez autoriser l'accès à la galerie pour continuer.");
       return;
     }
-
+  
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.40,
+      base64: false,
+      quality: 1, // on commence avec la meilleure qualité
     });
-
+  
     if (result.canceled) {
       Alert.alert('Erreur', 'Aucune photo sélectionnée');
       return;
     }
-
-    const photoUri = result.assets[0].uri;
+  
+    let photoUri = result.assets[0].uri;
+    let compressQuality = 0.8; // commence à 80%
+    const minQuality = 0.2;
+  
+    // Compression en boucle si > 5 Mo
+    while (true) {
+      const info = await fetch(photoUri);
+      const blob = await info.blob();
+  
+      if (blob.size <= MAX_IMAGE_SIZE_BYTES) {
+        break; // OK, on sort de la boucle
+      }
+  
+      if (compressQuality < minQuality) {
+        Alert.alert("Image trop lourde", "Impossible de compresser l'image sous 5 Mo.");
+        return;
+      }
+  
+      const compressed = await ImageManipulator.manipulateAsync(
+        photoUri,
+        [{ resize: { width: 1000 } }],
+        {
+          compress: compressQuality,
+          format: ImageManipulator.SaveFormat.JPEG,
+        }
+      );
+  
+      photoUri = compressed.uri;
+      compressQuality -= 0.1; // réduit la qualité à chaque tour
+    }
+  
     setLocalPhotoUri(photoUri);
     setPhoto({ uri: photoUri });
   };
+  
 
   const uploadImage = async () => {
     if (!localPhotoUri) return;
