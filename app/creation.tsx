@@ -1,24 +1,52 @@
-import { Ionicons } from '@expo/vector-icons'; // 👈 Import de l’icône
+import { Ionicons } from '@expo/vector-icons';
+import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import * as FileSystem from 'expo-file-system';
+import React, { useEffect, useState } from 'react';
 import {
+  Modal,
+  Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import config from '../config.json';
 
 const CreationScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); //
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [pdfUri, setPdfUri] = useState<string | null>(null);
+
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const loadPdf = async () => {
+      const fileUri = FileSystem.documentDirectory + 'politique_de_confidentialite.pdf';
+      const fileInfo = await FileSystem.getInfoAsync(fileUri);
+      if (!fileInfo.exists) {
+        await FileSystem.downloadAsync(
+          'https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf',
+          fileUri
+        );
+      }
+      const base64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      setPdfUri(`data:application/pdf;base64,${base64}`);
+    };
+    loadPdf();
+  }, []);
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -38,46 +66,35 @@ const CreationScreen = () => {
       setErrorMessage('Les mots de passe ne correspondent pas.');
       return;
     }
+    if (!acceptedPrivacy) {
+      setErrorMessage('Vous devez accepter la politique de confidentialité.');
+      return;
+    }
 
-    try 
-    {
+    try {
       const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code-if-exists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          
-          email : email,
-        }),
+        body: JSON.stringify({ email }),
       });
       if (!response.ok) throw new Error('Erreur réseau.');
       const data = await response.json();
-      if(data.success == true)
-      {
+      if (data.success === true) {
         setErrorMessage('e-mail existe déjà');
+      } else {
+        navigation.navigate({
+          name: 'mailVerificationCode',
+          params: { email, password },
+        } as never);
       }
-      else
-      {
-        navigation.navigate(
-                            {
-                            name: 'mailVerificationCode',
-                            params: { email: email, password: password },
-                            } as never
-                          );
-      }
-    } 
-    catch (error) 
-    {
+    } catch (error) {
       setErrorMessage('Erreur lors de l’envoi de l’e-mail. Veuillez réessayer.');
       console.error(error);
-    } 
-    finally
-    {
-    } 
-    
+    }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.enter}>Création par Email !</Text>
       <Text style={styles.subtitle}>
         Laissez-nous identifier votre profil, Star Set n'attend plus que vous !
@@ -94,7 +111,7 @@ const CreationScreen = () => {
       />
       {!isEmailValid && <Text style={styles.errorText}>Email invalide</Text>}
 
-      {/* Mot de passe avec œil */}
+      {/* Mot de passe */}
       <View style={styles.passwordWrapper}>
         <TextInput
           style={styles.passwordInput}
@@ -104,19 +121,12 @@ const CreationScreen = () => {
           secureTextEntry={!showPassword}
           value={password}
         />
-        <TouchableOpacity
-          onPress={() => setShowPassword(!showPassword)}
-          style={styles.eyeIcon}
-        >
-          <Ionicons
-            name={showPassword ? 'eye-off' : 'eye'}
-            size={22}
-            color="#333"
-          />
+        <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+          <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
 
-      {/* Confirmation mot de passe avec œil */}
+      {/* Confirmation mot de passe */}
       <View style={styles.passwordWrapper}>
         <TextInput
           style={styles.passwordInput}
@@ -126,16 +136,23 @@ const CreationScreen = () => {
           secureTextEntry={!showConfirmPassword}
           value={confirmPassword}
         />
-        <TouchableOpacity
-          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-          style={styles.eyeIcon}
-        >
-          <Ionicons
-            name={showConfirmPassword ? 'eye-off' : 'eye'}
-            size={22}
-            color="#333"
-          />
+        <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeIcon}>
+          <Ionicons name={showConfirmPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
+      </View>
+
+      {/* Case à cocher + lien */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
+        <CheckBox
+          value={acceptedPrivacy}
+          onValueChange={setAcceptedPrivacy}
+          tintColors={{ true: '#4CAF50', false: 'black' }}
+        />
+        <Pressable onPress={() => setModalVisible(true)}>
+          <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
+            J’ai lu et j’accepte la politique de confidentialité
+          </Text>
+        </Pressable>
       </View>
 
       {errorMessage !== '' && <Text style={styles.errorText}>{errorMessage}</Text>}
@@ -143,11 +160,29 @@ const CreationScreen = () => {
       <TouchableOpacity
         onPress={handleSubmit}
         style={styles.submitbutton}
-        disabled={!isEmailValid}
+        disabled={!isEmailValid || !acceptedPrivacy}
       >
         <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>Suivant</Text>
       </TouchableOpacity>
-    </View>
+
+      {/* Modal WebView PDF */}
+      <Modal visible={modalVisible} animationType="slide">
+        <View style={{ flex: 1 }}>
+          <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+          {pdfUri && (
+            <WebView
+              source={{ uri: pdfUri }}
+              style={{ flex: 1 }}
+              originWhitelist={['*']}
+            />
+          )}
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
 
