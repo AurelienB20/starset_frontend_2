@@ -4,164 +4,156 @@ import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-
-const API_URL = 'https://api.starsetfrance.com'; // change si besoin
-
+const API_URL = 'https://api.starsetfrance.com';
 
 const PaymentMethodScreen = () => {
- const { confirmSetupIntent } = useStripe();
- const [cards, setCards] = useState([]);
- const [modalVisible, setModalVisible] = useState(false);
- const [cardDetails, setCardDetails] = useState<any>(null);
- const [customerId, setCustomerId] = useState<string | null>(null);
+  const { confirmSetupIntent } = useStripe();
+  const [cards, setCards] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [cardDetails, setCardDetails] = useState<any>(null);
+  const [customerId, setCustomerId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const loadCustomerAndCards = async () => {
+      try {
+        const user_id = await AsyncStorage.getItem('account_id');
+        if (!user_id) return;
 
- useEffect(() => {
-   const loadCustomerAndCards = async () => {
-     try {
-       const id = await AsyncStorage.getItem('stripe_customer_id');
-       if (!id) return;
+        // Appel backend pour récupérer ou créer le customer Stripe
+        const customerRes = await fetch(`${API_URL}/api/stripe/create-customer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id }),
+        });
 
+        const customerData = await customerRes.json();
+        if (!customerData.success) {
+          console.log("❌ Impossible de récupérer stripe_customer_id");
+          return;
+        }
 
-       setCustomerId(id);
+        const id = customerData.stripe_customer_id;
+        setCustomerId(id);
 
+        // Ensuite, récupérer les cartes liées à ce customer
+        const response = await fetch(`${API_URL}/api/stripe/get-cards`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stripe_customer_id: id }),
+        });
 
-       const response = await fetch(`${API_URL}/api/stripe/get-cards`, {
-         method: 'POST',
-         headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({ customer_id: id }),
-       });
+        const data = await response.json();
+        if (data.success) {
+          setCards(data.cards.map((card: any) => ({
+            id: card.id,
+            name: card.card.brand,
+            lastFour: card.card.last4,
+            status: card.card.exp_month && card.card.exp_year ? 'Valide' : 'Expiré'
+          })));
+        }
+      } catch (error) {
+        console.log("Erreur chargement customer/cartes:", error);
+      }
+    };
 
+    loadCustomerAndCards();
+  }, []);
 
-       const data = await response.json();
-       if (data.success) {
-         setCards(data.cards.map((card: { id: any; card: { brand: any; last4: any; exp_month: any; exp_year: any; }; }) => ({
-           id: card.id,
-           name: card.card.brand,
-           lastFour: card.card.last4,
-           status: card.card.exp_month && card.card.exp_year ? 'Valide' : 'Expiré'
-         })));
-       }
-     } catch (error) {
-       console.log("Erreur chargement cartes:", error);
-     }
-   };
+  const handleAddCard = async () => {
+    if (!cardDetails || !cardDetails.complete || !customerId) {
+      Alert.alert("Erreur", "Veuillez entrer une carte valide.");
+      return;
+    }
 
+    try {
+      const intentRes = await fetch(`${API_URL}/api/stripe/create-setup-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      });
 
-   loadCustomerAndCards();
- }, []);
+      const intentData = await intentRes.json();
+      if (!intentData.success) throw new Error('SetupIntent échoué');
 
+      const { setupIntent, error } = await confirmSetupIntent(intentData.clientSecret, {
+        paymentMethodType: 'Card',
+      });
 
- const handleAddCard = async () => {
-   if (!cardDetails || !cardDetails.complete || !customerId) {
-     Alert.alert("Erreur", "Veuillez entrer une carte valide.");
-     return;
-   }
+      if (error) {
+        Alert.alert("Erreur", error.message || "Erreur ajout carte");
+        return;
+      }
 
+      const updatedCards = await fetch(`${API_URL}/api/stripe/get-cards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      });
 
-   try {
-     const intentRes = await fetch(`${API_URL}/api/stripe/create-setup-intent`, {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ customer_id: customerId }),
-     });
+      const updatedData = await updatedCards.json();
+      if (updatedData.success) {
+        setCards(updatedData.cards.map((card: any) => ({
+          id: card.id,
+          name: card.card.brand,
+          lastFour: card.card.last4,
+          status: 'Valide',
+        })));
+      }
 
+      setModalVisible(false);
+      setCardDetails(null);
+    } catch (error) {
+      console.log("Erreur ajout carte:", error);
+      Alert.alert("Erreur", "Impossible d'ajouter la carte.");
+    }
+  };
 
-     const intentData = await intentRes.json();
+  const renderCard = ({ item }: any) => (
+    <View style={styles.cardContainer}>
+      <Icon name="card" size={30} color="#000" />
+      <View style={styles.cardTextContainer}>
+        <Text style={styles.cardName}>{item.name}</Text>
+        <Text style={item.status === 'Valide' ? styles.cardStatusValid : styles.cardStatusExpired}>{item.status}</Text>
+        <Text style={styles.cardNumber}>**** {item.lastFour}</Text>
+      </View>
+    </View>
+  );
 
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Mes cartes</Text>
 
-     if (!intentData.success) throw new Error('SetupIntent échoué');
+      <FlatList
+        data={cards}
+        renderItem={renderCard}
+        keyExtractor={(item: any) => item.id}
+      />
 
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.addButtonText}>+ Ajouter une carte</Text>
+      </TouchableOpacity>
 
-     const { setupIntent, error } = await confirmSetupIntent(intentData.clientSecret, {
-       paymentMethodType: 'Card',
-     });
-
-
-     if (error) {
-       Alert.alert("Erreur", error.message || "Erreur ajout carte");
-       return;
-     }
-
-
-     // Recharger les cartes
-     const updatedCards = await fetch(`${API_URL}/api/stripe/get-cards`, {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ customer_id: customerId }),
-     });
-     const updatedData = await updatedCards.json();
-     if (updatedData.success) {
-       setCards(updatedData.cards.map((card: { id: any; card: { brand: any; last4: any; }; })  => ({
-         id: card.id,
-         name: card.card.brand,
-         lastFour: card.card.last4,
-         status: 'Valide'
-       })));
-     }
-
-
-     setModalVisible(false);
-     setCardDetails(null);
-   } catch (error) {
-     console.log("Erreur ajout carte:", error);
-     Alert.alert("Erreur", "Impossible d'ajouter la carte.");
-   }
- };
-
-
- const renderCard = ({ item }: any) => (
-   <View style={styles.cardContainer}>
-     <Icon name="card" size={30} color="#000" />
-     <View style={styles.cardTextContainer}>
-       <Text style={styles.cardName}>{item.name}</Text>
-       <Text style={item.status === 'Valide' ? styles.cardStatusValid : styles.cardStatusExpired}>{item.status}</Text>
-       <Text style={styles.cardNumber}>**** {item.lastFour}</Text>
-     </View>
-   </View>
- );
-
-
- return (
-   <View style={styles.container}>
-     <Text style={styles.title}>Mes cartes</Text>
-
-
-     <FlatList
-       data={cards}
-       renderItem={renderCard}
-       keyExtractor={(item : any) => item.id}
-     />
-
-
-     <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-       <Text style={styles.addButtonText}>+ Ajouter une carte</Text>
-     </TouchableOpacity>
-
-
-     <Modal visible={modalVisible} animationType="slide" transparent>
-       <View style={styles.modalContainer}>
-         <View style={styles.modalContent}>
-           <Text style={styles.modalTitle}>Ajouter une carte</Text>
-           <CardField
-             postalCodeEnabled={false}
-             onCardChange={setCardDetails}
-             style={styles.cardField}
-           />
-           <TouchableOpacity style={styles.saveButton} onPress={handleAddCard}>
-             <Text style={styles.saveButtonText}>Ajouter</Text>
-           </TouchableOpacity>
-           <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-             <Text style={styles.cancelButtonText}>Annuler</Text>
-           </TouchableOpacity>
-         </View>
-       </View>
-     </Modal>
-   </View>
- );
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Ajouter une carte</Text>
+            <CardField
+              postalCodeEnabled={false}
+              onCardChange={setCardDetails}
+              style={styles.cardField}
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={handleAddCard}>
+              <Text style={styles.saveButtonText}>Ajouter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.cancelButtonText}>Annuler</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
 };
-
-
 
 
 const styles = StyleSheet.create({
