@@ -14,9 +14,14 @@ const PaymentScreen = () => {
   const { cart = [], instruction = '', totalRemuneration = 0 } = route.params || {};
 
   const [isLoading, setIsLoading] = useState(false);
+  const [savedCards, setSavedCards] = useState<any[]>([]);
+const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
+const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
+
 
   useEffect(() => {
     initialisePaymentSheet();
+    fetchSavedCards();
   }, []);
 
   const getAccountId = async () => {
@@ -48,6 +53,20 @@ const PaymentScreen = () => {
       }
     };
 
+    const fetchSavedCards = async () => {
+      const user_id = await getAccountId();
+      const res = await fetch(`${config.backendUrl}/api/stripe/get-customer-payment-methods-with-account-id`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account_id: user_id }),
+      });
+    
+      const data = await res.json();
+      if (data.success) {
+        setSavedCards(data.cards);
+      }
+    };
+
     const fetchPaymentSheetParams = async () =>{
       const user_id = await getAccountId();
       const response = await fetch(`${config.backendUrl}/api/stripe/create-payment-sheet`, {
@@ -68,73 +87,96 @@ const PaymentScreen = () => {
       }
     };
 
-  const handlePayment = async () => {
-    if (cart.length === 0) {
-      Alert.alert('Panier vide', 'Votre panier est vide.');
-      return;
-    }
-
-    setIsLoading(true);
-    //disable Payment sheet because it's not working for now :(
-   const {error} = await presentPaymentSheet();
-   if (error){
-    Alert.alert(`Error code: ${error.code}`, error.message);
-   }
-    try {
-      const user_id = await getAccountId();
-
-      // Envoyer une requête pour chaque prestation dans le panier
-      for (const item of cart) {
-        const {
-          prestation,
-          startDate,
-          endDate,
-          arrivalTime,
-          departureTime,
-          totalRemuneration: itemRemuneration,
-          type_of_remuneration,
-          customPrestationId,
-          instruction,
-          profilePictureUrl
-        } = item;
-
-        const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            worker_id: prestation.worker_id,
-            user_id,
-            prestation_id: prestation.id,
-            start_date: startDate,
-            end_date: endDate,
-            type_of_remuneration: type_of_remuneration,
-            remuneration: itemRemuneration,
-            start_time: arrivalTime,
-            end_time: departureTime,
-            instruction, // Optionnel, tu peux l'ajouter si applicable globalement,
-            custom_prestation_id :  customPrestationId,
-            profile_picture_url : profilePictureUrl
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!data.success) {
-          throw new Error(`Erreur lors de la création de la prestation ${prestation.metier}`);
-        }
+    const handlePayment = async () => {
+      if (cart.length === 0) {
+        Alert.alert('Panier vide', 'Votre panier est vide.');
+        return;
       }
-
-      setIsLoading(false);
-      setReady(false);
-      Alert.alert('Succès', 'Le paiement et les prestations ont bien été enregistrés.');
-      navigation.navigate('validation' as never);
-    } catch (error) {
-      setIsLoading(false);
-      setReady(false);
-      console.error('Erreur paiement :', error);
-      Alert.alert('Erreur', 'Impossible de valider le paiement. Vérifiez votre connexion.');
-    }
-  };
+    
+      setIsLoading(true);
+    
+      try {
+        const user_id = await getAccountId();
+    
+        // Paiement avec carte enregistrée
+        if (selectedPaymentMethodId) {
+          const res = await fetch(`${config.backendUrl}/api/stripe/charge-payment-method`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              account_id: user_id,
+              payment_method_id: selectedPaymentMethodId,
+              amount: totalRemuneration * 100,
+            }),
+          });
+    
+          const chargeData = await res.json();
+          if (!chargeData.success) {
+            throw new Error('Échec du paiement avec la carte sélectionnée');
+          }
+        } else {
+          // Paiement via Stripe Payment Sheet (nouvelle carte)
+          const { error } = await presentPaymentSheet();
+          if (error) {
+            Alert.alert('Erreur', error.message);
+            setIsLoading(false);
+            return;
+          }
+        }
+    
+        // Créer les prestations après paiement réussi
+        for (const item of cart) {
+          const {
+            prestation,
+            startDate,
+            endDate,
+            arrivalTime,
+            departureTime,
+            totalRemuneration: itemRemuneration,
+            type_of_remuneration,
+            customPrestationId,
+            instruction,
+            profilePictureUrl,
+          } = item;
+    
+          const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              worker_id: prestation.worker_id,
+              user_id,
+              prestation_id: prestation.id,
+              start_date: startDate,
+              end_date: endDate,
+              type_of_remuneration,
+              remuneration: itemRemuneration,
+              start_time: arrivalTime,
+              end_time: departureTime,
+              instruction,
+              custom_prestation_id: customPrestationId,
+              profile_picture_url: profilePictureUrl,
+            }),
+          });
+    
+          const data = await response.json();
+          if (!data.success) {
+            throw new Error(`Erreur lors de la création de la prestation ${prestation.metier}`);
+          }
+        }
+    
+        setIsLoading(false);
+        setReady(false);
+        Alert.alert('Succès', 'Le paiement et les prestations ont bien été enregistrés.');
+        navigation.navigate('validation' as never);
+    
+      } catch (error) {
+        console.error('Erreur paiement :', error);
+        Alert.alert('Erreur', 'Impossible de valider le paiement. Vérifiez votre connexion.');
+        setIsLoading(false);
+        setReady(false);
+      }
+    };
+    
 
   // Affichage résumé des prestations dans le panier
   return (
@@ -164,6 +206,42 @@ const PaymentScreen = () => {
 
       <View style={styles.separator} />
       <Text style={styles.totalText}>Total global : {parseFloat(totalRemuneration).toFixed(2)} €</Text>
+
+      <View style={{ width: '100%', marginBottom: 20 }}>
+  <Text style={styles.headerText}>Choisir une carte enregistrée</Text>
+  {savedCards.length === 0 && <Text>Aucune carte enregistrée.</Text>}
+  {savedCards.map((card) => (
+    <TouchableOpacity
+      key={card.id}
+      style={{
+        padding: 10,
+        borderWidth: 1,
+        borderColor: selectedPaymentMethodId === card.id ? 'green' : '#ccc',
+        borderRadius: 8,
+        marginBottom: 10,
+      }}
+      onPress={() => setSelectedPaymentMethodId(card.id)}
+    >
+      <Text>{card.card.brand.toUpperCase()} **** {card.card.last4}</Text>
+      <Text>Expire: {card.card.exp_month}/{card.card.exp_year}</Text>
+    </TouchableOpacity>
+  ))}
+  <TouchableOpacity
+  onPress={() => {
+    setUseSavedCard(false);
+    setSelectedPaymentMethodId(null);
+  }}
+  style={{
+    padding: 10,
+    backgroundColor: '#eee',
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  }}
+>
+  <Text style={{ color: '#000' }}>Utiliser une autre carte</Text>
+</TouchableOpacity>
+</View>
       
       <TouchableOpacity
         style={[styles.button, isLoading && { backgroundColor: '#666' }]}

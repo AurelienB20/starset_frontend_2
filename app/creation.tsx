@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/native';
-import * as FileSystem from 'expo-file-system';
-import React, { useEffect, useState } from 'react';
+
+import React, { useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -26,27 +26,11 @@ const CreationScreen = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [pdfUri, setPdfUri] = useState<string | null>(null);
+ 
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const loadPdf = async () => {
-      const fileUri = FileSystem.documentDirectory + 'politique_de_confidentialite.pdf';
-      const fileInfo = await FileSystem.getInfoAsync(fileUri);
-      if (!fileInfo.exists) {
-        await FileSystem.downloadAsync(
-          'https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf',
-          fileUri
-        );
-      }
-      const base64 = await FileSystem.readAsStringAsync(fileUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      setPdfUri(`data:application/pdf;base64,${base64}`);
-    };
-    loadPdf();
-  }, []);
+  
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -173,13 +157,11 @@ const CreationScreen = () => {
               <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
             </TouchableOpacity>
           </View>
-          {pdfUri && (
-            <WebView
-              source={{ uri: pdfUri }}
-              style={{ flex: 1 }}
-              originWhitelist={['*']}
-            />
-          )}
+          <WebView
+  source={{ uri: 'https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf' }}
+  style={{ flex: 1 }}
+  originWhitelist={['*']}
+/>
         </View>
       </Modal>
     </ScrollView>

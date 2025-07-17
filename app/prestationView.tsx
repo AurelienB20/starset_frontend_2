@@ -59,6 +59,7 @@ const PrestationViewScreen = () => {
   const { addToCart } = useCart();
   const { user, setUser} = useUser()
   const { currentWorkerPrestation, setCurrentWorkerPrestation} = useCurrentWorkerPrestation()
+  const [isProfileInfoVisible, setProfileInfoVisible] = useState(false);
 
     const profileImageSize = scrollY.interpolate({
       inputRange: [0, 70],
@@ -662,10 +663,13 @@ const unlikeImage = async (imageId: string) => {
               />
             </View>
           )}      
-        <Animated.Image
-          source={{ uri: profilePictureUrl }}
-          style={[styles.profilePicture, { width: profileImageSize, height: profileImageSize }]}
-        />
+        
+        <TouchableOpacity onPress={() => setProfileInfoVisible(true)}>
+          <Animated.Image
+            source={{ uri: profilePictureUrl }}
+            style={[styles.profilePicture, { width: profileImageSize, height: profileImageSize }]}
+          />
+        </TouchableOpacity>
       </Animated.View>
       
     <Animated.ScrollView
@@ -951,7 +955,7 @@ const unlikeImage = async (imageId: string) => {
           </View>
         </TouchableOpacity>
       </Modal>
-
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -1089,6 +1093,30 @@ const unlikeImage = async (imageId: string) => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+  visible={isProfileInfoVisible}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setProfileInfoVisible(false)}
+>
+  <TouchableOpacity
+    style={styles.overlay}
+    activeOpacity={1}
+    onPressOut={() => setProfileInfoVisible(false)}
+  >
+    <View style={styles.popupContainer}>
+      <Text style={styles.popupTitle}>Informations</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Prénom :</Text> {account?.firstname}</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo || 'mariemmm'}</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> Étudiante</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de métiers effectués :</Text>105</Text>
+      <Text style={styles.popupText}>
+        <Text style={styles.bold}>Métier favori :</Text>  Petsitting
+      </Text>
+    </View>
+  </TouchableOpacity>
+</Modal>
       
     </Animated.ScrollView>
 
@@ -2001,6 +2029,39 @@ certificationInstitution: {
     height: 40,
     resizeMode: 'contain',
   },
+
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+  popupContainer: {
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'flex-start',
+    elevation: 5,
+  },
+  
+  popupTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    alignSelf: 'center',
+  },
+  
+  popupText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  
+  bold: {
+    fontWeight: 'bold',
+  }
+  
   
 });
 
