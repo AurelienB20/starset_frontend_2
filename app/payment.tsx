@@ -88,113 +88,78 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
     };
 
   const handlePayment = async () => {
-    if (cart.length === 0) {
-      Alert.alert('Panier vide', 'Votre panier est vide.');
+  if (cart.length === 0) {
+    Alert.alert('Panier vide', 'Votre panier est vide.');
+    return;
+  }
+
+  setIsLoading(true);
+
+  try {
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert(`Erreur de paiement`, error.message);
+      setIsLoading(false);
       return;
     }
 
-   
-  setIsLoading(true);
-   const {error} = await presentPaymentSheet();
-   if (error){
-    Alert.alert(`Error code: ${error.code}`, error.message);
-   }
-    try {
-      const user_id = await getAccountId();
+    const user_id = await getAccountId();
 
-      // Envoyer une requête pour chaque prestation dans le panier
-      for (const item of cart) {
-        const {
-          prestation,
-          startDate,
-          endDate,
-          arrivalTime,
-          departureTime,
-          totalRemuneration: itemRemuneration,
+    // Envoyer une requête pour chaque prestation dans le panier
+    for (const item of cart) {
+      const {
+        prestation,
+        startDate,
+        endDate,
+        arrivalTime,
+        departureTime,
+        totalRemuneration: itemRemuneration,
+        type_of_remuneration,
+        customPrestationId,
+        instruction,
+        profilePictureUrl,
+      } = item;
+
+      const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          worker_id: prestation.worker_id,
+          user_id,
+          prestation_id: prestation.id,
+          start_date: startDate,
+          end_date: endDate,
           type_of_remuneration,
-          customPrestationId,
+          remuneration: itemRemuneration,
+          start_time: arrivalTime,
+          end_time: departureTime,
           instruction,
-          profilePictureUrl
-        } = item;
+          custom_prestation_id: customPrestationId,
+          profile_picture_url: profilePictureUrl,
+        }),
+      });
 
-        const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            worker_id: prestation.worker_id,
-            user_id,
-            prestation_id: prestation.id,
-            start_date: startDate,
-            end_date: endDate,
-            type_of_remuneration: type_of_remuneration,
-            remuneration: itemRemuneration,
-            start_time: arrivalTime,
-            end_time: departureTime,
-            instruction, // Optionnel, tu peux l'ajouter si applicable globalement,
-            custom_prestation_id :  customPrestationId,
-            profile_picture_url : profilePictureUrl
-          }),
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (!data.success) {
-          throw new Error(`Erreur lors de la création de la prestation ${prestation.metier}`);
-
-        }
-    
-        // Créer les prestations après paiement réussi
-        for (const item of cart) {
-          const {
-            prestation,
-            startDate,
-            endDate,
-            arrivalTime,
-            departureTime,
-            totalRemuneration: itemRemuneration,
-            type_of_remuneration,
-            customPrestationId,
-            instruction,
-            profilePictureUrl,
-          } = item;
-    
-          const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              worker_id: prestation.worker_id,
-              user_id,
-              prestation_id: prestation.id,
-              start_date: startDate,
-              end_date: endDate,
-              type_of_remuneration,
-              remuneration: itemRemuneration,
-              start_time: arrivalTime,
-              end_time: departureTime,
-              instruction,
-              custom_prestation_id: customPrestationId,
-              profile_picture_url: profilePictureUrl,
-            }),
-          });
-    
-          const data = await response.json();
-          if (!data.success) {
-            throw new Error(`Erreur lors de la création de la prestation ${prestation.metier}`);
-          }
-        }
-    
-        setIsLoading(false);
-        setReady(false);
-        Alert.alert('Succès', 'Le paiement et les prestations ont bien été enregistrés.');
-        navigation.navigate('validation' as never);
-    
-      } catch (error) {
-        console.error('Erreur paiement :', error);
-        Alert.alert('Erreur', 'Impossible de valider le paiement. Vérifiez votre connexion.');
-        setIsLoading(false);
-        setReady(false);
+      if (!data.success) {
+        throw new Error(`Erreur lors de la création de la prestation : ${prestation.metier}`);
       }
-    };
+    }
+
+    setIsLoading(false);
+    setReady(false);
+    Alert.alert('Succès', 'Le paiement et les prestations ont bien été enregistrés.');
+    navigation.navigate('validation' as never);
+
+  } catch (error) {
+    console.error('Erreur paiement :', error);
+    Alert.alert('Erreur', 'Impossible de valider le paiement. Vérifiez votre connexion.');
+    setIsLoading(false);
+    setReady(false);
+  }
+};
+
     
 
   // Affichage résumé des prestations dans le panier
