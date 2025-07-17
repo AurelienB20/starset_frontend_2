@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { StripeProvider, usePaymentSheet } from '@stripe/stripe-react-native';
+import { usePaymentSheet } from '@stripe/stripe-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -47,16 +47,15 @@ const PaymentScreen = () => {
     };
 
     const fetchPaymentSheetParams = async () =>{
-      const userId = await  getAccountId();
-      console.log(userId);
+      const user_id = await getAccountId();
       const response = await fetch(`${config.backendUrl}/api/stripe/create-payment-sheet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userId,
-          items: {amount: totalRemuneration*100}})
+          user_id: user_id,
+          items: [{amount: totalRemuneration*100}]})
       });
 
       console.log(response.status)
@@ -77,8 +76,6 @@ const PaymentScreen = () => {
 
     setIsLoading(true);
     //disable Payment sheet because it's not working for now :(
-
-    //await new Promise(resolve => setTimeout(resolve, 1000));
    const {error} = await presentPaymentSheet();
    if (error){
     Alert.alert(`Error code: ${error.code}`, error.message);
@@ -143,9 +140,7 @@ const PaymentScreen = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.headerText}>Paiement</Text>
-      <StripeProvider
-        publishableKey={config.publishableKeyTest}
-      >
+      
       {cart.map((item: any, index: number) => {
         const {
           prestation,
@@ -168,7 +163,6 @@ const PaymentScreen = () => {
       })}
 
       <View style={styles.separator} />
-
       <Text style={styles.totalText}>Total global : {parseFloat(totalRemuneration).toFixed(2)} €</Text>
       
       <TouchableOpacity
@@ -178,7 +172,6 @@ const PaymentScreen = () => {
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>
-      </StripeProvider>
     </ScrollView>
   );
 };

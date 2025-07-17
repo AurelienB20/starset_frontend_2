@@ -1,5 +1,5 @@
 import { useUser } from '@/context/userContext';
-import { MaterialIcons } from '@expo/vector-icons';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
@@ -31,8 +31,16 @@ const AccountWorkerScreen = () => {
     navigation.navigate('language' as never);
   }
 
-  const goToProfilePicture = async () => {
+  const goToReceivePayout = async () => {
+    navigation.navigate('receivePayout' as never);
+  }
+
+  const goToModifyAccount = async () => {
     navigation.navigate('modifyAccount' as never);
+  };
+
+  const goToConfidentiality = async () => {
+    navigation.navigate('confidentiality' as never);
   };
 
   const getAccountId = async () => {
@@ -93,7 +101,7 @@ const AccountWorkerScreen = () => {
         <Text style={styles.typeOAccount}>Worker</Text>
     
         <View style={styles.rightHeader}>
-              <TouchableOpacity style={styles.profileHeader} onPress={goToProfilePicture}>
+              <TouchableOpacity style={styles.profileHeader} onPress={goToModifyAccount}>
                   <View>
                   <Image
                     source={{ 
@@ -114,7 +122,7 @@ const AccountWorkerScreen = () => {
         </View>
       </View>
 
-      <View style={styles.balanceContainer}>
+      <TouchableOpacity style={styles.balanceContainer} onPress={goToReceivePayout}>
         <Text style={styles.balanceLabel}>Tirelire</Text>
         <View style={styles.balanceCard}>
           <Text style={styles.balanceAmount}>0,00 €</Text>
@@ -123,19 +131,16 @@ const AccountWorkerScreen = () => {
             style={styles.tirelire} 
           />
         </View>
-      </View>
+      </TouchableOpacity>
 
       <TouchableOpacity style={styles.menuItem}>
   <MaterialIcons name="help-outline" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>Aide</Text>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem}>
-  <MaterialIcons name="star-border" size={24} color="#000" style={styles.menuIcon} />
-  <Text style={[styles.menuItemText, styles.premiereColor]}>Star Set Business</Text>
-</TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem}>
+
+<TouchableOpacity style={styles.menuItem}  onPress={goToModifyAccount}>
   <MaterialIcons name="settings" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>Paramètres</Text>
 </TouchableOpacity>
@@ -148,6 +153,13 @@ const AccountWorkerScreen = () => {
 <TouchableOpacity style={styles.menuItem}>
   <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>À propos</Text>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>Politique de confidentialite</Text>
+  </View>
 </TouchableOpacity>
 
 <TouchableOpacity style={styles.menuItem} onPress={goToDocument}>
@@ -282,6 +294,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
+  },
+
+  iconWithText: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 
 });

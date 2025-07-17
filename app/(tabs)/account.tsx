@@ -78,7 +78,7 @@ const AccountScreen = () => {
 
   
 
-  const goToProfilePicture = async () => {
+  const goToModifyAccount = async () => {
     navigation.navigate('modifyAccount' as never);
   };
 
@@ -105,6 +105,13 @@ const AccountScreen = () => {
   const goToAbout = async () => {
     navigation.navigate('about' as never);
   };
+
+  const goToConfidentiality = async () => {
+    navigation.navigate('confidentiality' as never);
+  };
+
+
+
 
   const getAccountId = async () => {
     try {
@@ -316,7 +323,7 @@ navigation.dispatch(
   >
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.profileHeader} onPress={goToProfilePicture}>
+        <TouchableOpacity style={styles.profileHeader} onPress={goToModifyAccount}>
           <View>
           <Image
             source={{ 
@@ -398,26 +405,20 @@ navigation.dispatch(
   </View>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem} onPress={goToHistory}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="history" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>Historique</Text>
-  </View>
-</TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem}>
+
+
+<TouchableOpacity style={styles.menuItem} onPress={goToModifyAccount}>
   <View style={styles.iconWithText}>
     <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Paramètres</Text>
   </View>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem} onPress={goToAvailability}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="calendar-check-o" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>Disponibilité</Text>
-  </View>
-</TouchableOpacity>
+
+
+
+
 
 <TouchableOpacity style={styles.menuItem} onPress={goToDocument}>
   <View style={styles.iconWithText}>
@@ -432,6 +433,22 @@ navigation.dispatch(
     <Text style={styles.menuItemText}>A Propos</Text>
   </View>
 </TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>Politique de confidentialite</Text>
+  </View>
+</TouchableOpacity>
+
+
+
+
+
+
+
+
+
 
 <TouchableOpacity style={styles.menuItem} onPress={changeToWorker}>
   <View style={styles.iconWithText}>
@@ -1096,5 +1113,3 @@ dayImage: {
 });
 
 export default AccountScreen;
-
-
