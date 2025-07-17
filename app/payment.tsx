@@ -31,7 +31,6 @@ const PaymentScreen = () => {
   const initialisePaymentSheet = async() =>{
     const {paymentIntent, ephemeralKey, customer} =
       await fetchPaymentSheetParams();
-  
       const {error} = await initPaymentSheet({
         customerId: customer,
         customerEphemeralKeySecret: ephemeralKey,
@@ -39,7 +38,6 @@ const PaymentScreen = () => {
         merchantDisplayName: 'Starset',
         allowsDelayedPaymentMethods: true,
         returnURL: 'starset://stripe-redirect'
-
       });
       if(error){
         console.log(`Error code: ${error.code}`, error.message);
@@ -49,17 +47,21 @@ const PaymentScreen = () => {
     };
 
     const fetchPaymentSheetParams = async () =>{
+      const userId = await  getAccountId();
+      console.log(userId);
       const response = await fetch(`${config.backendUrl}/api/stripe/create-payment-sheet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: getAccountId(),
-          items: [{amount: totalRemuneration*100}]})
+          user_id: userId,
+          items: {amount: totalRemuneration*100}})
       });
 
+      console.log(response.status)
       const {paymentIntent, ephemeralKey, customer} = await response.json();
+      console.log({paymentIntent}, {ephemeralKey}, {customer});
       return {
         paymentIntent,
         ephemeralKey,
@@ -75,10 +77,12 @@ const PaymentScreen = () => {
 
     setIsLoading(true);
     //disable Payment sheet because it's not working for now :(
-   /*const {error} = await presentPaymentSheet();
+
+    //await new Promise(resolve => setTimeout(resolve, 1000));
+   const {error} = await presentPaymentSheet();
    if (error){
     Alert.alert(`Error code: ${error.code}`, error.message);
-   }*/
+   }
     try {
       const user_id = await getAccountId();
 
