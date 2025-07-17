@@ -36,7 +36,6 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
   const initialisePaymentSheet = async() =>{
     const {paymentIntent, ephemeralKey, customer} =
       await fetchPaymentSheetParams();
-  
       const {error} = await initPaymentSheet({
         customerId: customer,
         customerEphemeralKeySecret: ephemeralKey,
@@ -44,7 +43,6 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
         merchantDisplayName: 'Starset',
         allowsDelayedPaymentMethods: true,
         returnURL: 'starset://stripe-redirect'
-
       });
       if(error){
         console.log(`Error code: ${error.code}`, error.message);
@@ -76,10 +74,12 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
         },
         body: JSON.stringify({
           user_id: user_id,
-          items: [{amount: totalRemuneration*100}]})
+          items: {amount: totalRemuneration*100}})
       });
 
+      console.log(response.status)
       const {paymentIntent, ephemeralKey, customer} = await response.json();
+      console.log({paymentIntent}, {ephemeralKey}, {customer});
       return {
         paymentIntent,
         ephemeralKey,
@@ -87,41 +87,60 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
       }
     };
 
-    const handlePayment = async () => {
-      if (cart.length === 0) {
-        Alert.alert('Panier vide', 'Votre panier est vide.');
-        return;
-      }
-    
-      setIsLoading(true);
-    
-      try {
-        const user_id = await getAccountId();
-    
-        // Paiement avec carte enregistrée
-        if (selectedPaymentMethodId) {
-          const res = await fetch(`${config.backendUrl}/api/stripe/charge-payment-method`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              account_id: user_id,
-              payment_method_id: selectedPaymentMethodId,
-              amount: totalRemuneration * 100,
-            }),
-          });
-    
-          const chargeData = await res.json();
-          if (!chargeData.success) {
-            throw new Error('Échec du paiement avec la carte sélectionnée');
-          }
-        } else {
-          // Paiement via Stripe Payment Sheet (nouvelle carte)
-          const { error } = await presentPaymentSheet();
-          if (error) {
-            Alert.alert('Erreur', error.message);
-            setIsLoading(false);
-            return;
-          }
+  const handlePayment = async () => {
+    if (cart.length === 0) {
+      Alert.alert('Panier vide', 'Votre panier est vide.');
+      return;
+    }
+
+   
+  setIsLoading(true);
+   const {error} = await presentPaymentSheet();
+   if (error){
+    Alert.alert(`Error code: ${error.code}`, error.message);
+   }
+    try {
+      const user_id = await getAccountId();
+
+      // Envoyer une requête pour chaque prestation dans le panier
+      for (const item of cart) {
+        const {
+          prestation,
+          startDate,
+          endDate,
+          arrivalTime,
+          departureTime,
+          totalRemuneration: itemRemuneration,
+          type_of_remuneration,
+          customPrestationId,
+          instruction,
+          profilePictureUrl
+        } = item;
+
+        const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            worker_id: prestation.worker_id,
+            user_id,
+            prestation_id: prestation.id,
+            start_date: startDate,
+            end_date: endDate,
+            type_of_remuneration: type_of_remuneration,
+            remuneration: itemRemuneration,
+            start_time: arrivalTime,
+            end_time: departureTime,
+            instruction, // Optionnel, tu peux l'ajouter si applicable globalement,
+            custom_prestation_id :  customPrestationId,
+            profile_picture_url : profilePictureUrl
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(`Erreur lors de la création de la prestation ${prestation.metier}`);
+
         }
     
         // Créer les prestations après paiement réussi
@@ -246,7 +265,7 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
       <TouchableOpacity
         style={[styles.button, isLoading && { backgroundColor: '#666' }]}
         onPress={handlePayment}
-        disabled={isLoading} // add  || !ready when 
+        disabled={isLoading || !ready} 
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>
