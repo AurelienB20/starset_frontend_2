@@ -894,6 +894,7 @@ const PrestationScreen = () => {
   useEffect(() => {
     getPrestation(prestation_id).then((data: any) => {
       setCurrentWorkerPrestation(data.prestation);
+      setSelectedTarifMode(data.prestation.type_of_remuneration)
       setPrestationPhotos(data.images);
       setRemuneration(data.prestation.remuneration);
     }).catch((error: any)  => console.error(error));

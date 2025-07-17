@@ -1,25 +1,64 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Platform } from 'react-native';
-import { Calendar } from 'react-native-big-calendar';
-import moment from 'moment';
-import config from '../config.json';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { useUser } from '@/context/userContext';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
+import {
+  Modal, ScrollView,
+  StyleSheet,
+  Text, TextInput, TouchableOpacity,
+  View,
+} from 'react-native';
+import { Calendar } from 'react-native-big-calendar';
+import config from '../config.json';
 
 const ModifyAvailabilityScreen = () => {
   const navigation = useNavigation();
-  const { user, setUser } = useUser();
-
   const [events, setEvents] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [timeRange, setTimeRange] = useState({ start: '', end: '' });
+  const [workerId, setWorkerId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user?.availability) {
-      setEvents(user.availability);
+    (async () => {
+      const id = await AsyncStorage.getItem('worker_id');
+      if (id) {
+        setWorkerId(id);
+        fetchSchedule(id);
+      }
+    })();
+  }, []);
+
+  const fetchSchedule = async (id: string) => {
+    try {
+      const res = await fetch(`${config.backendUrl}/api/mission/get-worker-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ worker_id: id }),
+      });
+
+      const data = await res.json();
+
+      console.log(data)
+
+      if (data.success && data.schedule) {
+        const formatted = data.schedule.map((item: any) => {
+  const localDate = moment(item.date).local().format('YYYY-MM-DD'); // force la date locale sans heure
+  const startStr = item.start_time.slice(0, 5); // ex: "09:00"
+  const endStr = item.end_time.slice(0, 5);     // ex: "17:00"
+
+  return {
+    title: 'Disponible',
+    start: moment(`${localDate}T${startStr}`).toDate(),
+    end: moment(`${localDate}T${endStr}`).toDate(),
+  };
+});
+        setEvents(formatted);
+      }
+    } catch (err) {
+      console.error('Erreur lors de la récupération du planning :', err);
     }
-  }, [user]);
+  };
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
@@ -27,55 +66,53 @@ const ModifyAvailabilityScreen = () => {
     setShowModal(true);
   };
 
-  const handleAddAvailability = () => {
-    if (!selectedDate || !timeRange.start || !timeRange.end) return;
+  const handleAddAvailability = async () => {
+    if (!selectedDate || !timeRange.start || !timeRange.end || !workerId) return;
 
-    const startTime = moment(`${moment(selectedDate).format('YYYY-MM-DD')}T${timeRange.start}`).toDate();
-    const endTime = moment(`${moment(selectedDate).format('YYYY-MM-DD')}T${timeRange.end}`).toDate();
-
+    const date = moment(selectedDate).format('YYYY-MM-DD');
     const newEvent = {
       title: 'Disponible',
-      start: startTime,
-      end: endTime,
+      start: moment(`${date}T${timeRange.start}`).toDate(),
+      end: moment(`${date}T${timeRange.end}`).toDate(),
     };
 
-    setEvents([...events, newEvent]);
-    setShowModal(false);
-  };
-
-  const handleConfirmUpdate = async () => {
-    const updatedUser = { ...user, availability: events };
-    setUser(updatedUser);
-
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/update-account`, {
+      const res = await fetch(`${config.backendUrl}/api/mission/add-worker-schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ account: updatedUser }),
+        body: JSON.stringify({
+          worker_id: workerId,
+          date,
+          start_time: timeRange.start,
+          end_time: timeRange.end,
+        }),
       });
-      if (!response.ok) throw new Error('Erreur réseau');
 
-      const data = await response.json();
-      console.log('Mise à jour réussie:', data);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour :', error);
+      const data = await res.json();
+
+      if (data.success) {
+        setEvents([...events, newEvent]);
+        setShowModal(false);
+      } else {
+        console.warn('Erreur côté serveur :', data.message);
+      }
+    } catch (err) {
+      console.error('Erreur lors de l\'ajout de disponibilité :', err);
     }
-    navigation.goBack();
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>Modifier vos disponibilités</Text>
 
       <Calendar
         events={events}
         height={600}
         mode="week"
-        weekStartsOn={1} // Lundi
+        weekStartsOn={1}
         onPressCell={handleDateClick}
-        swipeEnabled={true}
-        scrollOffsetMinutes={480} // Start view at 8am
-        
+        swipeEnabled
+        scrollOffsetMinutes={480}
       />
 
       <Modal visible={showModal} animationType="slide" transparent>
@@ -84,7 +121,7 @@ const ModifyAvailabilityScreen = () => {
             <Text style={styles.modalTitle}>Ajouter une disponibilité</Text>
             {selectedDate && (
               <Text style={styles.selectedDate}>
-                {moment(selectedDate).locale('fr').format('dddd')}
+                {moment(selectedDate).locale('fr').format('dddd D MMMM YYYY')}
               </Text>
             )}
 
@@ -105,32 +142,28 @@ const ModifyAvailabilityScreen = () => {
               <Text style={styles.buttonText}>Ajouter</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.button, { backgroundColor: '#ccc' }]} onPress={() => setShowModal(false)}>
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: '#ccc' }]}
+              onPress={() => setShowModal(false)}
+            >
               <Text style={styles.buttonText}>Annuler</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
-      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmUpdate}>
-        <Text style={styles.buttonText}>Confirmer</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff' },
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
-
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   input: { height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 5, marginBottom: 10, paddingHorizontal: 10 },
-
   button: { backgroundColor: '#70FF70', padding: 10, borderRadius: 8, marginTop: 10 },
   buttonText: { fontSize: 16, textAlign: 'center' },
-  confirmButton: { backgroundColor: '#70FF70', padding: 12, borderRadius: 10, marginTop: 20 },
   selectedDate: {
     fontSize: 18,
     fontWeight: '600',

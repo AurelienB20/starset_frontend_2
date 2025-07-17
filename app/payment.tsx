@@ -17,6 +17,9 @@ const PaymentScreen = () => {
   const [savedCards, setSavedCards] = useState<any[]>([]);
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
+const serviceFee = totalRemuneration * 0.10;
+const transactionFee = totalRemuneration * 0.015 + 0.25;
+const finalTotal = totalRemuneration + serviceFee + transactionFee;
 
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
         },
         body: JSON.stringify({
           user_id: user_id,
-          items: {amount: totalRemuneration*100}})
+          items:{ amount: Math.round(finalTotal * 100) }})
       });
 
       console.log(response.status)
@@ -188,8 +191,13 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
         );
       })}
 
+      <View style={{ width: '100%', marginTop: 10 }}>
+        <Text style={{ fontSize: 16 }}>Frais de service (10%) : {serviceFee.toFixed(2)} €</Text>
+        <Text style={{ fontSize: 16 }}>Frais de transaction (1,5% + 0,25€) : {transactionFee.toFixed(2)} €</Text>
+      </View>
+
       <View style={styles.separator} />
-      <Text style={styles.totalText}>Total global : {parseFloat(totalRemuneration).toFixed(2)} €</Text>
+      <Text style={styles.totalText}>Total à payer : {finalTotal.toFixed(2)} €</Text>
 
       
       <TouchableOpacity
