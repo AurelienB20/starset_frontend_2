@@ -74,8 +74,8 @@ const PaymentScreen = () => {
       return;
     }
 
-    setIsLoading(true);
-    //disable Payment sheet because it's not working for now :(
+   
+  setIsLoading(true);
    const {error} = await presentPaymentSheet();
    if (error){
     Alert.alert(`Error code: ${error.code}`, error.message);
@@ -168,7 +168,7 @@ const PaymentScreen = () => {
       <TouchableOpacity
         style={[styles.button, isLoading && { backgroundColor: '#666' }]}
         onPress={handlePayment}
-        disabled={isLoading} // add  || !ready when 
+        disabled={isLoading || !ready} 
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>
