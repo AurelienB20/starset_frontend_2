@@ -95,21 +95,24 @@ const ConversationScreen = () => {
   };
 
   const renderItem = ({ item }: any) => (
-    <TouchableOpacity
-      style={styles.messageContainer}
-      onPress={() => gotoChat(item.id, item.profile_picture_url, item.firstname)}
-    >
-      <Image
-        source={{ uri: item.profile_picture_url || "https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg" }}
-        style={styles.profileImage}
-      />
-      <View style={styles.messageContent}>
-        <Text style={styles.name}>{item.firstname}</Text>
-        <Text style={styles.message}>{item.message_text}</Text>
-      </View>
-      <Text style={styles.time}>{getFormattedTime(item.timestamp)}</Text>
-    </TouchableOpacity>
-  );
+  <TouchableOpacity
+    style={styles.messageContainer}
+    onPress={() => gotoChat(item.id, item.profile_picture_url, item.firstname)}
+  >
+    <Image
+      source={{ uri: item.profile_picture_url || "https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg" }}
+      style={styles.profileImage}
+    />
+    <View style={styles.messageContent}>
+      <Text style={styles.name}>
+        {item.firstname}
+        {!item.accepted && <Text style={styles.notAccepted}> (non acceptée)</Text>}
+      </Text>
+      <Text style={styles.message}>{item.message_text}</Text>
+    </View>
+    <Text style={styles.time}>{getFormattedTime(item.timestamp)}</Text>
+  </TouchableOpacity>
+);
 
   const getAllConversation = async () => {
     try {
@@ -137,11 +140,7 @@ const ConversationScreen = () => {
     }
   };
 
-  const filteredConversations = conversations.filter(
-    (conv: any) =>
-      conv.accepted === true &&
-      conv.firstname.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+ 
 
   useEffect(() => {
     getAllConversation();
@@ -190,7 +189,7 @@ const ConversationScreen = () => {
         Array.from({ length: 6 }).map((_, index) => <SkeletonMessage key={index} />)
       ) : (
         <FlatList
-          data={filteredConversations}
+          data={conversations}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
         />
@@ -270,6 +269,12 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgba(255,255,255,0.4)',
   },
+
+  notAccepted: {
+  color: '#FF5E5E',
+  fontSize: 12,
+  fontStyle: 'italic',
+},
 });
 
 export default ConversationScreen;
