@@ -665,6 +665,50 @@ const PrestationScreen = () => {
     }
   };
 
+  const handleTarifModeChange = (newValue : any) => {
+    // Afficher l'alerte de confirmation
+    Alert.alert(
+      "Confirmer le changement",
+      `Voulez-vous vraiment passer au tarif par ${newValue === 'heure' ? 'heure' : 'prestation'} ?`,
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Confirmer",
+          onPress: () => {
+            // Appel API
+            fetch('https://api.starsetfrance.com/api/mission/update-type-of-remuneration', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                prestation_id: prestation_id,
+                type_of_remuneration: newValue,
+              }),
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  setSelectedTarifMode(newValue);
+                  setCurrentWorkerPrestation({
+                    ...prestation,
+                    type_of_remuneration: newValue,
+                  });
+                  Alert.alert("Succès", "Type de rémunération mis à jour.");
+                } else {
+                  Alert.alert("Erreur", data.message || "Une erreur est survenue.");
+                }
+              })
+              .catch((error) => {
+                console.error("Erreur réseau :", error);
+                Alert.alert("Erreur", "Impossible de contacter le serveur.");
+              });
+          }
+        }
+      ]
+    );
+  };
+
   const createExperience = async () => {
     try {
       if (!selectedItem) return;
@@ -991,7 +1035,7 @@ const PrestationScreen = () => {
             </Picker>
           </View>
         </View>
-        <View style={{ marginBottom: 20 }}>
+         <View style={{ marginBottom: 20 }}>
           <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}>
             Mode de paiement
           </Text>
@@ -1003,11 +1047,10 @@ const PrestationScreen = () => {
           }}>
             <Picker
               selectedValue={selectedTarifMode}
-              onValueChange={(itemValue) =>
-                setSelectedTarifMode(itemValue)
-              }>
-              <Picker.Item label="tarif par heure" value="heure" />
-              <Picker.Item label="tarif par prestation" value="prestation" />
+              onValueChange={(itemValue) => handleTarifModeChange(itemValue)}
+            >
+              <Picker.Item label="Tarif par heure" value="heure" />
+              <Picker.Item label="Tarif par prestation" value="prestation" />
             </Picker>
           </View>
         </View>
