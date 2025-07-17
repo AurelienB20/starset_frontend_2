@@ -84,7 +84,7 @@ const PaymentMethodScreen = () => {
         return;
       }
 
-      const updatedCards = await fetch(`${API_URL}/api/stripe/get-cards`, {
+      const updatedCards = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stripe_customer_id: customerId }),

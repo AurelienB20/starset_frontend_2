@@ -10,6 +10,8 @@ const CroissanceScreen = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const { user } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
+  const [otherJobs, setOtherJobs] = useState<any[]>([]);
+
 
   const news = {
     title: 'Big Announcement',
@@ -24,11 +26,17 @@ const CroissanceScreen = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
-
+  
       if (!response.ok) throw new Error('Failed to fetch jobs');
-
+  
       const data = await response.json();
-      if(data) setJobsOfTheDay([...data.metiers, ...data.metiers]); // doublage temporaire
+      const allJobs = [...data.metiers]; // ou appelle un autre endpoint si disponible
+  
+      const jobOfTheDay = allJobs.slice(0, 4); // par exemple : les 4 premiers en "jobs of the day"
+      const jobsNeedingHelp = allJobs.filter(job => !jobOfTheDay.some(j => j.id === job.id));
+  
+      setJobsOfTheDay(jobOfTheDay);
+      setOtherJobs(jobsNeedingHelp.slice(0, 4)); // limite à 4 aussi ici
     } catch (error) {
       console.error('Erreur lors de la récupération des jobs:', error);
     } finally {
@@ -122,18 +130,19 @@ const CroissanceScreen = () => {
       <Text style={[styles.sectionHeader, { marginTop: 30 }]}>CES JOBS QUI ONT BESOIN DE VOUS</Text>
       <FlatList
         horizontal
-        data={[
-          { name: 'DEV WEB', icon: 'https://cdn-icons-png.flaticon.com/512/4703/4703487.png' },
-          { name: 'LECTURE', icon: 'https://cdn-icons-png.flaticon.com/512/864/864685.png' },
-          { name: 'CHAUFFEUR', icon: 'https://cdn-icons-png.flaticon.com/512/846/846338.png' },
-          { name: 'TRADUCTEUR', icon: 'https://cdn-icons-png.flaticon.com/512/2793/2793765.png' },
-        ]}
-        keyExtractor={(item, index) => index.toString()}
+        data={otherJobs}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.jobItem}>
-            <Image source={{ uri: item.icon }} style={styles.jobIcon} />
-            
-          </View>
+          <TouchableOpacity onPress={() => handleJobClick(item)}>
+            <View style={styles.jobItem}>
+              <Image
+                source={{
+                  uri: item.picture_url || 'https://cdn-icons-png.flaticon.com/512/91/91501.png',
+                }}
+                style={styles.jobIcon}
+              />
+            </View>
+          </TouchableOpacity>
         )}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingRight: 20 }}
