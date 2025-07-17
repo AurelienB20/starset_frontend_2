@@ -55,7 +55,7 @@ const PaymentScreen = () => {
         },
         body: JSON.stringify({
           user_id: user_id,
-          items: [{amount: totalRemuneration*100}]})
+          items: {amount: totalRemuneration*100}})
       });
 
       console.log(response.status)

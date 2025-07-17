@@ -33,8 +33,7 @@ const VerificationScreen = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          
-          email : email,
+          email : email.toLocaleLowerCase(),
         }),
       });
       if (!response.ok) throw new Error('Erreur réseau lors de l’envoi du code.');
