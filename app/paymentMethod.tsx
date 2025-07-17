@@ -1,67 +1,120 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Modal } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+const API_URL = 'https://api.starsetfrance.com';
 
 const PaymentMethodScreen = () => {
-  const navigation = useNavigation();
-  const { confirmPayment } = useStripe();
-  const [cards, setCards] = useState([
-    { id: '1', name: 'Carte Maman', lastFour: '2546', status: 'Valide' },
-    { id: '2', name: 'Carte Papa', lastFour: '254G', status: 'Expiré' },
-  ]);
+  const { confirmSetupIntent } = useStripe();
+  const [cards, setCards] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [cardDetails, setCardDetails] = useState<any>(null);
+  const [customerId, setCustomerId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCustomerAndCards = async () => {
+      try {
+        const user_id = await AsyncStorage.getItem('account_id');
+        if (!user_id) return;
+
+        // Appel backend pour récupérer ou créer le customer Stripe
+        const customerRes = await fetch(`${API_URL}/api/stripe/create-stripe-customer`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id }),
+        });
+
+        const customerData = await customerRes.json();
+        if (!customerData.success) {
+          console.log("❌ Impossible de récupérer stripe_customer_id");
+          return;
+        }
+
+        const id = customerData.stripe_customer_id;
+        setCustomerId(id);
+
+        // Ensuite, récupérer les cartes liées à ce customer
+        const response = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ stripe_customer_id: id }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setCards(data.cards.map((card: any) => ({
+            id: card.id,
+            name: card.card.brand,
+            lastFour: card.card.last4,
+            status: card.card.exp_month && card.card.exp_year ? 'Valide' : 'Expiré'
+          })));
+        }
+      } catch (error) {
+        console.log("Erreur chargement customer/cartes:", error);
+      }
+    };
+
+    loadCustomerAndCards();
+  }, []);
 
   const handleAddCard = async () => {
-    console.log("handleAddCard appelé");
-    console.log("Détails de la carte:", cardDetails);
-    
-    if (!cardDetails) {
-      console.error("Erreur: cardDetails est null");
-      alert("Veuillez entrer une carte valide.");
+    if (!cardDetails || !cardDetails.complete || !customerId) {
+      Alert.alert("Erreur", "Veuillez entrer une carte valide.");
       return;
     }
 
-    if (!cardDetails.complete) {
-      console.error("Erreur: La carte est incomplète");
-      alert("Veuillez entrer une carte complète.");
-      return;
-    }
-  
     try {
-      console.log("Ajout de la carte en cours...");
-      const newCard = {
-        id: Date.now().toString(),
-        name: 'Nouvelle carte',
-        lastFour: cardDetails.last4 || "XXXX",
-        status: 'Valide',
-      };
-      console.log("Nouvelle carte créée:", newCard);
-      
-      setCards([...cards, newCard]);
-      console.log("Cartes mises à jour:", cards);
-      
+      const intentRes = await fetch(`${API_URL}/api/stripe/create-setup-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      });
+
+      const intentData = await intentRes.json();
+      if (!intentData.success) throw new Error('SetupIntent échoué');
+
+      const { setupIntent, error } = await confirmSetupIntent(intentData.clientSecret, {
+        paymentMethodType: 'Card',
+      });
+
+      if (error) {
+        Alert.alert("Erreur", error.message || "Erreur ajout carte");
+        return;
+      }
+
+      const updatedCards = await fetch(`${API_URL}/api/stripe/get-cards`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stripe_customer_id: customerId }),
+      });
+
+      const updatedData = await updatedCards.json();
+      if (updatedData.success) {
+        setCards(updatedData.cards.map((card: any) => ({
+          id: card.id,
+          name: card.card.brand,
+          lastFour: card.card.last4,
+          status: 'Valide',
+        })));
+      }
+
       setModalVisible(false);
-      console.log("Fermeture du modal");
       setCardDetails(null);
-      console.log("Réinitialisation de cardDetails");
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la carte:", error);
+      console.log("Erreur ajout carte:", error);
+      Alert.alert("Erreur", "Impossible d'ajouter la carte.");
     }
   };
 
-
-  const renderCard = ({ item } : any) => (
+  const renderCard = ({ item }: any) => (
     <View style={styles.cardContainer}>
-      <View style={styles.cardInfo}>
-        <Icon name="card" size={30} color="#000" />
-        <View style={styles.cardTextContainer}>
-          <Text style={styles.cardName}>{item.name}</Text>
-          <Text style={item.status === 'Valide' ? styles.cardStatusValid : styles.cardStatusExpired}>{item.status}</Text>
-          <Text style={styles.cardNumber}>--- {item.lastFour}</Text>
-        </View>
+      <Icon name="card" size={30} color="#000" />
+      <View style={styles.cardTextContainer}>
+        <Text style={styles.cardName}>{item.name}</Text>
+        <Text style={item.status === 'Valide' ? styles.cardStatusValid : styles.cardStatusExpired}>{item.status}</Text>
+        <Text style={styles.cardNumber}>**** {item.lastFour}</Text>
       </View>
     </View>
   );
@@ -69,11 +122,11 @@ const PaymentMethodScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mes cartes</Text>
-      
+
       <FlatList
         data={cards}
         renderItem={renderCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: any) => item.id}
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
@@ -85,12 +138,8 @@ const PaymentMethodScreen = () => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Ajouter une carte</Text>
             <CardField
-              postalCodeEnabled={true}
-              placeholders={{ number: '4242 4242 4242 4242' }}
-              onCardChange={(cardDetails) => {
-                console.log("📦 Changement dans le champ carte:", cardDetails);
-                setCardDetails(cardDetails);
-              }}
+              postalCodeEnabled={false}
+              onCardChange={setCardDetails}
               style={styles.cardField}
             />
             <TouchableOpacity style={styles.saveButton} onPress={handleAddCard}>
@@ -106,109 +155,112 @@ const PaymentMethodScreen = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#000',
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  cardInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardTextContainer: {
-    marginLeft: 10,
-  },
-  cardName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  cardStatusValid: {
-    color: 'green',
-    fontSize: 14,
-  },
-  cardStatusExpired: {
-    color: 'red',
-    fontSize: 14,
-  },
-  cardNumber: {
-    fontSize: 14,
-    color: '#666',
-  },
-  addButton: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    alignItems: 'center',
-    borderColor: 'green',
-    borderWidth: 1,
-  },
-  addButtonText: {
-    color: 'green',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  cardField: {
-    width: '100%',
-    height: 50,
-    marginVertical: 10,
-  },
-  saveButton: {
-    backgroundColor: 'green',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    width: '100%',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  cancelButton: {
-    marginTop: 10,
-  },
-  cancelButtonText: {
-    color: 'red',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+ container: {
+   flex: 1,
+   padding: 20,
+   backgroundColor: '#FFFFFF',
+ },
+ title: {
+   fontSize: 24,
+   fontWeight: 'bold',
+   marginBottom: 20,
+   color: '#000',
+ },
+ cardContainer: {
+   flexDirection: 'row',
+   alignItems: 'center',
+   backgroundColor: '#f9f9f9',
+   padding: 15,
+   borderRadius: 10,
+   marginBottom: 10,
+   borderWidth: 1,
+   borderColor: '#e0e0e0',
+ },
+ cardInfo: {
+   flexDirection: 'row',
+   alignItems: 'center',
+ },
+ cardTextContainer: {
+   marginLeft: 10,
+ },
+ cardName: {
+   fontSize: 18,
+   fontWeight: 'bold',
+   color: '#000',
+ },
+ cardStatusValid: {
+   color: 'green',
+   fontSize: 14,
+ },
+ cardStatusExpired: {
+   color: 'red',
+   fontSize: 14,
+ },
+ cardNumber: {
+   fontSize: 14,
+   color: '#666',
+ },
+ addButton: {
+   marginTop: 20,
+   padding: 15,
+   backgroundColor: 'white',
+   borderRadius: 20,
+   alignItems: 'center',
+   borderColor: 'green',
+   borderWidth: 1,
+ },
+ addButtonText: {
+   color: 'green',
+   fontSize: 16,
+   fontWeight: 'bold',
+ },
+ modalContainer: {
+   flex: 1,
+   justifyContent: 'center',
+   alignItems: 'center',
+   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+ },
+ modalContent: {
+   width: '80%',
+   backgroundColor: 'white',
+   padding: 20,
+   borderRadius: 10,
+   alignItems: 'center',
+ },
+ modalTitle: {
+   fontSize: 20,
+   fontWeight: 'bold',
+   marginBottom: 10,
+ },
+ cardField: {
+   width: '100%',
+   height: 50,
+   marginVertical: 10,
+ },
+ saveButton: {
+   backgroundColor: 'green',
+   padding: 10,
+   borderRadius: 8,
+   alignItems: 'center',
+   width: '100%',
+ },
+ saveButtonText: {
+   color: 'white',
+   fontSize: 16,
+   fontWeight: 'bold',
+ },
+ cancelButton: {
+   marginTop: 10,
+ },
+ cancelButtonText: {
+   color: 'red',
+   fontSize: 16,
+   fontWeight: 'bold',
+ },
 });
 
+
 export default PaymentMethodScreen;
+
