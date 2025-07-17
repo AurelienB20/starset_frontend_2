@@ -14,7 +14,8 @@ const ConnexionScreen = () => {
   const navigation = useNavigation();
   const { setUser } = useUser()
 
-  const handleEmailChange = (text: string) => setEmail(text.toLocaleLowerCase());
+  const handleEmailChange = (text: string) => setEmail(text);
+  //const handleEmailChange = (text: string) => setEmail(text.toLocaleLowerCase());
   const handlePasswordChange = (text: string) => setPassword(text);
   const togglePasswordVisibility = () => setShowPassword(prev => !prev); // 👈
 

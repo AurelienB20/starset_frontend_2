@@ -11,7 +11,7 @@ const PaymentMethodScreen = () => {
   const [cards, setCards] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [cardDetails, setCardDetails] = useState<any>(null);
-  const [customerId, setCustomerId] = useState<string | null>(null);
+  //const [customerId, setCustomerId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadCustomerAndCards = async () => {
@@ -32,14 +32,14 @@ const PaymentMethodScreen = () => {
           return;
         }
 
-        const id = customerData.stripe_customer_id;
-        setCustomerId(id);
+        //const id = customerData.stripe_customer_id;
+        //setCustomerId(id);
 
         // Ensuite, récupérer les cartes liées à ce customer
         const response = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stripe_customer_id: id }),
+          body: JSON.stringify({ account_id: user_id }),
         });
 
         const data = await response.json();
@@ -60,16 +60,18 @@ const PaymentMethodScreen = () => {
   }, []);
 
   const handleAddCard = async () => {
-    if (!cardDetails || !cardDetails.complete || !customerId) {
+    if (!cardDetails || !cardDetails.complete) {
       Alert.alert("Erreur", "Veuillez entrer une carte valide.");
       return;
     }
 
     try {
+
+       const user_id = await AsyncStorage.getItem('account_id');
       const intentRes = await fetch(`${API_URL}/api/stripe/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stripe_customer_id: customerId }),
+        body: JSON.stringify({ account_id: user_id }),
       });
 
       const intentData = await intentRes.json();
@@ -87,7 +89,7 @@ const PaymentMethodScreen = () => {
       const updatedCards = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stripe_customer_id: customerId }),
+        body: JSON.stringify({ account_id: user_id }),
       });
 
       const updatedData = await updatedCards.json();

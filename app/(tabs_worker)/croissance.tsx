@@ -20,38 +20,55 @@ const CroissanceScreen = () => {
       'We are excited to introduce new features to our platform that will make your job search easier and more efficient!',
   };
 
-  const fetchJobsOfTheDay = async () => {
-    try {
-      const response = await fetch(`${config.backendUrl}/api/mission/get-job-of-the-day`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-  
-      if (!response.ok) throw new Error('Failed to fetch jobs');
-  
-      const data = await response.json();
-      const allJobs = [...data.metiers]; // ou appelle un autre endpoint si disponible
-  
-      const jobOfTheDay = allJobs.slice(0, 4); // par exemple : les 4 premiers en "jobs of the day"
-      const jobsNeedingHelp = allJobs.filter(job => !jobOfTheDay.some(j => j.id === job.id));
-  
-      setJobsOfTheDay(jobOfTheDay);
-      setOtherJobs(jobsNeedingHelp.slice(0, 4)); // limite à 4 aussi ici
-    } catch (error) {
-      console.error('Erreur lors de la récupération des jobs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+  fetchJobsOfTheDay();
+  fetchJobsThatNeedHelp();
+}, []);
+
+const fetchJobsOfTheDay = async () => {
+  try {
+    const response = await fetch(`${config.backendUrl}/api/mission/get-job-of-the-day`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch jobs of the day');
+    const data = await response.json();
+    
+    const jobOfTheDay = data.metiers.slice(0, 4);
+    setJobsOfTheDay(jobOfTheDay);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des jobs of the day:', error);
+  }
+};
+
+const fetchJobsThatNeedHelp = async () => {
+  try {
+    const response = await fetch(`${config.backendUrl}/api/mission/get-job-of-the-day`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch other jobs');
+    const data = await response.json();
+
+    
+    const jobsNeedingHelp  = data.metiers.slice(0, 4);
+
+    setOtherJobs(jobsNeedingHelp.slice(0, 4));
+  } catch (error) {
+    console.error('Erreur lors de la récupération des jobs qui ont besoin de vous:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleJobClick = (job: any) => {
     setSelectedJob(job);
     setIsModalVisible(true);
   };
 
-  useEffect(() => {
-    fetchJobsOfTheDay();
-  }, []);
+  
 
   const workersMock = [
     'https://randomuser.me/api/portraits/men/36.jpg',

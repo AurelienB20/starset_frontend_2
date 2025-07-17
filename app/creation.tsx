@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import CheckBox from '@react-native-community/checkbox';
 import { useNavigation } from '@react-navigation/native';
+import Checkbox from 'expo-checkbox';
 
 import React, { useState } from 'react';
 import {
@@ -127,11 +127,10 @@ const CreationScreen = () => {
 
       {/* Case à cocher + lien */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
-        <CheckBox
-          value={acceptedPrivacy}
-          onValueChange={setAcceptedPrivacy}
-          tintColors={{ true: '#4CAF50', false: 'black' }}
-        />
+       <Checkbox
+  value={acceptedPrivacy}
+  onValueChange={setAcceptedPrivacy}
+/>
         <Pressable onPress={() => setModalVisible(true)}>
           <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
             J’ai lu et j’accepte la politique de confidentialité
@@ -158,10 +157,11 @@ const CreationScreen = () => {
             </TouchableOpacity>
           </View>
           <WebView
-  source={{ uri: 'https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf' }}
-  style={{ flex: 1 }}
-  originWhitelist={['*']}
-/>
+           source={{
+             uri: 'https://docs.google.com/gview?embedded=true&url=https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf'
+           }}
+           style={{ flex: 1, width:'100%', height : 50 }}
+         />
         </View>
       </Modal>
     </ScrollView>
