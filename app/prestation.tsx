@@ -70,6 +70,7 @@ const PrestationScreen = () => {
   const [showExperienceCalendar, setShowExperienceCalendar] = useState(false);
   const [experienceDate, setExperienceDate] = useState('');
   const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>('sur place');
+  const [selectedTarifMode, setSelectedTarifMode] = useState<'heure' | 'prestation'>('heure');
   const [showModeOptions, setShowModeOptions] = useState(false);
   const [certificationImages, setCertificationImages] = useState<any[]>([]);
   const [experienceImages, setExperienceImages] = useState<string[]>([]);
@@ -990,6 +991,26 @@ const PrestationScreen = () => {
             </Picker>
           </View>
         </View>
+        <View style={{ marginBottom: 20 }}>
+          <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}>
+            Mode de paiement
+          </Text>
+          <View style={{
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 8,
+            overflow: 'hidden'
+          }}>
+            <Picker
+              selectedValue={selectedTarifMode}
+              onValueChange={(itemValue) =>
+                setSelectedTarifMode(itemValue)
+              }>
+              <Picker.Item label="tarif par heure" value="heure" />
+              <Picker.Item label="tarif par prestation" value="prestation" />
+            </Picker>
+          </View>
+        </View>
       </View>
 
       
@@ -997,7 +1018,7 @@ const PrestationScreen = () => {
       {!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
  !prestation?.type_of_remuneration?.toLowerCase().includes('hourly') ? (
        <View style={styles.tarifSection}>
-        <Text style={styles.tarifTitle}>Ajouter mes tarids</Text>
+        <Text style={styles.tarifTitle}>Ajouter mes tarifs</Text>
         <TouchableOpacity
           style={prestation?.remuneration ? styles.tarifDisplay : styles.tarifButton}
           onPress={goToMultiplePrestation}
