@@ -464,19 +464,6 @@ navigation.dispatch(
   </View>
 </TouchableOpacity>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
       {/* Modal de confirmation de déconnexion */}
       </ScrollView>
       <Modal
