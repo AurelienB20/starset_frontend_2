@@ -16,6 +16,34 @@ const ChatScreen = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[] | null>([]);
   const [isSending, setIsSending] = useState(false);
+  const [otherId, setOtherId] = useState<string | null>(null);
+
+  const getConversationDetails = async () => {
+  try {
+    const response = await fetch(`${config.backendUrl}/api/conversation/get-conversation-with-id`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ conversation_id: conversation_id }),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération de la conversation');
+
+    const data = await response.json();
+    console.log(data)
+
+    if (data.success && data.conversation) {
+      const { person1_id, person2_id } = data.conversation;
+
+      // ✅ Trouve l'autre personne en comparant avec sender_id
+      const other = person1_id === sender_id ? person2_id : person1_id;
+      setOtherId(other);
+      console.log('Autre personne dans la conversation :', other);
+    }
+  } catch (error) {
+    console.error("Erreur dans getConversationDetails:", error);
+  }
+};
+
 
   const getAllMessages = async () => {
     try {
@@ -137,6 +165,35 @@ const ChatScreen = () => {
       Alert.alert('Erreur', 'Impossible d\'envoyer l\'image');
     }
   };
+
+  const goToPrestationViewWithId = (id: any) => {
+  navigation.navigate({
+    name: 'prestationView',
+    params: { id },
+  } as never);
+};
+
+const fetchPrestationIdByWorker = async (workerId: any) => {
+  try {
+    const response = await fetch(`${config.backendUrl}/api/mission/get-any`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ worker_id: workerId }),
+    });
+
+    const data = await response.json();
+    if (data.success && data.prestation_id) {
+      goToPrestationViewWithId(data.prestation_id);
+    } else {
+      Alert.alert("Erreur", "Impossible de récupérer la prestation.");
+    }
+  } catch (err) {
+    console.error("Erreur lors de la récupération du prestation_id :", err);
+    Alert.alert("Erreur", "Impossible de naviguer vers la prestation.");
+  }
+};
 
   const handleSendMessageMultipleImage = async () => {
     const trimmedMessage = newMessage.trim();
@@ -281,6 +338,7 @@ const ChatScreen = () => {
 
   useEffect(() => {
     getAllMessages();
+    getConversationDetails();
   }, []);
 
   useEffect(() => {
@@ -306,10 +364,23 @@ const ChatScreen = () => {
     >
       {/* Placeholder image at the top center */}
       <View style={styles.header}>
-        <Image
-          source={{ uri: contact_profile_picture_url }} // Placeholder for user avatar
-          style={styles.headerImage}
-        />
+        <TouchableOpacity
+  onPress={() => {
+    if (sender_type === 'user') {
+      if (otherId) {
+        fetchPrestationIdByWorker(otherId);
+      } else {
+        Alert.alert('Erreur', 'Identifiant du contact non disponible.');
+      }
+    }
+    // Si sender_type n'est pas 'user' → ne rien faire
+  }}
+>
+  <Image
+    source={{ uri: contact_profile_picture_url }}
+    style={styles.headerImage}
+  />
+</TouchableOpacity>
         <Text style={styles.headerName}>{contact_firstname}</Text>
       </View>
 

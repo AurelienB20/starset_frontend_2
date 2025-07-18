@@ -87,7 +87,7 @@ const ConversationScreen = () => {
       params: {
         conversation_id: conversationId,
         sender_id,
-        sender_type: 'worker',
+        sender_type: 'user',
         contact_profile_picture_url: contactProfilePictureUrl,
         contact_firstname: contactFirstname,
       },
