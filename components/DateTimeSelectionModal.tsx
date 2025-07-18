@@ -226,7 +226,7 @@ const getMarkedDates = () => {
   height={200}
   mode="week"
   date={selectedDates[0]}
-  swipeEnabled={false}
+  swipeEnabled={true}
   hourRowHeight={30} // 🔽 Réduit la hauteur de chaque heure
   eventCellStyle={() => ({
     paddingVertical: 2,
