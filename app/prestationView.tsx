@@ -1,3 +1,4 @@
+import DateTimeSelectionModal from '@/components/DateTimeSelectionModal'; // ajuste le chemin si besoin
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { JosefinSans_100Thin, JosefinSans_700Bold } from '@expo-google-fonts/josefin-sans';
@@ -7,9 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
+import moment, { MomentInput } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Calendar } from 'react-native-calendars'; // Import the Calendar component
+import { Alert, Animated, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Assurez-vous d'avoir installé cette bibliothèque
 import config from '../config.json';
@@ -60,6 +61,8 @@ const PrestationViewScreen = () => {
   const { user, setUser} = useUser()
   const { currentWorkerPrestation, setCurrentWorkerPrestation} = useCurrentWorkerPrestation()
   const [isProfileInfoVisible, setProfileInfoVisible] = useState(false);
+  const [availabilityByDate, setAvailabilityByDate] = useState<any>({});
+  const [selectedDates, setSelectedDates] = useState<any>({});
 
     const profileImageSize = scrollY.interpolate({
       inputRange: [0, 70],
@@ -220,7 +223,7 @@ const PrestationViewScreen = () => {
     setCalendarVisible(!isCalendarVisible); // Toggle the visibility of the calendar
   };
 
-  const handleDateSelect = (day : any) => {
+  const handleDateSelectAncien = (day : any) => {
     const selectedDate = day.dateString;
     if (!startDate) {
       setStartDate(selectedDate); // Si aucune date de début n'est définie, définissez-la
@@ -236,6 +239,17 @@ const PrestationViewScreen = () => {
       setStartDate(selectedDate); // Redémarrez avec la nouvelle date de début
       setEndDate(''); // Réinitialisez la date de fin
     }
+  };
+
+  const handleDateSelect = (day : any) => {
+    const date = day.dateString;
+
+    if (!availabilityByDate[date]) return;
+
+    setSelectedDates((prev: any) => ({
+      ...prev,
+      [date]: !prev[date], // toggle selection
+    }));
   };
 
   const getPrestation = async () => {
@@ -265,6 +279,7 @@ const PrestationViewScreen = () => {
         setAccount(data.account);
         setPrestationImages(data.images);
         setComments(data.comments);
+        fetchAvailability(data.account.worker)
       }
     } catch (error) {
       console.error('Une erreur est survenue lors de la récupération des prestations:', error);
@@ -399,6 +414,32 @@ const PrestationViewScreen = () => {
     }
   };
 
+  const fetchAvailability = async (worker_id : any) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/mission/get-worker-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ worker_id :  worker_id }), // Remplace dynamiquement
+      });
+      const data = await response.json();
+
+      if (data.success && data.schedule) {
+        const map : any = {};
+
+        data.schedule.forEach((item: { date: MomentInput; start_time: any; end_time: any; }) => {
+          const date = moment(item.date).format('YYYY-MM-DD');
+          if (!map[date]) map[date] = [];
+          map[date].push(`${item.start_time} - ${item.end_time}`);
+        });
+
+        setAvailabilityByDate(map);
+      }
+    } catch (err) {
+      console.error('Erreur de chargement des disponibilités:', err);
+    }
+  };
+
+
   const getUnavailableDates = async () => {
     try {
       const response = await fetch(`${config.backendUrl}/api/planned-prestation/get-worker-unavailable-dates`, {
@@ -420,37 +461,43 @@ const PrestationViewScreen = () => {
   };
 
   const getMarkedDates = () => {
-    const markedDates: any = {};
-  
-    if (startDate) {
-      markedDates[startDate] = { startingDay: true, color: 'green', textColor: 'white' };
-    }
-    if (endDate) {
-      markedDates[endDate] = { endingDay: true, color: 'green', textColor: 'white' };
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      let currentDate = start;
-  
-      while (currentDate <= end) {
-        const dateString = currentDate.toISOString().split('T')[0];
-        markedDates[dateString] = { color: 'lightgreen', textColor: 'white' };
-        currentDate.setDate(currentDate.getDate() + 1);
+    const marked : any = {};
+    const allDates : any = Object.keys(availabilityByDate);
+
+    // Grise tous les jours sans dispo + ajoute couleur aux dispo
+    for (let i = 0; i < 31; i++) {
+      const date = moment().startOf('month').add(i, 'days').format('YYYY-MM-DD');
+      if (availabilityByDate[date]) {
+        marked[date] = {
+          marked: true,
+          selected: selectedDates[date],
+          customStyles: {
+            container: {
+              backgroundColor: selectedDates[date] ? '#4CAF50' : '#C6F6D5',
+            },
+            text: {
+              color: '#000',
+              fontWeight: 'bold',
+            },
+          },
+        };
+      } else {
+        marked[date] = {
+          disabled: true,
+          disableTouchEvent: true,
+          customStyles: {
+            container: {
+              backgroundColor: '#e0e0e0',
+            },
+            text: {
+              color: '#999',
+            },
+          },
+        };
       }
     }
-  
-    // Ajouter les dates indisponibles en rouge
-    unavailableDates.forEach(date => {
-      console.log(2)
-      markedDates[date] = {
-        disabled: true,
-        disableTouchEvent: true,
-        color: 'red',
-        textColor: 'white'
-      };
-    });
-    console.log(markedDates)
-  
-    return markedDates;
+
+    return marked;
   };
   
 
@@ -519,6 +566,7 @@ const unlikeImage = async (imageId: string) => {
     getAllExperience();
     getAllCertification()
     getUnavailableDates();
+    
     getLikedImages()
     async function loadFonts() {
       await Font.loadAsync({
@@ -980,119 +1028,30 @@ const unlikeImage = async (imageId: string) => {
           </View>
         </View>
       </Modal>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isCalendarVisible}
-        onRequestClose={toggleCalendar}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {/* Petite croix pour fermer le modal */}
-            <TouchableOpacity onPress={toggleCalendar} style={styles.closeIcon}>
-              <Icon name="close" size={24} color="#000" />
-            </TouchableOpacity>
 
-            {/* Flèche retour pour étapes > 1 */}
-            {(modalType === 'arrival' || modalType === 'departure') && (
-              <TouchableOpacity
-                onPress={() => {
-                  if (modalType === 'arrival') setModalType('date');
-                  else if (modalType === 'departure') setModalType('arrival');
-                }}
-                style={styles.backIcon}
-              >
-                <Icon name="arrow-back" size={24} color="#000" />
-              </TouchableOpacity>
-            )}
+      <DateTimeSelectionModal
+  visible={isCalendarVisible}
+  onClose={toggleCalendar}
+  modalType={modalType}
+  setModalType={setModalType}
+  
+  availabilityByDate={availabilityByDate}
+  onDateSelect={handleDateSelect}
+  arrivalHour={arrivalHour}
+  arrivalMinute={arrivalMinute}
+  setStartDate={setStartDate}
+  setEndDate={setEndDate}
+  startDate={startDate}
+  endDate={endDate}
+  departureHour={departureHour}
+  departureMinute={departureMinute}
+  onArrivalHourChange={(text) => handleHourChange(text, setArrivalHour)}
+  onArrivalMinuteChange={(text) => handleMinuteChange(text, setArrivalMinute)}
+  onDepartureHourChange={(text) => handleDepartureHourChange(text, setDepartureHour)}
+  onDepartureMinuteChange={(text) => handleDepartureMinuteChange(text, setDepartureMinute)}
+  onConfirm={handleAddToCart}
+/>
 
-
-            {/* Afficher le contenu en fonction du type */}
-            {modalType === 'date' && (
-              <>
-                <Text style={styles.modalTitle}>Choisissez une date</Text>
-                <Calendar
-                  onDayPress={handleDateSelect}
-                  markingType="period"
-                  markedDates={getMarkedDates()}
-                  style={styles.calendar}
-                />
-                <TouchableOpacity onPress={toggleArrivalTimePicker} style={styles.horairesButton}>
-                  <Text style={styles.horairesButtonText}>Horaires</Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {modalType === 'arrival' && (
-              <>
-                <Text style={styles.modalTitle}>Heure d'arrivée</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="numeric"
-                    maxLength={2}
-                    placeholder="HH"
-                    value={arrivalHour}
-                    onChangeText={(text) => handleHourChange(text, setArrivalHour)}
-                  />
-                  <Text style={styles.timeSeparator}>:</Text>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="numeric"
-                    maxLength={2}
-                    placeholder="MM"
-                    value={arrivalMinute}
-                    onChangeText={(text) => handleMinuteChange(text, setArrivalMinute)}
-                  />
-                </View>
-                
-                <TouchableOpacity
-                  style={[styles.nextButton, !(arrivalHour.length === 2 && arrivalMinute.length === 2) && { backgroundColor: '#ccc' }]}
-                  disabled={!(arrivalHour.length === 2 && arrivalMinute.length === 2)}
-                  onPress={() => {
-                    setModalType('departure');
-                  }}
-                >
-                  <Text style={styles.nextButtonText}>Suivant</Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {modalType === 'departure' && (
-              <>
-                <Text style={styles.modalTitle}>Heure de départ</Text>
-                <View style={styles.inputRow}>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="numeric"
-                    maxLength={2}
-                    placeholder="HH"
-                    value={departureHour}
-                    onChangeText={(text) => handleHourChange(text, setDepartureHour)}
-                  />
-                  <Text style={styles.timeSeparator}>:</Text>
-                  <TextInput
-                    style={styles.input}
-                    keyboardType="numeric"
-                    maxLength={2}
-                    placeholder="MM"
-                    value={departureMinute}
-                    onChangeText={(text) => handleMinuteChange(text, setDepartureMinute)}
-                  />
-                </View>
-                
-                <TouchableOpacity
-                  style={[styles.nextButton, !(departureHour.length === 2 && departureMinute.length === 2) && { backgroundColor: '#ccc' }]}
-                  disabled={!(departureHour.length === 2 && departureMinute.length === 2)}
-                  onPress={handleAddToCart}
-                >
-                  <Text style={styles.nextButtonText}>Confirmer</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
 
       <Modal
   visible={isProfileInfoVisible}
@@ -1537,18 +1496,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
 
-  horairesButton: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#00cc66', // Couleur du bouton Horaires
-    width: '100%',
-    alignItems: 'center',
-  },
-  horairesButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  
 
   timePickerModalContainer: {
     flex: 1,
@@ -1647,10 +1595,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
   },
-  timeSeparator: {
-    fontSize: 40,
-    marginHorizontal: 10,
-  },
+  
 
   backIcon: {
     position: 'absolute',
@@ -1788,8 +1733,6 @@ const styles = StyleSheet.create({
   
   seeMoreButton: {
     flexDirection: 'row',
-    //alignItems: 'space-between',
-  
     justifyContent: 'space-between',
   },
   
@@ -1990,7 +1933,6 @@ certificationInstitution: {
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-
   
   certificationImagesColumn: {
     flexShrink: 0,

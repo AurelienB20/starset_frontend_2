@@ -26,11 +26,9 @@ const CreationScreen = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
- 
+  
 
   const navigation = useNavigation();
-
-  
 
   const handleEmailChange = (text: string) => {
     setEmail(text);

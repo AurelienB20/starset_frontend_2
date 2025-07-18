@@ -1,6 +1,7 @@
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -18,6 +19,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
 
 const ChoosePrestationScreen = () => {
+  const [availabilityByDate, setAvailabilityByDate] = useState<any>({});
   const route = useRoute();
   const { prestation_id } = route.params as { prestation_id: number };
   const [customPrestations, setCustomPrestations] = useState([]);
@@ -40,7 +42,10 @@ const ChoosePrestationScreen = () => {
 
   useEffect(() => {
     getCustomPrestations();
+    fetchAvailability(currentWorkerPrestation?.worker_id);
   }, []);
+
+  
 
   const getCustomPrestations = async () => {
     try {
@@ -62,6 +67,30 @@ const ChoosePrestationScreen = () => {
       }
     } catch (error) {
       console.error('Erreur chargement prestations personnalisées:', error);
+    }
+  };
+
+  const fetchAvailability = async (worker_id: any) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/mission/get-worker-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ worker_id }),
+      });
+  
+      const data = await response.json();
+  
+      if (data.success && data.schedule) {
+        const map: any = {};
+        data.schedule.forEach((item: any) => {
+          const date = moment(item.date).format('YYYY-MM-DD');
+          if (!map[date]) map[date] = [];
+          map[date].push(`${item.start_time} - ${item.end_time}`);
+        });
+        setAvailabilityByDate(map);
+      }
+    } catch (err) {
+      console.error('Erreur de chargement des disponibilités:', err);
     }
   };
 
@@ -89,8 +118,11 @@ const ChoosePrestationScreen = () => {
   };
 
   const handleDateSelect = (day: any) => {
-    setSelectedDate(day.dateString);
-    setModalType('arrival'); // passe à l’étape heure
+    const date = day.dateString;
+    if (!availabilityByDate[date]) return;
+  
+    setSelectedDate(date);
+    setModalType('arrival');
   };
 
   const handleAddToCart = () => {
@@ -125,6 +157,20 @@ const ChoosePrestationScreen = () => {
     addToCart(cartItem);
     Alert.alert('Succès', 'Prestation ajoutée au panier.');
     setModalVisible(false);
+  };
+
+  const getMarkedDates = () => {
+    const marked: any = {};
+  
+    Object.keys(availabilityByDate).forEach((date) => {
+      marked[date] = {
+        marked: true,
+        selected: selectedDate === date,
+        selectedColor: selectedDate === date ? '#4CAF50' : '#C6F6D5',
+      };
+    });
+  
+    return marked;
   };
 
   const renderItem = ({ item }: any) => (
@@ -190,9 +236,7 @@ const ChoosePrestationScreen = () => {
                 <Calendar
                   onDayPress={handleDateSelect}
                   
-                  markedDates={
-                    selectedDate ? { [selectedDate]: { selected: true, selectedColor: 'green' } } : {}
-                  }
+                  markedDates={getMarkedDates()}
                   style={styles.calendar}
                 />
               </>

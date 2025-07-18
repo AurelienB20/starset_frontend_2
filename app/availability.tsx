@@ -3,12 +3,14 @@ import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   Modal, ScrollView,
   StyleSheet,
   Text, TextInput, TouchableOpacity,
   View,
 } from 'react-native';
 import { Calendar } from 'react-native-big-calendar';
+import { Menu, Provider as PaperProvider } from 'react-native-paper';
 import config from '../config.json';
 
 const ModifyAvailabilityScreen = () => {
@@ -18,6 +20,9 @@ const ModifyAvailabilityScreen = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [timeRange, setTimeRange] = useState({ start: '', end: '' });
   const [workerId, setWorkerId] = useState<string | null>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null);
+const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -60,7 +65,12 @@ const ModifyAvailabilityScreen = () => {
     }
   };
 
-  const handleDateClick = (date: Date) => {
+  const handleDateClick = (date: Date | undefined) => {
+    if (!date || isNaN(new Date(date).getTime())) {
+      console.warn('Clic ignoré – Date invalide ou absente :', date);
+      return;
+    }
+  
     setSelectedDate(date);
     setTimeRange({ start: '', end: '' });
     setShowModal(true);
@@ -101,43 +111,140 @@ const ModifyAvailabilityScreen = () => {
     }
   };
 
+  const normalizeTimeInput = (input: string): string => {
+  // Supprime les espaces
+  input = input.trim().replace(/\s+/g, '');
+
+  // Remplace 'h' ou 'H' par ':'
+  input = input.replace(/[hH]/, ':');
+
+  // Si format est par exemple "9:0", complète avec zéros
+  const [hour, minute] = input.split(':');
+
+  if (!hour) return '';
+  const hh = hour.padStart(2, '0');
+  const mm = (minute || '00').padEnd(2, '0');
+
+  // Ne garde que les deux premiers caractères des minutes
+  return `${hh}:${mm.slice(0, 2)}`;
+};
+
+
+  const deleteWorkerSchedule = async () => {
+  if (!workerId || !selectedEvent) return;
+
+  const date = moment(selectedEvent.start).format('YYYY-MM-DD');
+  const start_time = moment(selectedEvent.start).format('HH:mm');
+  const end_time = moment(selectedEvent.end).format('HH:mm');
+
+  try {
+    const res = await fetch(`${config.backendUrl}/api/mission/delete-worker-schedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        worker_id: workerId,
+        date,
+        start_time,
+        end_time,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setEvents((prev) =>
+        prev.filter(
+          (ev) =>
+            !(
+              moment(ev.start).isSame(selectedEvent.start) &&
+              moment(ev.end).isSame(selectedEvent.end)
+            )
+        )
+      );
+      setMenuVisible(false);
+      setSelectedEvent(null);
+    } else {
+      console.warn('Suppression échouée :', data.message);
+    }
+  } catch (err) {
+    console.error('Erreur suppression :', err);
+  }
+};
+
   return (
+  <PaperProvider>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Modifier vos disponibilités</Text>
-
       <Calendar
         events={events}
         height={600}
         mode="week"
         weekStartsOn={1}
         onPressCell={handleDateClick}
+        onPressEvent={(event) => {
+        setSelectedEvent(event);
+        setMenuAnchor(null); // ou { x: 0, y: 0 } pour forcer un coin
+        setMenuVisible(true);
+      }}
         swipeEnabled
         scrollOffsetMinutes={480}
       />
+
+      <Menu
+      visible={menuVisible}
+      onDismiss={() => setMenuVisible(false)}
+      anchor={menuAnchor}
+    >
+      <Menu.Item
+        onPress={() => {
+          setMenuVisible(false);
+          Alert.alert(
+            'Supprimer ce créneau ?',
+            'Cette action est irréversible.',
+            [
+              { text: 'Annuler', style: 'cancel' },
+              { text: 'Supprimer', style: 'destructive', onPress: deleteWorkerSchedule },
+            ]
+          );
+        }}
+        title="Supprimer"
+      />
+    </Menu>
 
       <Modal visible={showModal} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Ajouter une disponibilité</Text>
-            {selectedDate && (
-              <Text style={styles.selectedDate}>
-                {moment(selectedDate).locale('fr').format('dddd D MMMM YYYY')}
-              </Text>
-            )}
+            <Text style={styles.selectedDate}>
+              {selectedDate
+                ? new Intl.DateTimeFormat('fr-FR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  }).format(selectedDate)
+                : 'Date non sélectionnée'}
+            </Text>
 
             <TextInput
               style={styles.input}
-              placeholder="Heure de début (ex: 09:00)"
+              placeholder="Heure de début (ex: 09:00 ou 9h00)"
               value={timeRange.start}
-              onChangeText={(text) => setTimeRange({ ...timeRange, start: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Heure de fin (ex: 17:00)"
-              value={timeRange.end}
-              onChangeText={(text) => setTimeRange({ ...timeRange, end: text })}
+              onChangeText={(text) => {
+                const formatted = normalizeTimeInput(text);
+                setTimeRange({ ...timeRange, start: formatted });
+              }}
             />
 
+            <TextInput
+              style={styles.input}
+              placeholder="Heure de fin (ex: 17:00 ou 17h00)"
+              value={timeRange.end}
+              onChangeText={(text) => {
+                const formatted = normalizeTimeInput(text);
+                setTimeRange({ ...timeRange, end: formatted });
+              }}
+            />
             <TouchableOpacity style={styles.button} onPress={handleAddAvailability}>
               <Text style={styles.buttonText}>Ajouter</Text>
             </TouchableOpacity>
@@ -152,6 +259,7 @@ const ModifyAvailabilityScreen = () => {
         </View>
       </Modal>
     </ScrollView>
+    </PaperProvider>
   );
 };
 
