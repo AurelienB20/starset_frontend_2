@@ -506,6 +506,12 @@ const PrestationViewScreen = () => {
     setImageModalVisible(true);
   };
 
+  const openImageModalFromUri = (imageUri : string) => {
+    const image = {adress: imageUri};
+    setSelectedImage(image);
+    setImageModalVisible(true);
+  };
+
   const closeImageModal = () => {
     setSelectedImage(null);
     setImageModalVisible(false);
@@ -847,7 +853,9 @@ const unlikeImage = async (imageId: string) => {
             <Text style={styles.experienceDescription}>{experience.description}</Text>
             <View style={styles.experienceImages}>
               {experience.images?.map((imageUri: string, idx: number) => (
+                <TouchableOpacity key={idx} onPress={() => openImageModalFromUri(imageUri)} style={styles.photoButton}>
                 <Image key={idx} source={{ uri: imageUri }} style={styles.experienceImage} />
+                </TouchableOpacity>
               ))}
             </View>
           </View>
@@ -890,11 +898,13 @@ const unlikeImage = async (imageId: string) => {
                       </>
                     ) : (
                       certification.images?.map((uri: string, i: number) => (
+                        <TouchableOpacity key={i} onPress={() => openImageModalFromUri(uri)} style={styles.photoButton}>
                         <Image
                           key={i}
                           source={{ uri }}
                           style={styles.certificationMiniImage}
                         />
+                        </TouchableOpacity>
                       ))
                     )}
                   </View>
