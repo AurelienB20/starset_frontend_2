@@ -13,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import config from '../config.json';
 
 const CreationScreen = () => {
@@ -148,20 +147,101 @@ const CreationScreen = () => {
 
       {/* Modal WebView PDF */}
       <Modal visible={modalVisible} animationType="slide">
-        <View style={{ flex: 1 }}>
-          <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
-            </TouchableOpacity>
-          </View>
-          <WebView
-           source={{
-             uri: 'https://docs.google.com/gview?embedded=true&url=https://api.starsetfrance.com/media/assets/politique_de_confidentialite.pdf'
-           }}
-           style={{ flex: 1, width:'100%', height : 50 }}
-         />
-        </View>
-      </Modal>
+  <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
+      <TouchableOpacity onPress={() => setModalVisible(false)}>
+        <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
+      </TouchableOpacity>
+    </View>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+        🔒 Politique de confidentialité – STARSET
+      </Text>
+      <Text style={{ color: '#666', fontSize: 12, marginBottom: 15 }}>
+        Dernière mise à jour : 01/07/2025
+      </Text>
+
+      <Text style={styles.policyTitle}>1. Responsable du traitement</Text>
+      <Text style={styles.policyText}>
+        STAR SET SAS{"\n"}
+        contact@starsetfrance.com{"\n"}
+        23 rue de la Garenne, Champs sur Marne, 77420
+      </Text>
+
+      <Text style={styles.policyTitle}>2. Données collectées</Text>
+      <Text style={styles.policyText}>
+        - Informations fournies : nom, prénom, email, téléphone, adresse, profil, justificatifs{"\n"}
+        - Automatiquement : géolocalisation, appareil, IP, usage app{"\n"}
+        - Paiements via Stripe (aucune donnée bancaire stockée)
+      </Text>
+
+      <Text style={styles.policyTitle}>3. Utilisation</Text>
+      <Text style={styles.policyText}>
+        - Créer et gérer les comptes{"\n"}
+        - Mettre en relation les utilisateurs{"\n"}
+        - Gérer les missions, paiements{"\n"}
+        - Lutte contre les fraudes{"\n"}
+        - Respect légal
+      </Text>
+
+      <Text style={styles.policyTitle}>4. Partage</Text>
+      <Text style={styles.policyText}>
+        - Avec utilisateurs (mise en relation){"\n"}
+        - Prestataires techniques (hébergement, paiement){"\n"}
+        - Autorités si nécessaire{"\n"}
+        - Pas de vente de données
+      </Text>
+
+      <Text style={styles.policyTitle}>5. Géolocalisation</Text>
+      <Text style={styles.policyText}>
+        - Pour proposer des missions proches{"\n"}
+        - Sous réserve de votre consentement
+      </Text>
+
+      <Text style={styles.policyTitle}>6. Durée de conservation</Text>
+      <Text style={styles.policyText}>
+        - Pendant l’activité du compte + 5 ans après suppression (lutte contre fraudes)
+      </Text>
+
+      <Text style={styles.policyTitle}>7. Sécurité</Text>
+      <Text style={styles.policyText}>
+        - Chiffrement, pare-feu, contrôle d’accès, pseudonymisation
+      </Text>
+
+      <Text style={styles.policyTitle}>8. Vos droits</Text>
+      <Text style={styles.policyText}>
+        - Accès, modification, suppression, opposition, portabilité{"\n"}
+        - Contact : contact@starsetfrance.com
+      </Text>
+
+      <Text style={styles.policyTitle}>9. Transferts internationaux</Text>
+      <Text style={styles.policyText}>
+        - Vers pays avec protection adéquate ou garanties légales
+      </Text>
+
+      <Text style={styles.policyTitle}>10. Cookies</Text>
+      <Text style={styles.policyText}>
+        - Mesure d’audience, personnalisation{"\n"}
+        - Conforme RGPD & App Store
+      </Text>
+
+      <Text style={styles.policyTitle}>11. Mise à jour</Text>
+      <Text style={styles.policyText}>
+        - Vous serez notifié en cas de changement
+      </Text>
+
+      <Text style={styles.policyTitle}>12. Contact</Text>
+      <Text style={styles.policyText}>
+        contact@starsetfrance.com{"\n"}
+        23 rue de la Garenne, Champs sur Marne, 77420
+      </Text>
+
+      <Text style={{ fontStyle: 'italic', marginTop: 20, color: '#555' }}>
+        📱 Conforme aux règles App Store (section 5.1)
+      </Text>
+    </ScrollView>
+  </View>
+</Modal>
     </ScrollView>
   );
 };
@@ -245,6 +325,19 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 25,
   },
+
+  policyTitle: {
+  fontWeight: 'bold',
+  fontSize: 16,
+  marginTop: 15,
+  color: '#000',
+},
+policyText: {
+  fontSize: 14,
+  color: '#333',
+  lineHeight: 20,
+  marginTop: 5,
+},
 });
 
 export default CreationScreen;
