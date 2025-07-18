@@ -77,39 +77,57 @@ const [selectedEvent, setSelectedEvent] = useState<any>(null);
   };
 
   const handleAddAvailability = async () => {
-    if (!selectedDate || !timeRange.start || !timeRange.end || !workerId) return;
+  if (!selectedDate || !timeRange.start || !timeRange.end || !workerId) return;
 
-    const date = moment(selectedDate).format('YYYY-MM-DD');
-    const newEvent = {
-      title: 'Disponible',
-      start: moment(`${date}T${timeRange.start}`).toDate(),
-      end: moment(`${date}T${timeRange.end}`).toDate(),
-    };
+  const startFormatted = normalizeTimeInput(timeRange.start);
+  const endFormatted = normalizeTimeInput(timeRange.end);
 
-    try {
-      const res = await fetch(`${config.backendUrl}/api/mission/add-worker-schedule`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          worker_id: workerId,
-          date,
-          start_time: timeRange.start,
-          end_time: timeRange.end,
-        }),
-      });
+  // Vérification validité format horaire HH:mm
+  const isValidFormat = (val: string) => /^([01]\d|2[0-3]):[0-5]\d$/.test(val);
 
-      const data = await res.json();
+  if (!isValidFormat(startFormatted) || !isValidFormat(endFormatted)) {
+    Alert.alert("Format invalide", "Les heures doivent être au format HH:mm ou 9h00.");
+    return;
+  }
 
-      if (data.success) {
-        setEvents([...events, newEvent]);
-        setShowModal(false);
-      } else {
-        console.warn('Erreur côté serveur :', data.message);
-      }
-    } catch (err) {
-      console.error('Erreur lors de l\'ajout de disponibilité :', err);
-    }
+  const startMoment = moment(`${moment(selectedDate).format("YYYY-MM-DD")}T${startFormatted}`);
+  const endMoment = moment(`${moment(selectedDate).format("YYYY-MM-DD")}T${endFormatted}`);
+
+  if (!startMoment.isValid() || !endMoment.isValid() || endMoment.isSameOrBefore(startMoment)) {
+    Alert.alert("Heure incorrecte", "L'heure de fin doit être après l'heure de début.");
+    return;
+  }
+
+  const newEvent = {
+    title: 'Disponible',
+    start: startMoment.toDate(),
+    end: endMoment.toDate(),
   };
+
+  try {
+    const res = await fetch(`${config.backendUrl}/api/mission/add-worker-schedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        worker_id: workerId,
+        date: moment(selectedDate).format('YYYY-MM-DD'),
+        start_time: startFormatted,
+        end_time: endFormatted,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      setEvents([...events, newEvent]);
+      setShowModal(false);
+    } else {
+      console.warn('Erreur côté serveur :', data.message);
+    }
+  } catch (err) {
+    console.error('Erreur lors de l\'ajout de disponibilité :', err);
+  }
+};
 
   const normalizeTimeInput = (input: string): string => {
   // Supprime les espaces
@@ -227,24 +245,18 @@ const [selectedEvent, setSelectedEvent] = useState<any>(null);
             </Text>
 
             <TextInput
-              style={styles.input}
-              placeholder="Heure de début (ex: 09:00 ou 9h00)"
-              value={timeRange.start}
-              onChangeText={(text) => {
-                const formatted = normalizeTimeInput(text);
-                setTimeRange({ ...timeRange, start: formatted });
-              }}
-            />
+  style={styles.input}
+  placeholder="Heure de début (ex: 09:00 ou 9h00)"
+  value={timeRange.start}
+  onChangeText={(text) => setTimeRange({ ...timeRange, start: text })}
+/>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Heure de fin (ex: 17:00 ou 17h00)"
-              value={timeRange.end}
-              onChangeText={(text) => {
-                const formatted = normalizeTimeInput(text);
-                setTimeRange({ ...timeRange, end: formatted });
-              }}
-            />
+<TextInput
+  style={styles.input}
+  placeholder="Heure de fin (ex: 17:00 ou 17h00)"
+  value={timeRange.end}
+  onChangeText={(text) => setTimeRange({ ...timeRange, end: text })}
+/>
             <TouchableOpacity style={styles.button} onPress={handleAddAvailability}>
               <Text style={styles.buttonText}>Ajouter</Text>
             </TouchableOpacity>
