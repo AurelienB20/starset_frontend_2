@@ -235,7 +235,6 @@ const ChoosePrestationScreen = () => {
                 <Text style={styles.modalTitle}>Choisissez une date</Text>
                 <Calendar
                   onDayPress={handleDateSelect}
-                  
                   markedDates={getMarkedDates()}
                   style={styles.calendar}
                 />

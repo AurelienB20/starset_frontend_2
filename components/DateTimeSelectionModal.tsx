@@ -2,13 +2,13 @@ import moment from 'moment';
 import React from 'react';
 import {
   Modal,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { Calendar as BigCalendar } from 'react-native-big-calendar';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -115,6 +115,39 @@ const getSelectedRange = () => {
   return range;
 };
 
+const getSelectedRangeArray = () => {
+  if (!startDate || !endDate) return [];
+  const range: string[] = [];
+  let cursor = moment(startDate);
+  const end = moment(endDate);
+
+  while (cursor.isSameOrBefore(end)) {
+    range.push(cursor.format('YYYY-MM-DD'));
+    cursor.add(1, 'day');
+  }
+
+  return range;
+};
+
+const selectedDates : any = getSelectedRangeArray();
+
+// Transforme availabilityByDate en events pour react-native-big-calendar
+const allEvents = Object.keys(availabilityByDate).flatMap((date) =>
+  availabilityByDate[date].map((timeRange: string) => {
+    const [start, end] = timeRange.split(' - ');
+    return {
+      title: 'Disponible',
+      start: moment(`${date}T${start}`).toDate(),
+      end: moment(`${date}T${end}`).toDate(),
+    };
+  })
+);
+
+// Ne garde que les events correspondant aux dates sélectionnées
+const filteredEvents = allEvents.filter((event) =>
+  selectedDates.includes(moment(event.start).format('YYYY-MM-DD'))
+);
+
 
 const getMarkedDates = () => {
   const marked: any = {};
@@ -183,16 +216,27 @@ const getMarkedDates = () => {
                 markedDates={getMarkedDates()}
                 style={styles.calendar}
               />
-              <ScrollView style={{ marginTop: 20, maxHeight: 200 }}>
-              {Object.keys(getSelectedRange()).map((date) => (
-                    <View key={date} style={{ marginBottom: 10 }}>
-                      <Text style={{ fontWeight: 'bold' }}>{moment(date).format('dddd D MMMM YYYY')}</Text>
-                      {availabilityByDate[date]?.map((range: any, idx: any) => (
-                        <Text key={idx} style={{ marginLeft: 10 }}>{range}</Text>
-                      ))}
-                    </View>
-                  ))}
-              </ScrollView>
+              
+              {selectedDates.length > 0 && (
+                <>
+                  <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>Disponibilités :</Text>
+                  <View style={{ height: 300, marginTop: 10, width : '100%' }}>
+                  <BigCalendar
+  events={filteredEvents}
+  height={200}
+  mode="week"
+  date={selectedDates[0]}
+  swipeEnabled={false}
+  hourRowHeight={30} // 🔽 Réduit la hauteur de chaque heure
+  eventCellStyle={() => ({
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+  })}
+/>
+                  </View>
+                </>
+              )}
+              
               <TouchableOpacity onPress={() => setModalType('arrival')} style={styles.horairesButton}>
                 <Text style={styles.horairesButtonText}>Suivant</Text>
               </TouchableOpacity>
