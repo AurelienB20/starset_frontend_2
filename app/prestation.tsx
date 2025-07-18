@@ -70,7 +70,7 @@ const PrestationScreen = () => {
   const [showExperienceCalendar, setShowExperienceCalendar] = useState(false);
   const [experienceDate, setExperienceDate] = useState('');
   const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>('sur place');
-  const [selectedTarifMode, setSelectedTarifMode] = useState<'heure' | 'prestation'>('heure');
+  const [selectedTarifMode, setSelectedTarifMode] = useState<any>('heure');
   const [showModeOptions, setShowModeOptions] = useState(false);
   const [certificationImages, setCertificationImages] = useState<any[]>([]);
   const [experienceImages, setExperienceImages] = useState<string[]>([]);
