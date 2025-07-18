@@ -8,12 +8,11 @@ import {
   Image,
   Modal,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 interface CertificationFormModalProps {
@@ -79,7 +78,7 @@ const CertificationFormModal: React.FC<CertificationFormModalProps> = ({
   return (
     <Modal visible={visible} animationType="slide" transparent style={styles.modal}>
       <View style={styles.overlay}>
-        <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.container}>
           <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
             <MaterialIcons name="close" size={24} />
           </TouchableOpacity>
@@ -162,7 +161,7 @@ const CertificationFormModal: React.FC<CertificationFormModalProps> = ({
               {isEditMode ? 'Mettre à jour' : 'Valider'}
             </Text>
           </TouchableOpacity>
-        </ScrollView>
+        </View>
       </View>
     </Modal>
   );
