@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Menu, Provider as PaperProvider } from 'react-native-paper';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
 
@@ -45,6 +47,8 @@ const PrestationsScreen = () => {
   const [newPrestation, setNewPrestation] = useState({ title: '', price: '', description: '' });
   const { currentWorkerPrestation: prestation } = useCurrentWorkerPrestation();
   const [prestationImages, setPrestationImages] = useState<string[]>([]);
+  const [menuVisibleId, setMenuVisibleId] = useState<number | null>(null);
+
 
   const getCustomPrestations = async () => {
     try {
@@ -141,6 +145,39 @@ const PrestationsScreen = () => {
     }
   };
 
+  const handleDeleteCustomPrestation = async (id: number) => {
+  Alert.alert(
+    'Supprimer la prestation',
+    'Êtes-vous sûr de vouloir supprimer cette prestation ?',
+    [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const response = await fetch(`${config.backendUrl}/api/prestation/delete-prestation-custom`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prestation_custom_id: id }),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+              setCustomPrestations((prev: any[]) => prev.filter((item) => item.id !== id));
+            } else {
+              Alert.alert('Erreur', 'Impossible de supprimer la prestation.');
+            }
+          } catch (err) {
+            console.error('Erreur suppression prestation custom :', err);
+            Alert.alert('Erreur', 'Une erreur est survenue.');
+          }
+        },
+      },
+    ]
+  );
+};
+
   const openEditModal = (item: any) => {
     setEditingPrestation(item);
     setNewPrestation({ title: item.title, price: String(item.price), description: item.description });
@@ -149,7 +186,29 @@ const PrestationsScreen = () => {
   };
 
   const renderPrestation = ({ item }: any) => (
-    <TouchableOpacity onPress={() => openEditModal(item)} style={styles.prestationCard}>
+  <View style={styles.prestationCard}>
+    <View style={{ position: 'absolute', top: 10, right: 10 }}>
+      <Menu
+        visible={menuVisibleId === item.id}
+        onDismiss={() => setMenuVisibleId(null)}
+        anchor={
+          <TouchableOpacity onPress={() => setMenuVisibleId(item.id)} style = {{ paddingHorizontal : 20}}  >
+            <Icon name="more-vert" size={30} color="#333"  />
+          </TouchableOpacity>
+        }
+      >
+        <Menu.Item
+          onPress={() => {
+            setMenuVisibleId(null);
+            handleDeleteCustomPrestation(item.id);
+          }}
+          title="Supprimer"
+          leadingIcon="delete"
+        />
+      </Menu>
+    </View>
+
+    <View style={{ flexDirection: 'row' }}>
       <View
         style={[
           styles.certificationImagesColumn,
@@ -173,7 +232,7 @@ const PrestationsScreen = () => {
           ))
         )}
       </View>
-  
+
       <View style={styles.prestationDetails}>
         <Text style={styles.prestationTitle}>{item.title}</Text>
         <Text style={styles.prestationPrice}>{item.price} €</Text>
@@ -181,10 +240,13 @@ const PrestationsScreen = () => {
           <Text style={{ color: '#666', marginTop: 4 }}>{item.description}</Text>
         ) : null}
       </View>
-    </TouchableOpacity>
-  );
+    </View>
+  </View>
+);
 
   return (
+    <PaperProvider>
+
     <View style={styles.container}>
       <FlatList
         data={customPrestations}
@@ -246,6 +308,7 @@ const PrestationsScreen = () => {
         </View>
       </Modal>
     </View>
+    </PaperProvider>
   );
 };
 

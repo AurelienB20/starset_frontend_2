@@ -190,19 +190,7 @@ const fetchJobsThatNeedHelp = async () => {
             <Text style={styles.jobDescription}>{selectedJob?.description}</Text>
 
             {/* Autres informations */}
-            <Text style={styles.sectionTitle}>MISSIONS</Text>
-            {/* Missions */}
-            {selectedJob?.mission ? (
-              selectedJob.mission
-                .split('/')
-                .map((m: string) => m.trim())
-                .filter(Boolean)
-                .map((mission: string, index: number) => (
-                  <Text key={index} style={styles.missionItem}>• {mission}</Text>
-                ))
-            ) : (
-              <Text style={styles.missionItem}>Aucune mission renseignée.</Text>
-            )}
+            
 
             {/* Bouton fermer */}
             <TouchableOpacity
