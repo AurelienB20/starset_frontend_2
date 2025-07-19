@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'; // You can use icons for the send
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
-import { Alert, Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Image, Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 import socket from './socket';
 
@@ -17,6 +17,9 @@ const ChatScreen = () => {
   const [selectedImages, setSelectedImages] = useState<string[] | null>([]);
   const [isSending, setIsSending] = useState(false);
   const [otherId, setOtherId] = useState<string | null>(null);
+  const screenHeight = Dimensions.get('window').height;
+const [keyboardHeight, setKeyboardHeight] = useState(0);
+const [visibleHeight, setVisibleHeight] = useState(screenHeight);
 
   const getConversationDetails = async () => {
   try {
@@ -337,9 +340,20 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   };
 
   useEffect(() => {
-    getAllMessages();
-    getConversationDetails();
-  }, []);
+    const showSubscription = Keyboard.addListener('keyboardDidShow', (event) => {
+      setKeyboardHeight(event.endCoordinates.height +10);
+    });
+
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+
+    }, []);
 
   useEffect(() => {
     if (!conversation_id) return;
@@ -357,11 +371,8 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   }, [conversation_id]);
   
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
-    >
+    <View style={[styles.container, { paddingBottom: keyboardHeight }]}>
+      <SafeAreaView style={{ flex: 1 }}>
       {/* Placeholder image at the top center */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -436,7 +447,8 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         <Ionicons name="send" size={24} color="white" />
       </TouchableOpacity>
     </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
+    </View>
   );
 };
 
