@@ -55,6 +55,12 @@ const [isModalVisible, setIsModalVisible] = useState(false);
     } as never);
   };
 
+   const goToNearbyWorkersMap = () => {
+   
+    
+    navigation.navigate('nearbyWorkersMap' as never);
+  };
+
   const goToSearchInHomeScreen = (metierName: string) => {
     
     //navigation.navigate({
@@ -276,10 +282,11 @@ const [isModalVisible, setIsModalVisible] = useState(false);
           <TouchableOpacity style={styles.bellIconContainer} onPress={() => console.log('Notifications')}>
             <Ionicons name="notifications-outline" size={28} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.fakeSearchBar}>
+          <TouchableOpacity style={styles.fakeSearchBar} onPress={goToNearbyWorkersMap}>
             <Ionicons name="location-sharp" size={16} color="#999" style={{ marginRight: 8 }} />
-            <Text style={styles.fakeSearchText}>Top Worker</Text>
+            <Text style={styles.fakeSearchText}>Autour de vous</Text>
           </TouchableOpacity>
+          <Text style={styles.sectionHeader}>Top Worker</Text>
           <FlatList
             data={workers}
             horizontal
