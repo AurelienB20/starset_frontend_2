@@ -222,7 +222,7 @@ const AccountScreen = () => {
 navigation.dispatch(
   CommonActions.reset({
     index: 0,
-    routes: [{ name: 'connexion' }],
+    routes: [{ name: 'isVisitor' }],
   })
 );
   };

@@ -58,7 +58,7 @@ const StarsetScreen = () => {
     if (!accountId) {
       console.warn('[getProfile] Aucun accountId trouvé. Suppression et redirection.');
       await AsyncStorage.clear();
-      navigation.navigate('connexion' as never);
+      navigation.navigate('isVisitor' as never);
       return;
     }
 
@@ -78,7 +78,7 @@ const StarsetScreen = () => {
     if (!data || !data.account || !data.account.id) {
       console.warn('[getProfile] Compte invalide ou supprimé. Suppression et redirection.');
       await AsyncStorage.clear();
-      navigation.navigate('connexion' as never);
+      navigation.navigate('isVisitor' as never);
       return;
     }
 
@@ -87,7 +87,7 @@ const StarsetScreen = () => {
 
     if (!data.account.verified) {
       console.log('[getProfile] Compte non vérifié. Redirection vers connexion.');
-      navigation.navigate('connexion' as never);
+      navigation.navigate('isVisitor' as never);
     } else {
       console.log('[getProfile] Compte vérifié. Redirection vers (tabs).');
       navigation.navigate('(tabs)' as never);
