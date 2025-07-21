@@ -3,7 +3,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
 const ModifyAccountScreen = () => {
@@ -16,10 +16,11 @@ const ModifyAccountScreen = () => {
   const [description, setDescription] = useState('');
   const [profilePictureUrl, setProfilePictureUrl] = useState('');
   const [pseudo, setPseudo] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const [descriptionPopup, setDescriptionPopup] = useState('');
   const navigation = useNavigation();
-  const { user } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
+  const { user,setUser } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
 
   const getAccount = async () => {
     try {
@@ -60,6 +61,49 @@ const ModifyAccountScreen = () => {
     }
   };
 
+  const deleteAccount = async () => {
+    Alert.alert(
+      'Suppression du compte',
+      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setIsDeleting(true); // Lancement du chargement
+              const accountId = await AsyncStorage.getItem('account_id');
+              const response = await fetch(`${config.backendUrl}/api/account/delete-account-soft`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ account_id: accountId }),
+              });
+  
+              const result = await response.json();
+  
+              if (result.success) {
+                await AsyncStorage.clear();
+                Alert.alert('Compte supprimé', 'Votre compte a bien été supprimé.');
+                setUser({})
+                navigation.reset({ index: 0, routes: [{ name: 'LoginScreen' as never }] });
+              } else {
+                Alert.alert('Erreur', 'La suppression a échoué.');
+              }
+            } catch (err) {
+              console.error('Erreur suppression compte :', err);
+              Alert.alert('Erreur serveur', 'Impossible de supprimer votre compte pour le moment.');
+            } finally {
+              setIsDeleting(false); // Fin du chargement
+            }
+          }
+        },
+      ]
+    );
+  };
+  
+  
+
   useEffect(() => { getAccount(); }, []);
 
   return (
@@ -86,6 +130,20 @@ const ModifyAccountScreen = () => {
           : require('../assets/images/people.png')
         }
       />
+
+      <TouchableOpacity
+        onPress={deleteAccount}
+        style={[styles.deleteButton, isDeleting && { opacity: 0.5 }]}
+        disabled={isDeleting}
+      >
+        {isDeleting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.deleteButtonText}>Supprimer le compte</Text>
+        )}
+      </TouchableOpacity>
+
+      
       
       <Modal visible={isDescriptionModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
@@ -150,6 +208,20 @@ const styles = StyleSheet.create({
     marginRight: 10,
     resizeMode: 'contain',
   },
+  deleteButton: {
+    backgroundColor: '#ff4d4d',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  
 });
 
 export default ModifyAccountScreen;
