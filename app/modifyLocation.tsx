@@ -54,7 +54,7 @@ const ModifyLocationScreen = () => {
       if (json.status === 'OK') {
         const location = json.result.geometry.location;
         setCoordinates(location);
-        console.log('📍 Coordonnées récupérées :', location);
+        console.log('Coordonnées récupérées :', location);
       } else {
         console.warn('Erreur API Place Details:', json.status);
       }

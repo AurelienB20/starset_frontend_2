@@ -111,8 +111,6 @@ const AccountScreen = () => {
   };
 
 
-
-
   const getAccountId = async () => {
     try {
       const account_id = await AsyncStorage.getItem('account_id');
@@ -317,7 +315,40 @@ navigation.dispatch(
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-  <ScrollView
+      {(!user || Object.keys(user).length === 0) ? (
+      <View style={{ alignItems: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#008000', marginBottom: 30, textAlign: 'center' }}>
+          Pas encore de compte
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#28a745',
+            paddingVertical: 12,
+            paddingHorizontal: 30,
+            borderRadius: 25,
+            marginBottom: 15,
+          }}
+          onPress={() => navigation.navigate('creation' as never)}
+        >
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>S'inscrire</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#ffc107',
+            paddingVertical: 12,
+            paddingHorizontal: 30,
+            borderRadius: 25,
+          }}
+          onPress={() => navigation.navigate('connexion' as never)}
+        >
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Se connecter</Text>
+        </TouchableOpacity>
+      </View>
+    ) : (
+      // Ton code original ici (tout ce qui est dans <ScrollView> actuellement)
+      <ScrollView
     showsVerticalScrollIndicator={false}
     contentInsetAdjustmentBehavior="automatic"
   >
@@ -416,10 +447,6 @@ navigation.dispatch(
 </TouchableOpacity>
 
 
-
-
-
-
 <TouchableOpacity style={styles.menuItem} onPress={goToDocument}>
   <View style={styles.iconWithText}>
     <FontAwesome name="file-text" size={20} color="#000" style={styles.menuIcon} />
@@ -440,15 +467,6 @@ navigation.dispatch(
     <Text style={styles.menuItemText}>Politique de confidentialite</Text>
   </View>
 </TouchableOpacity>
-
-
-
-
-
-
-
-
-
 
 <TouchableOpacity style={styles.menuItem} onPress={changeToWorker}>
   <View style={styles.iconWithText}>
@@ -672,6 +690,8 @@ navigation.dispatch(
       </Modal>
     </View>
     </ScrollView>
+    )}
+  
     </SafeAreaView>
   );
 };

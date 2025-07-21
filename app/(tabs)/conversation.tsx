@@ -116,7 +116,13 @@ const ConversationScreen = () => {
 
   const getAllConversation = async () => {
     try {
+
       const worker_id = await getAccountId();
+
+      if (!worker_id) {
+        setIsLoading(false);
+        return;
+      }
       const response = await fetch(`${config.backendUrl}/api/conversation/get-all-worker-conversation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

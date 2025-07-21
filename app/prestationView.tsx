@@ -954,7 +954,12 @@ const unlikeImage = async (imageId: string) => {
       ) : (
         <View style={styles.pricingContainer}>
           <Text style={styles.pricingText}>{prestation.remuneration ? `${prestation.remuneration}€/heure` : "Tarif non défini"}</Text>
-          <TouchableOpacity style={styles.calendarButton} onPress={toggleCalendar}>
+          <TouchableOpacity 
+            style={[
+              styles.calendarButton,
+              (!user || Object.keys(user).length === 0) && { backgroundColor: '#ccc' } // grise le bouton si user vide
+            ]}
+          onPress={toggleCalendar} disabled={!user || Object.keys(user).length === 0}>
             <Text style={styles.calendarButtonText}>Voir le calendrier</Text>
           </TouchableOpacity>
           <View style={styles.diagonal} />
@@ -1113,12 +1118,19 @@ const unlikeImage = async (imageId: string) => {
     
     <View style={styles.addButtonFixedContainer}>
         
-        <TouchableOpacity style={styles.addButton} onPress={goToSummary}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Text style={styles.addButtonText}>Ajouter</Text>
-            <Icon name="shopping-cart" size={24} color="white" style={{ marginLeft: 8 }} />
-          </View>
-        </TouchableOpacity>
+    <TouchableOpacity
+  style={[
+    styles.addButton,
+    (!user || Object.keys(user).length === 0) && { backgroundColor: '#ccc' } // Bouton grisé si user vide
+  ]}
+  onPress={goToSummary}
+  disabled={!user || Object.keys(user).length === 0}
+>
+  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+    <Text style={styles.addButtonText}>Ajouter</Text>
+    <Icon name="shopping-cart" size={24} color="white" style={{ marginLeft: 8 }} />
+  </View>
+</TouchableOpacity>
       </View>
     </View>
   );
