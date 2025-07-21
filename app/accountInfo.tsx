@@ -1,3 +1,4 @@
+import { useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -23,6 +24,7 @@ const AccountInfoScreen = () => {
   const navigation = useNavigation();
   const route = useRoute() as any;
   const { email, password , preferredFields, address, coordinates} = route.params || {};
+   const { user, setUser } = useUser()
   
   const handleFirstNameChange = (text : any) => setFirstName(text);
   const handleLastNameChange = (text : any) => setLastName(text);
@@ -65,7 +67,9 @@ const AccountInfoScreen = () => {
         }),
       });
       const data = await response.json();
+
       saveData(data.account);
+      setUser(data.account)
       if (data.success) {
         navigation.navigate('chooseAccount' as never);
       } else {

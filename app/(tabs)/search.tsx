@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
 //import axios from '../api/axios';
 import * as Font from 'expo-font';
@@ -28,6 +28,8 @@ const SearchScreen = () => {
   const [workers, setWorkers] = useState([]);
   const [metiers, setMetiers] = useState([]);
   const [mostLikedImages, setMostLikedImages] = useState([]);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+const [isModalVisible, setIsModalVisible] = useState(false);
   let [fontsLoaded] = useFonts({
     BebasNeue: BebasNeue_400Regular,
     LexendDeca : LexendDeca_400Regular,
@@ -51,6 +53,12 @@ const SearchScreen = () => {
       name: 'prestationView',
       params: { id },
     } as never);
+  };
+
+   const goToNearbyWorkersMap = () => {
+   
+    
+    navigation.navigate('nearbyWorkersMap' as never);
   };
 
   const goToSearchInHomeScreen = (metierName: string) => {
@@ -91,6 +99,8 @@ const SearchScreen = () => {
       console.error('Erreur lors de la récupération des prestations :', error);
     }
   };
+
+  
 
   const fetchMetiers = async () => {
     try {
@@ -198,14 +208,20 @@ const SearchScreen = () => {
   };
   
   const renderMetierItem = ({ item }: any) => (
-    <TouchableOpacity style={styles.metierContainer} onPress={() => goToSearchInHomeScreen(item.name)}>
-      <Image
-        source={{ uri: item.picture_url || 'https://cdn-icons-png.flaticon.com/512/91/91501.png' }}
-        style={styles.metierImage}
-      />
-      <Text style={styles.metierText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
+  <TouchableOpacity
+    style={styles.metierContainer}
+    onPress={() => {
+      setSelectedJob(item);
+      setIsModalVisible(true);
+    }}
+  >
+    <Image
+      source={{ uri: item.picture_url || 'https://cdn-icons-png.flaticon.com/512/91/91501.png' }}
+      style={styles.metierImage}
+    />
+    <Text style={styles.metierText}>{item.name}</Text>
+  </TouchableOpacity>
+);
 
   const renderUserItem = ({ item } : any) => (
     <View style={styles.userContainer}>
@@ -266,10 +282,11 @@ const SearchScreen = () => {
           <TouchableOpacity style={styles.bellIconContainer} onPress={() => console.log('Notifications')}>
             <Ionicons name="notifications-outline" size={28} color="#000" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.fakeSearchBar}>
+          <TouchableOpacity style={styles.fakeSearchBar} onPress={goToNearbyWorkersMap}>
             <Ionicons name="location-sharp" size={16} color="#999" style={{ marginRight: 8 }} />
-            <Text style={styles.fakeSearchText}>Top Worker</Text>
+            <Text style={styles.fakeSearchText}>Autour de vous</Text>
           </TouchableOpacity>
+          <Text style={styles.sectionHeader}>Top Worker</Text>
           <FlatList
             data={workers}
             horizontal
@@ -307,7 +324,35 @@ const SearchScreen = () => {
             contentContainerStyle={styles.userList}
           />
           <Text style={styles.sectionHeader}>Ce qui pourrait vous plaire</Text>
+          <Modal
+  animationType="slide"
+  transparent={true}
+  visible={isModalVisible}
+  onRequestClose={() => setIsModalVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      {/* Titre du métier */}
+      <Text style={styles.jobTitle}>{selectedJob?.name?.toUpperCase()}</Text>
+
+      {/* Description */}
+      <Text style={styles.jobDescription}>{selectedJob?.description}</Text>
+
+      
+
+      {/* Bouton de fermeture */}
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => setIsModalVisible(false)}
+      >
+        <Text style={styles.addButtonText}>Fermer</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
         </View>
+        
       }
       ListFooterComponent={loadingMore ? <ActivityIndicator size="large" color="#00cc66" style={styles.loader} /> : null}
     />
@@ -644,6 +689,61 @@ const styles = StyleSheet.create({
     right: 20,
     zIndex: 10,
   },
+
+  modalContainer: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+},
+
+modalContent: {
+  backgroundColor: '#FFFFFF',
+  padding: 20,
+  borderRadius: 10,
+  width: '90%',
+},
+
+jobTitle: {
+  fontSize: 24,
+  fontFamily: 'BebasNeue',
+  textAlign: 'center',
+  marginBottom: 10,
+},
+
+jobDescription: {
+  fontSize: 16,
+  color: '#333',
+  textAlign: 'center',
+  marginBottom: 20,
+},
+
+sectionTitle: {
+  fontSize: 18,
+  fontFamily: 'BebasNeue',
+  marginBottom: 10,
+},
+
+missionItem: {
+  fontSize: 16,
+  color: '#555',
+  marginBottom: 5,
+},
+
+addButton: {
+  backgroundColor: '#00cc66',
+  padding: 15,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginTop: 20,
+},
+
+addButtonText: {
+  color: 'white',
+  fontSize: 18,
+  fontWeight: 'bold',
+},
+
   
 });
 
