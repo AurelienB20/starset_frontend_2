@@ -263,10 +263,12 @@ const onRefresh = React.useCallback(() => {
   };
 
   useEffect(() => {
+    navigation.addListener('focus', () => {
     getAllPrestation();
     getAllMetierNames();
     getWorkerPlannedPrestation()
-  }, []);
+    });
+  }, [navigation]);
 
   const isSelected = (jobTitle : any) => selectedJob === jobTitle;
 
