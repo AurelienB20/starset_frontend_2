@@ -3,6 +3,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Animated, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import WebView from 'react-native-webview';
 import config from '../config.json';
 
 const SkeletonDoc = () => {
@@ -47,6 +48,8 @@ const DocumentsScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [identityDocs, setIdentityDocs] = useState<any[]>([]);
+  
   
   const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +60,9 @@ const DocumentsScreen = () => {
   const [recommendedWorkerDocs, setRecommendedWorkerDocs] = useState<any[]>([]);
   const [allDocTypes, setAllDocTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDocUrl, setSelectedDocUrl] = useState<string | null>(null);
+const [showDocModal, setShowDocModal] = useState(false);
+
 
   const fetchWorkerDocs = async () => {
     try {
@@ -72,6 +78,7 @@ const DocumentsScreen = () => {
       {
         setMandatoryWorkerDocs(data.mandatory_documents || []);
         setRecommendedWorkerDocs(data.recommended_documents || []);
+        setIdentityDocs(data.identity_documents || []); // ✅ Ajout ici
       }
       else
       {
@@ -117,19 +124,27 @@ const DocumentsScreen = () => {
   }, [worker_id]);
 
   const renderDocument = (doc: any, isMandatory: boolean) => {
-    return (
-      <TouchableOpacity
-        key={doc.id}
-        style={[
-          styles.docButton,
-          isMandatory ? styles.okButton : styles.recommendedMissingButton,
-        ]}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.docText}>{doc.document_type}</Text>
-      </TouchableOpacity>
-    );
-  };
+  return (
+    <TouchableOpacity
+      key={doc.id}
+      style={[
+        styles.docButton,
+        isMandatory ? styles.okButton : styles.recommendedMissingButton,
+      ]}
+      activeOpacity={0.7}
+      onPress={() => {
+        if (doc.file_url) {
+          setSelectedDocUrl(doc.file_url);
+          setShowDocModal(true);
+        } else {
+          Alert.alert("Erreur", "Ce document ne contient pas de lien.");
+        }
+      }}
+    >
+      <Text style={styles.docText}>{doc.document_type}</Text>
+    </TouchableOpacity>
+  );
+};
 
   const handleUploadDocument = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -228,6 +243,15 @@ const DocumentsScreen = () => {
         recommendedWorkerDocs.map(doc => renderDocument(doc, false))
       )}
 
+      <Text style={[styles.sectionTitle, { marginTop: 30 }]}>DOCUMENTS D'IDENTITÉ</Text>
+{isLoading ? (
+  Array.from({ length: 1 }).map((_, i) => <SkeletonDoc key={`id-${i}`} />)
+) : identityDocs.length === 0 ? (
+  <Text>Aucun document d'identité envoyé.</Text>
+) : (
+  identityDocs.map(doc => renderDocument(doc, true)) // tu peux aussi le mettre à false
+)}
+
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.addButtonText}>AJOUTER UN DOCUMENT</Text>
       </TouchableOpacity>
@@ -293,6 +317,20 @@ const DocumentsScreen = () => {
           </View>
         </View>
       </Modal>
+      <Modal visible={showDocModal} animationType="slide">
+  <View style={{ flex: 1 }}>
+    <View style={{ padding: 10, backgroundColor: '#008080' }}>
+      <TouchableOpacity onPress={() => setShowDocModal(false)}>
+        <Text style={{ color: 'white', fontSize: 16 }}>Fermer</Text>
+      </TouchableOpacity>
+    </View>
+    {selectedDocUrl ? (
+      <WebView source={{ uri: selectedDocUrl }} style={{ flex: 1 }} />
+    ) : (
+      <Text style={{ padding: 20 }}>Aucun document à afficher.</Text>
+    )}
+  </View>
+</Modal>
     </ScrollView>
 
   );

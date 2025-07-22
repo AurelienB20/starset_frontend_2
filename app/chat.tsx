@@ -160,7 +160,7 @@ const [visibleHeight, setVisibleHeight] = useState(screenHeight);
       });
   
       // Ajouter à l'affichage localement
-      setMessages((prev : any) => [...prev, data.message]);
+      //setMessages((prev : any) => [...prev, data.message]);
       setSelectedImage(null); // Nettoyer l'image sélectionnée
   
     } catch (error) {
@@ -239,7 +239,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         const data = await response.json();
   
         socket.emit('newMessage', { ...data.message, conversation_id });
-        setMessages((prev: any) => [...prev, data.message]);
+        //setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
         console.error('Erreur envoi images/message :', error);
         Alert.alert('Erreur', "Impossible d'envoyer le message.");
@@ -258,7 +258,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   
         const data = await response.json();
         socket.emit('newMessage', { ...data.message, conversation_id });
-        setMessages((prev: any) => [...prev, data.message]);
+        //setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
         console.error('Erreur envoi message texte :', error);
       }
@@ -309,7 +309,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         const data = await response.json();
   
         socket.emit('newMessage', { ...data.message, conversation_id });
-        setMessages((prev: any) => [...prev, data.message]);
+        //setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
         console.error('Erreur envoi image/message :', error);
         Alert.alert('Erreur', "Impossible d'envoyer le message.");
@@ -328,7 +328,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   
         const data = await response.json();
         socket.emit('newMessage', { ...data.message, conversation_id });
-        setMessages((prev: any) => [...prev, data.message]);
+        //setMessages((prev: any) => [...prev, data.message]);
       } catch (error) {
         console.error('Erreur envoi message texte :', error);
       }
@@ -340,6 +340,8 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   };
 
   useEffect(() => {
+
+    getAllMessages()
     const showSubscription = Keyboard.addListener('keyboardDidShow', (event) => {
       setKeyboardHeight(event.endCoordinates.height +10);
     });
@@ -351,6 +353,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
     return () => {
       showSubscription.remove();
       hideSubscription.remove();
+      
     };
 
     }, []);

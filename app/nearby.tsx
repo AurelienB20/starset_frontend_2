@@ -1,25 +1,24 @@
 import { useUser } from '@/context/userContext';
-import { useNavigation } from '@react-navigation/native'; // 👈 Ajout
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import MapView from 'react-native-maps';
 import config from '../config.json';
 
-const NearbyWorkersMap = ({ route }: any) => {
-  const [region, setRegion] = useState<any>(null);
-  const [workers, setWorkers] = useState([]);
+const NearbyWorkersMap = () => {
+  const [workers, setWorkers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [region, setRegion] = useState<any>(null);
+
   const { user } = useUser();
-  const navigation = useNavigation(); // 👈 Ajout navigation
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchWorkersNearby = async () => {
       try {
         const response = await fetch(`${config.backendUrl}/api/mission/get-workers-with-metiers-nearby`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ account_id: user?.id }),
         });
 
@@ -27,6 +26,7 @@ const NearbyWorkersMap = ({ route }: any) => {
 
         if (data.success && data.workers.length > 0) {
           setWorkers(data.workers);
+
           const first = data.workers[0];
           setRegion({
             latitude: parseFloat(first.lat),
@@ -45,7 +45,6 @@ const NearbyWorkersMap = ({ route }: any) => {
     fetchWorkersNearby();
   }, [user?.id]);
 
-  // 👇 Fonction de navigation vers prestationView
   const goToPrestationViewWithId = (id: string) => {
     navigation.navigate({
       name: 'prestationView',
@@ -63,44 +62,14 @@ const NearbyWorkersMap = ({ route }: any) => {
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={region}>
-        {workers.map((worker: any) => (
-          <Marker
-          key={worker.worker_id}
-          coordinate={{
-            latitude: parseFloat(worker.lat),
-            longitude: parseFloat(worker.lng),
-          }}
-          onPress={() => goToPrestationViewWithId(worker.metiers?.[0]?.id)}
-        >
-          <View style={{ alignItems: 'center' }}>
-            <Image
-              source={{
-                uri: worker.profile_picture_url ||  'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png',
-              }}
-              style={{
-                width: 50,
-                height: 50,
-                borderRadius: 25,
-                borderWidth: 2,
-                borderColor: 'white',
-              }}
-            />
-            <View
-              style={{
-                backgroundColor: 'white',
-                paddingHorizontal: 6,
-                paddingVertical: 2,
-                borderRadius: 6,
-                marginTop: 4,
-              }}
-            >
-              <Text style={{ fontSize: 12 }}>{worker.firstname}</Text>
-            </View>
-          </View>
-        </Marker>
-        
-        ))}
+      <MapView style={styles.map} 
+      initialRegion={{
+        latitude: 48.8566,
+        longitude: 2.3522,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }}>
+
       </MapView>
     </View>
   );

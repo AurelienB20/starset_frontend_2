@@ -137,10 +137,7 @@ const AccountWorkerScreen = () => {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.menuItem}>
-  <MaterialIcons name="help-outline" size={24} color="#000" style={styles.menuIcon} />
-  <Text style={styles.menuItemText}>Aide</Text>
-</TouchableOpacity>
+      
 
 
 
