@@ -1,51 +1,57 @@
 import { useUser } from '@/context/userContext';
+import { useNavigation } from '@react-navigation/native'; // 👈 Ajout
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import config from '../config.json';
 
 const NearbyWorkersMap = ({ route }: any) => {
-  
   const [region, setRegion] = useState<any>(null);
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
-   const { user, setUser } = useUser()
+  const { user } = useUser();
+  const navigation = useNavigation(); // 👈 Ajout navigation
 
   useEffect(() => {
     const fetchWorkersNearby = async () => {
-  try {
-    const response = await fetch(`${config.backendUrl}/api/mission/get-workers-with-metiers-nearby`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ account_id : user?.id }),
-    });
+      try {
+        const response = await fetch(`${config.backendUrl}/api/mission/get-workers-with-metiers-nearby`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ account_id: user?.id }),
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (data.success && data.workers.length > 0) {
-      setWorkers(data.workers);
-
-      // Centrer la carte autour du 1er worker pour début
-      const first = data.workers[0];
-      setRegion({
-        latitude: parseFloat(first.lat),
-        longitude: parseFloat(first.lng),
-        latitudeDelta: 0.1,
-        longitudeDelta: 0.1,
-      });
-    }
-
-  } catch (err) {
-    console.error('Erreur API :', err);
-  } finally {
-    setLoading(false);
-  }
-};
+        if (data.success && data.workers.length > 0) {
+          setWorkers(data.workers);
+          const first = data.workers[0];
+          setRegion({
+            latitude: parseFloat(first.lat),
+            longitude: parseFloat(first.lng),
+            latitudeDelta: 0.1,
+            longitudeDelta: 0.1,
+          });
+        }
+      } catch (err) {
+        console.error('Erreur API :', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchWorkersNearby();
   }, [user?.id]);
+
+  // 👇 Fonction de navigation vers prestationView
+  const goToPrestationViewWithId = (id: string) => {
+    navigation.navigate({
+      name: 'prestationView',
+      params: { id },
+    } as never);
+  };
 
   if (loading || !region) {
     return (
@@ -60,14 +66,40 @@ const NearbyWorkersMap = ({ route }: any) => {
       <MapView style={styles.map} initialRegion={region}>
         {workers.map((worker: any) => (
           <Marker
-            key={worker.worker_id}
-            coordinate={{
-              latitude: parseFloat(worker.lat),
-              longitude: parseFloat(worker.lng)
-            }}
-            title={worker.firstname}
-            description={worker.metiers?.[0]?.name || ''}
-          />
+          key={worker.worker_id}
+          coordinate={{
+            latitude: parseFloat(worker.lat),
+            longitude: parseFloat(worker.lng),
+          }}
+          onPress={() => goToPrestationViewWithId(worker.metiers?.[0]?.id)}
+        >
+          <View style={{ alignItems: 'center' }}>
+            <Image
+              source={{
+                uri: worker.profile_picture_url || 'https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg',
+              }}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 25,
+                borderWidth: 2,
+                borderColor: 'white',
+              }}
+            />
+            <View
+              style={{
+                backgroundColor: 'white',
+                paddingHorizontal: 6,
+                paddingVertical: 2,
+                borderRadius: 6,
+                marginTop: 4,
+              }}
+            >
+              <Text style={{ fontSize: 12 }}>{worker.firstname}</Text>
+            </View>
+          </View>
+        </Marker>
+        
         ))}
       </MapView>
     </View>

@@ -10,16 +10,7 @@ import config from '../../config.json';
 //import axios from '../api/axios';
 import * as Font from 'expo-font';
 
-const profilePictures = [
-  "https://www.utopix.com/fr/blog/wp-content/uploads/2024/04/Mzk0NGJkOWEtY2ZlYS00MjVjLTkwNTAtOGY5OWQzN2IzNGVi_762cec57-2eaf-4eaf-9a0d-2e7860147e48_profilhomme7-scaled.jpg",
-  "https://st4.depositphotos.com/10313122/39913/i/450/depositphotos_399138226-stock-photo-portrait-young-handsome-persian-businessman.jpg",
-  "https://www.utopix.com/fr/blog/wp-content/uploads/2024/04/d34203d9-3bea-4d9e-9e83-e445d3e754de_instagram3-scaled.jpg",
-  "https://c.superprof.com/i/a/14131262/7200420/600/20230925185954/coach-sportif-nutrition-seances-personnalisees-adaptees-objectifs-capacites-service-personne.jpg",
-  "https://www.missnumerique.com/blog/wp-content/uploads/une-bonne-photo-de-profil-cest-quoi-jurica-koletic.jpg",
-  "https://c.superprof.com/i/a/22899983/10725281/600/20220930153117/seance-sport-personnalisee-adaptee-profil-coach-sportive-diplomee.jpg",
-  "https://www.pagesjaunes.fr/media/agc/d8/de/74/00/00/f9/7f/0c/cd/a2/624ed8de740000f97f0ccda2/624ed8de740000f97f0ccda3.jpg",
-  "https://www.utopix.com/fr/blog/wp-content/uploads/2024/04/Y2E4OTI3NzQtNmUyOC00YmU2LWE5ZjctODcxY2RlMzg2ZDIy_26dfc43e-31dd-463f-ad04-56f39a430691_profilhomme1-scaled.jpg"
-];
+
 
 const SearchScreen = () => {
   const [loadingMore, setLoadingMore] = useState(false);
@@ -216,7 +207,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
     }}
   >
     <Image
-      source={{ uri: item.picture_url || 'https://cdn-icons-png.flaticon.com/512/91/91501.png' }}
+      source={{ uri: item.picture_url || 'https://cdn-icons-png.flaticon.com/512/91/91501.png'}}
       style={styles.metierImage}
     />
     <Text style={styles.metierText}>{item.name}</Text>
@@ -235,7 +226,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
   const renderLikedItem = ({ item } : any) => (
     <TouchableOpacity onPress={() => goToPrestationViewWithId(item.id)}>
       <View style={styles.userContainer}>
-        <Image source={{ uri: item.image_url }} style={styles.userImage} />
+        <Image source={{ uri: item.image_url }} style={styles.userImage}/>
         <View style={styles.usernameContainer}>
           <Text style={styles.username}>@{item.pseudo || 'Utilisateur'}</Text>
         </View>
@@ -492,7 +483,6 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: 19,
-    
     fontFamily: 'Glacial-Bold', // Utilisation du nom défini dans useFonts
   },
 
@@ -543,7 +533,6 @@ const styles = StyleSheet.create({
 
   nameAndRating: {
     justifyContent : 'space-between',
-    
     flexDirection : 'row',
     //backgroundColor : 'green'
   },
@@ -608,7 +597,6 @@ const styles = StyleSheet.create({
   userList: {
     flexDirection: 'row',
     paddingHorizontal: 10,
-    
     marginHorizontal: 20, // <-- C'est ça qui fait que la ligne ne va pas jusqu'au bout
     borderRadius: 10, // (optionnel) rend les coins légèrement arrondis
     backgroundColor: '#fff', // (optionnel) si tu veux garder un fond blanc
@@ -742,6 +730,22 @@ addButtonText: {
   color: 'white',
   fontSize: 18,
   fontWeight: 'bold',
+},
+
+markerContainer: {
+  alignItems: 'center',
+},
+
+nameTag: {
+  backgroundColor: 'white',
+  paddingHorizontal: 6,
+  paddingVertical: 2,
+  borderRadius: 6,
+  marginTop: 4,
+},
+nameText: {
+  fontSize: 12,
+  color: '#333',
 },
 
   

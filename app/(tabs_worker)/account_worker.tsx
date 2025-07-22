@@ -97,7 +97,11 @@ const AccountWorkerScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+
+{user && Object.keys(user).length > 0 ? (
+      // 🟩 TON CONTENU ACTUEL ICI (copie ton JSX à l’intérieur de ce bloc)
+      <>
+         <View style={styles.header}>
         <Text style={styles.typeOAccount}>Worker</Text>
     
         <View style={styles.rightHeader}>
@@ -171,6 +175,41 @@ const AccountWorkerScreen = () => {
   <MaterialIcons name="swap-horiz" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>Interface User</Text>
 </TouchableOpacity>
+      </>
+    ) : (
+      // 🟥 AFFICHAGE SI NON CONNECTÉ
+      <View style={{ alignItems: 'center', padding: 20 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#008000', marginBottom: 30, textAlign: 'center' }}>
+          Pas encore de compte
+        </Text>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#28a745',
+            paddingVertical: 12,
+            paddingHorizontal: 30,
+            borderRadius: 25,
+            marginBottom: 15,
+          }}
+          onPress={() => navigation.navigate('creation' as never)}
+        >
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>S'inscrire</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#ffc107',
+            paddingVertical: 12,
+            paddingHorizontal: 30,
+            borderRadius: 25,
+          }}
+          onPress={() => navigation.navigate('connexion' as never)}
+        >
+          <Text style={{ color: 'white', fontSize: 16, fontWeight: 'bold' }}>Se connecter</Text>
+        </TouchableOpacity>
+      </View>
+    )}
+     
 
 
       
