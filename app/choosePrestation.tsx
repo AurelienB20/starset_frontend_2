@@ -1,8 +1,10 @@
+import SignupPromptModal from '@/components/SignupPromptModal'; // adapte le chemin si nécessaire
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
+
 import {
   Alert,
   FlatList,
@@ -39,6 +41,7 @@ const ChoosePrestationScreen = () => {
   // Modal step: 'date' or 'arrival'
   const [modalType, setModalType] = useState<'date' | 'arrival'>('date');
   const { user, setUser} = useUser()
+  const [signupPromptModal, setSignupPromptModal] = useState(false);
 
   useEffect(() => {
     getCustomPrestations();
@@ -109,6 +112,11 @@ const ChoosePrestationScreen = () => {
 
   // Ouvre modal et reset
   const openAddModal = (item: any) => {
+    if (!user || Object.keys(user).length === 0) {
+      setSignupPromptModal(true);
+      return;
+    }
+  
     setSelectedPrestation(item);
     setSelectedDate('');
     setArrivalHour('');
@@ -116,6 +124,7 @@ const ChoosePrestationScreen = () => {
     setModalType('date');
     setModalVisible(true);
   };
+  
 
   const handleDateSelect = (day: any) => {
     const date = day.dateString;
@@ -278,6 +287,10 @@ const ChoosePrestationScreen = () => {
           </View>
         </View>
       </Modal>
+      <SignupPromptModal
+        visible={signupPromptModal}
+        onClose={() => setSignupPromptModal(false)}
+      />
     </View>
   );
 };

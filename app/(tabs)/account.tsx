@@ -90,6 +90,10 @@ const AccountScreen = () => {
     navigation.navigate('document' as never);
   };
 
+  const goToIdentityDocument = async () => {
+    navigation.navigate('identityDocument' as never);
+  };
+
   const goToHistory = async () => {
     navigation.navigate('history' as never);
   };
@@ -451,6 +455,13 @@ navigation.dispatch(
   <View style={styles.iconWithText}>
     <FontAwesome name="file-text" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Document</Text>
+  </View>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={goToIdentityDocument}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="file-text" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>Identiy Document</Text>
   </View>
 </TouchableOpacity>
 

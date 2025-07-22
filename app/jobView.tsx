@@ -1,10 +1,12 @@
-import { useAllWorkerPrestation } from '@/context/userContext';
+import SignupPromptModal from '@/components/SignupPromptModal'; // ajuste le chemin si besoin
+import { useAllWorkerPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 
 import config from '../config.json';
 
@@ -14,6 +16,8 @@ const JobViewScreen = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigation = useNavigation()
   const route = useRoute() as any;
+  const [signupPromptModal, setSignupPromptModal] = useState(false);
+  const { user } = useUser();
   
   const {selectedJob} = route.params || ''; 
   // Fonction pour récupérer le métier "Professeur particulier à domicile"
@@ -159,7 +163,15 @@ const JobViewScreen = () => {
           styles.addButton,
           (isJobAlreadyAdded || isSubmitting) && styles.disabledButton,
         ]}
-        onPress={!isJobAlreadyAdded && !isSubmitting ? handleValidation : undefined}
+        onPress={() => {
+          if (!user || Object.keys(user).length === 0) {
+            setSignupPromptModal(true);
+            return;
+          }
+          if (!isJobAlreadyAdded && !isSubmitting) {
+            handleValidation();
+          }
+        }}
         disabled={isJobAlreadyAdded || isSubmitting}
       >
         <Text style={styles.addButtonText}>
@@ -176,6 +188,10 @@ const JobViewScreen = () => {
           Vous avez déjà ajouté ce métier.
         </Text>
       )}
+      <SignupPromptModal
+        visible={signupPromptModal}
+        onClose={() => setSignupPromptModal(false)}
+      />
     </ScrollView>
   );
 };

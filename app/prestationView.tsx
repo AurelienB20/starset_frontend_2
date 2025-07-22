@@ -1,4 +1,5 @@
 import DateTimeSelectionModal from '@/components/DateTimeSelectionModal'; // ajuste le chemin si besoin
+import SignupPromptModal from '@/components/SignupPromptModal';
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { JosefinSans_100Thin, JosefinSans_700Bold } from '@expo-google-fonts/josefin-sans';
@@ -63,6 +64,8 @@ const PrestationViewScreen = () => {
   const [isProfileInfoVisible, setProfileInfoVisible] = useState(false);
   const [availabilityByDate, setAvailabilityByDate] = useState<any>({});
   const [selectedDates, setSelectedDates] = useState<any>({});
+  const [signupPromptModalVisible, setSignupPromptModalVisible] = useState(false);
+
 
     const profileImageSize = scrollY.interpolate({
       inputRange: [0, 70],
@@ -962,18 +965,26 @@ const unlikeImage = async (imageId: string) => {
         </View>
       ) : (
         <View style={styles.pricingContainer}>
-          <Text style={styles.pricingText}>{prestation.remuneration ? `${prestation.remuneration}€/heure` : "Tarif non défini"}</Text>
-          <TouchableOpacity 
-            style={[
-              styles.calendarButton,
-              (!user || Object.keys(user).length === 0) && { backgroundColor: '#ccc' } // grise le bouton si user vide
-            ]}
-          onPress={toggleCalendar} disabled={!user || Object.keys(user).length === 0}>
-            <Text style={styles.calendarButtonText}>Voir le calendrier</Text>
-          </TouchableOpacity>
-          <View style={styles.diagonal} />
-          <View style={styles.diagonal2} />
-        </View>
+  <Text style={styles.pricingText}>
+    {prestation.remuneration ? `${prestation.remuneration}€/heure` : "Tarif non défini"}
+  </Text>
+
+  <TouchableOpacity
+    style={styles.calendarButton}
+    onPress={() => {
+      if (!user || Object.keys(user).length === 0) {
+        setSignupPromptModalVisible(true);
+      } else {
+        toggleCalendar();
+      }
+    }}
+  >
+    <Text style={styles.calendarButtonText}>Voir le calendrier</Text>
+  </TouchableOpacity>
+
+  <View style={styles.diagonal} />
+  <View style={styles.diagonal2} />
+</View>
       )}
 
       {/* Date Picker Modal */}
@@ -1066,6 +1077,11 @@ const unlikeImage = async (imageId: string) => {
   onConfirm={handleAddToCart}
 />
 
+      <SignupPromptModal
+        visible={signupPromptModalVisible}
+        onClose={() => setSignupPromptModalVisible(false)}
+      />
+
 
       <Modal
   visible={isProfileInfoVisible}
@@ -1100,12 +1116,18 @@ const unlikeImage = async (imageId: string) => {
       </TouchableOpacity>
             {/* Icônes à droite */}
       <View style={styles.headerIcons}>
-        <TouchableOpacity
-          onPress={checkConversation}
-          style={styles.iconButton}
-        >
-          <Icon name="mail" size={30} color="black" />
-        </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          if (!user || Object.keys(user).length === 0) {
+            setSignupPromptModalVisible(true);
+          } else {
+            checkConversation();
+          }
+        }}
+        style={styles.iconButton}
+      >
+        <Icon name="mail" size={30} color="black" />
+      </TouchableOpacity>
     
         <Menu
   visible={menuVisible}

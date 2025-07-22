@@ -76,7 +76,7 @@ const NearbyWorkersMap = ({ route }: any) => {
           <View style={{ alignItems: 'center' }}>
             <Image
               source={{
-                uri: worker.profile_picture_url || 'https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg',
+                uri: worker.profile_picture_url ||  'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png',
               }}
               style={{
                 width: 50,

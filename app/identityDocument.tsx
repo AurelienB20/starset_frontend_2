@@ -5,17 +5,20 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+
+import config from '../config.json';
 
 const IdentityUploadScreen = () => {
   const [identityFile, setIdentityFile] = useState<any>(null);
   const [identityType, setIdentityType] = useState<'camera' | 'file' | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const navigation = useNavigation();
   const { user } = useUser(); // 👈 récupération de l'utilisateur
@@ -50,13 +53,55 @@ const IdentityUploadScreen = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleUpload = async () => {
+    if (!identityFile || !user?.worker) {
+      Alert.alert('Erreur', 'Aucun fichier sélectionné ou utilisateur non valide.');
+      return;
+    }
 
-    // Tu peux utiliser user.id ici si besoin :
-    console.log('ID utilisateur :', user?.id);
-    Alert.alert('Succès', 'Pièce d’identité sélectionnée.');
+    try {
+      setUploading(true);
 
-    navigation.navigate('chooseAccount' as never);
+      // 1. Récupère le contenu du fichier
+      const response = await fetch(identityFile.uri);
+      const blob = await response.blob();
+
+      // 2. Convertir en base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result;
+
+        const file = {
+          filename: identityFile.name || 'identity.jpg',
+          mimetype: identityFile.mimeType || 'image/jpeg',
+          data: base64Data,
+        };
+
+        // 3. Envoi à l'API
+        const uploadResponse = await fetch(`${config.backendUrl}/api/mission/add-worker-document`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            file,
+            object_id: user.worker,
+            type_object: 'document',
+            document_name: "identity_document",
+          }),
+        });
+
+        if (!uploadResponse.ok) throw new Error('Échec du téléchargement');
+
+        Alert.alert('Succès', 'Pièce d’identité enregistrée avec succès.');
+        //navigation.navigate('chooseAccount' as never);
+      };
+
+      reader.readAsDataURL(blob);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l’enregistrement.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -96,8 +141,17 @@ const IdentityUploadScreen = () => {
         </View>
       )}
 
-      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-        <Text style={styles.nextButtonText}>Suivant</Text>
+      <TouchableOpacity
+        style={[
+          styles.nextButton,
+          (!identityFile || uploading) && { backgroundColor: '#ccc' },
+        ]}
+        onPress={handleUpload}
+        disabled={!identityFile || uploading}
+      >
+        <Text style={styles.nextButtonText}>
+          {uploading ? 'Téléchargement...' : 'Suivant'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
