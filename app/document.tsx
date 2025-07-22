@@ -191,6 +191,7 @@ const DocumentsScreen = () => {
         setSelectedImage(null);
         setSelectedDocType('');
         setSearchQuery('');
+        setUploading(false);
       };
   
       reader.readAsDataURL(blob);
@@ -198,7 +199,7 @@ const DocumentsScreen = () => {
       console.error(err);
       Alert.alert('Erreur', 'Une erreur est survenue lors de l\'enregistrement.');
     } finally {
-      setUploading(false);
+      
     }
   };
   
@@ -273,7 +274,7 @@ const DocumentsScreen = () => {
             )}
 
             <TouchableOpacity
-              style={[styles.addButton, { marginTop: 10, backgroundColor: selectedImage ? '#45D188' : '#ccc' }]}
+              style={[styles.addButton, { marginTop: 10, backgroundColor: (!selectedImage || uploading) ? '#ccc' : '#45D188'}]}
               onPress={handleSaveDocument}
               disabled={!selectedImage || uploading}
             >

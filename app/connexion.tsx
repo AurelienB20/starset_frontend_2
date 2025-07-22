@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   enter: {
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 40,
+    fontSize: 34,
     marginTop: 0,
     marginHorizontal: 20,
     color: 'black',
