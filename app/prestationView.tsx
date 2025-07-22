@@ -121,7 +121,6 @@ const PrestationViewScreen = () => {
       { cancelable: false }
     );
     setMenuVisible(false);
-    sendReport()
   };
 
   const sendReport = async () => {
@@ -131,7 +130,7 @@ const PrestationViewScreen = () => {
       const reported_name = account?.firstname + ' ' + account?.lastname;
       const prestation_title = prestation?.title || prestation?.metier;
       const prestation_description = prestation?.description || '';
-  
+
       const response = await fetch(`${config.backendUrl}/api/auth/submit-report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -506,6 +505,12 @@ const PrestationViewScreen = () => {
     setImageModalVisible(true);
   };
 
+  const openImageModalFromUri = (imageUri : string) => {
+    const image = {adress: imageUri};
+    setSelectedImage(image);
+    setImageModalVisible(true);
+  };
+
   const closeImageModal = () => {
     setSelectedImage(null);
     setImageModalVisible(false);
@@ -736,7 +741,11 @@ const unlikeImage = async (imageId: string) => {
       
 
       <View style={styles.tagsContainer}>
-        <ScrollView
+      
+    <Text style={styles.profileDescription}>
+      {account?.description || "Aucune description disponible"}
+    </Text>
+      <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.tagsScrollContainer}
@@ -761,10 +770,6 @@ const unlikeImage = async (imageId: string) => {
       </TouchableOpacity>
       ))}
     </ScrollView>
-    <Text style={styles.profileDescription}>
-      {account?.description || "Aucune description disponible"}
-    </Text>
-    
       </View>
 
       {/* Section des statistiques */}
@@ -847,7 +852,9 @@ const unlikeImage = async (imageId: string) => {
             <Text style={styles.experienceDescription}>{experience.description}</Text>
             <View style={styles.experienceImages}>
               {experience.images?.map((imageUri: string, idx: number) => (
+                <TouchableOpacity key={idx} onPress={() => openImageModalFromUri(imageUri)} style={styles.photoButton}>
                 <Image key={idx} source={{ uri: imageUri }} style={styles.experienceImage} />
+                </TouchableOpacity>
               ))}
             </View>
           </View>
@@ -890,11 +897,13 @@ const unlikeImage = async (imageId: string) => {
                       </>
                     ) : (
                       certification.images?.map((uri: string, i: number) => (
+                        <TouchableOpacity key={i} onPress={() => openImageModalFromUri(uri)} style={styles.photoButton}>
                         <Image
                           key={i}
                           source={{ uri }}
                           style={styles.certificationMiniImage}
                         />
+                        </TouchableOpacity>
                       ))
                     )}
                   </View>
@@ -1160,7 +1169,7 @@ const styles = StyleSheet.create({
   },
 
   metierName: {
-    fontSize: 24,
+    fontSize: 20,
     color: '#000',
     marginTop: 10,
     textAlign : 'center',

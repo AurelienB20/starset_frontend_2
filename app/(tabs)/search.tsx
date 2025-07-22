@@ -47,8 +47,6 @@ const [isModalVisible, setIsModalVisible] = useState(false);
   };
 
    const goToNearbyWorkersMap = () => {
-   
-    
     navigation.navigate('nearbyWorkersMap' as never);
   };
 

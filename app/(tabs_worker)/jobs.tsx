@@ -263,10 +263,12 @@ const onRefresh = React.useCallback(() => {
   };
 
   useEffect(() => {
+    navigation.addListener('focus', () => {
     getAllPrestation();
     getAllMetierNames();
     getWorkerPlannedPrestation()
-  }, []);
+    });
+  }, [navigation]);
 
   const isSelected = (jobTitle : any) => selectedJob === jobTitle;
 
@@ -276,7 +278,7 @@ const onRefresh = React.useCallback(() => {
   );
 
   return (
-    <ScrollView  bounces={false} style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
+    <ScrollView style={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}>
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => setInProgressModalVisible(true)}>
           <View style={styles.iconCircle}>
