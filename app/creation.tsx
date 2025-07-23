@@ -165,7 +165,6 @@ const CreationScreen = () => {
       <Text style={styles.policyText}>
         STAR SET SAS{"\n"}
         contact@starsetfrance.com{"\n"}
-        23 rue de la Garenne, Champs sur Marne, 77420
       </Text>
 
       <Text style={styles.policyTitle}>2. Données collectées</Text>

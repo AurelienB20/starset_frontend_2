@@ -11,7 +11,6 @@ const ConfidentialiteScreen = () => {
       <Text style={styles.text}>
         Société : STAR SET SAS{"\n"}
         Email : contact@starsetfrance.com{"\n"}
-        Adresse : 23 rue de la Garenne, Champs sur Marne, 77420
       </Text>
 
       <Text style={styles.sectionTitle}>2. Données que nous collectons</Text>

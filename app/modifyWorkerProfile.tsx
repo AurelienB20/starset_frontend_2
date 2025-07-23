@@ -1,12 +1,16 @@
 import { useUser } from '@/context/userContext';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
+
 
 const ModifyWorkerProfileScreen = () => {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
+  const [showKbisModal, setShowKbisModal] = useState(false);
+  const [kbisNumber, setKbisNumber] = useState('');
   const [selectedMode, setSelectedMode] = useState<'particulier' | 'company'>(
     user?.is_company ? 'company' : 'particulier'
   );
@@ -99,7 +103,7 @@ const ModifyWorkerProfileScreen = () => {
         styles.buttonIconOnly,
         selectedMode === 'company' ? styles.buttonSelected : styles.buttonUnselected,
       ]}
-      onPress={() => setSelectedMode('company')}
+      onPress={() => setShowKbisModal(true)}
     >
       <Image source={require('../assets/images/company.png')} style={styles.iconFull} />
     </TouchableOpacity>
@@ -118,6 +122,42 @@ const ModifyWorkerProfileScreen = () => {
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} activeOpacity={0.8}>
         <Text style={styles.confirmButtonText}>Confirmer</Text>
       </TouchableOpacity>
+
+
+      <Modal visible={showKbisModal} transparent animationType="fade">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      
+      {/* Bouton de fermeture en haut à droite */}
+      <TouchableOpacity
+  onPress={() => setShowKbisModal(false)}
+  style={styles.closeButton}
+>
+  <Icon name="close" size={24} color="#333" />
+</TouchableOpacity>
+
+      <Text style={styles.modalTitle}>Numéro de Kbis</Text>
+      <TextInput
+        style={styles.modalInput}
+        placeholder="Entrez votre numéro de Kbis"
+        value={kbisNumber}
+        onChangeText={setKbisNumber}
+        keyboardType="numeric"
+      />
+      <TouchableOpacity
+        style={styles.modalButton}
+        onPress={() => {
+          setShowKbisModal(false);
+          setSelectedMode('company');
+        }}
+      >
+        <Text style={styles.modalButtonText}>Valider</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+
     </View>
   );
 };
@@ -220,6 +260,57 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    width: '100%',
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: '#3B82F6',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    padding: 5,
+  },
+  
+  closeButtonText: {
+    fontSize: 22,
+    color: '#333',
+  },
+  
 });
 
 export default ModifyWorkerProfileScreen;

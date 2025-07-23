@@ -1142,7 +1142,7 @@ const PrestationScreen = () => {
           style={[styles.categoryButton, selectedTab === 'photos' && styles.activeCategoryButton]}
           onPress={() => setSelectedTab('photos')}
         >
-          <Text style={styles.categoryButtonText}>Photos (6)</Text>
+          <Text style={styles.categoryButtonText}>Photos ({prestationPhotos.length})</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.categoryButton, selectedTab === 'experiences' && styles.activeCategoryButton]}
