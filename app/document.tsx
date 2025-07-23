@@ -3,6 +3,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Animated, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { IconButton, Menu } from 'react-native-paper';
 import WebView from 'react-native-webview';
 import config from '../config.json';
 
@@ -49,6 +50,8 @@ const DocumentsScreen = () => {
   const [selectedDocType, setSelectedDocType] = useState('');
   const [uploading, setUploading] = useState(false);
   const [identityDocs, setIdentityDocs] = useState<any[]>([]);
+  const [menuVisible, setMenuVisible] = useState(false);
+const [selectedDocIdForMenu, setSelectedDocIdForMenu] = useState<string | null>(null);
   
   
   const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
@@ -124,27 +127,67 @@ const [showDocModal, setShowDocModal] = useState(false);
   }, [worker_id]);
 
   const renderDocument = (doc: any, isMandatory: boolean) => {
-  return (
-    <TouchableOpacity
-      key={doc.id}
-      style={[
-        styles.docButton,
-        isMandatory ? styles.okButton : styles.recommendedMissingButton,
-      ]}
-      activeOpacity={0.7}
-      onPress={() => {
-        if (doc.file_url) {
-          setSelectedDocUrl(doc.file_url);
-          setShowDocModal(true);
-        } else {
-          Alert.alert("Erreur", "Ce document ne contient pas de lien.");
-        }
-      }}
+    const openMenu = () => {
+      setSelectedDocIdForMenu(doc.id);
+      setMenuVisible(true);
+    };
+  
+    const closeMenu = () => {
+      setMenuVisible(false);
+      setSelectedDocIdForMenu(null);
+    };
+  
+    return (
+      <View
+  key={doc.id}
+  style={[
+    styles.docButton,
+    isMandatory ? styles.okButton : styles.recommendedMissingButton,
+    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  ]}
+>
+  <View style={{ flex: 1, paddingRight: 10 }}>
+    <Text
+      style={styles.docText}
+      numberOfLines={1}
+      ellipsizeMode="tail"
     >
-      <Text style={styles.docText}>{doc.document_type}</Text>
-    </TouchableOpacity>
-  );
-};
+      {doc.document_type}
+    </Text>
+  </View>
+
+  <Menu
+    visible={menuVisible && selectedDocIdForMenu === doc.id}
+    onDismiss={() => {
+      setMenuVisible(false);
+      setSelectedDocIdForMenu(null);
+    }}
+    anchor={
+      <IconButton
+        icon="dots-vertical"
+        iconColor="white"
+        size={20}
+        onPress={() => {
+          setSelectedDocIdForMenu(doc.id);
+          setMenuVisible(true);
+        }}
+      />
+    }
+  >
+    <Menu.Item
+      onPress={() => {
+        setMenuVisible(false);
+        handleDeleteDocument(doc.id);
+      }}
+      title="Supprimer"
+      leadingIcon="delete"
+    />
+  </Menu>
+</View>
+
+    );
+  };
+  
 
   const handleUploadDocument = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -217,6 +260,41 @@ const [showDocModal, setShowDocModal] = useState(false);
       
     }
   };
+
+  const handleDeleteDocument = async (documentId: string) => {
+    Alert.alert(
+      "Confirmer la suppression",
+      "Voulez-vous vraiment supprimer ce document ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await fetch(`${config.backendUrl}/api/mission/delete-worker-document`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ document_id: documentId }),
+              });
+  
+              const data = await response.json();
+              if (data.success) {
+                Alert.alert('Succès', 'Document supprimé.');
+                fetchWorkerDocs(); // Recharger la liste
+              } else {
+                Alert.alert('Erreur', 'La suppression a échoué.');
+              }
+            } catch (error) {
+              console.error('Erreur suppression document :', error);
+              Alert.alert('Erreur', 'Impossible de supprimer le document.');
+            }
+          }
+        }
+      ]
+    );
+  };
+  
   
 
   const filteredDocs = allDocTypes.filter(doc =>
@@ -275,8 +353,10 @@ const [showDocModal, setShowDocModal] = useState(false);
               onValueChange={(itemValue) => setSelectedDocType(itemValue)}
             >
               <Picker.Item label="Sélectionnez un document..." value="" />
-              {filteredDocs.map(doc => (
-                <Picker.Item key={doc} label={doc} value={doc} />
+              {filteredDocs
+                .filter(doc => !doc.toLowerCase().includes('au moins'))
+                .map(doc => (
+                  <Picker.Item key={doc} label={doc} value={doc} />
               ))}
             </Picker>
 

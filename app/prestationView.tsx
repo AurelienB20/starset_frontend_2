@@ -426,14 +426,18 @@ const PrestationViewScreen = () => {
       const data = await response.json();
 
       if (data.success && data.schedule) {
-        const map : any = {};
-
-        data.schedule.forEach((item: { date: MomentInput; start_time: any; end_time: any; }) => {
-          const date = moment(item.date).format('YYYY-MM-DD');
+        const map: any = {};
+        const today = moment().startOf('day');
+      
+        data.schedule.forEach((item: { date: MomentInput; start_time: any; end_time: any }) => {
+          const dateMoment = moment(item.date);
+          if (dateMoment.isBefore(today, 'day')) return; // 🔒 Ignore les dates passées
+      
+          const date = dateMoment.format('YYYY-MM-DD');
           if (!map[date]) map[date] = [];
           map[date].push(`${item.start_time} - ${item.end_time}`);
         });
-
+      
         setAvailabilityByDate(map);
       }
     } catch (err) {
