@@ -118,8 +118,6 @@ const AccountScreen = () => {
   const getAccountId = async () => {
     try {
       const account_id = await AsyncStorage.getItem('account_id');
-      console.log("account_id 123")
-      console.log(account_id)
       if (account_id !== null) {
         return account_id;
       }
@@ -180,8 +178,6 @@ const AccountScreen = () => {
       const data = await response.json();
       if(data)
       {
-        console.log(2);
-        console.log('Planned Prestation:', data.plannedPrestations);
         setPlannedPrestations(data.plannedPrestations);
       }
     } catch (error) {
@@ -237,6 +233,7 @@ navigation.dispatch(
   };
 
   const cancelPrestation = (prestationId: string) => {
+    console.log(prestationId);
     Alert.alert(
       'Confirmation',
       'Êtes-vous sûr de vouloir annuler cette prestation ?',
@@ -249,6 +246,7 @@ navigation.dispatch(
           text: 'Oui',
           onPress: async () => {
             try {
+              console.log(prestationId);
               const response = await fetch(`${config.backendUrl}/api/planned-prestation/cancel-planned-prestation`, {
                 method: 'POST',
                 headers: {
@@ -552,7 +550,7 @@ navigation.dispatch(
                               </View>
                               <TouchableOpacity
                                 style={styles.cancelButton}
-                                onPress={() => cancelPrestation(prestation._id)} // <-- Utilise l'ID de la prestation
+                                onPress={() => cancelPrestation(prestation.id)} // <-- Utilise l'ID de la prestation
                               >
                                 <Text style={styles.cancelButtonText}>Annuler</Text>
                               </TouchableOpacity>
@@ -655,7 +653,7 @@ navigation.dispatch(
                     </View>
                     <TouchableOpacity
                       style={styles.cancelButton}
-                      onPress={() => cancelPrestation(prestation._id)}
+                      onPress={() => cancelPrestation(prestation.id)}
                     >
                       <Text style={styles.cancelButtonText}>Annuler</Text>
                     </TouchableOpacity>
