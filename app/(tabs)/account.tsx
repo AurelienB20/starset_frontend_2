@@ -249,12 +249,12 @@ navigation.dispatch(
           text: 'Oui',
           onPress: async () => {
             try {
-              const response = await fetch(`${config.backendUrl}/api/mission/cancel-prestation`, {
+              const response = await fetch(`${config.backendUrl}/api/planned-prestation/cancel-planned-prestation`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prestationId }),
+                body: JSON.stringify({ id : prestationId }),
               });
   
               if (!response.ok) throw new Error('Échec de l’annulation');

@@ -15,7 +15,9 @@
       "ios.buildNumber": "0.2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "Cette application utilise la caméra pour permettre à l'utilisateur de scanner des codes ou prendre des photos."
+        "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre galerie pour sélectionner des documents.",
+        "NSCameraUsageDescription": "Cette application a besoin d'accéder à votre caméra pour prendre des photos.",
+        "NSPhotoLibraryAddUsageDescription": "Cette application a besoin d'accéder à votre galerie pour enregistrer des fichiers."
       }
     },
     "android": {
