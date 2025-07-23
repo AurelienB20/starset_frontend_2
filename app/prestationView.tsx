@@ -167,7 +167,6 @@ const PrestationViewScreen = () => {
   };
 
   const toggleLikeImage = async (image: any) => {
-    console.log(image)
     const user_id = await getAccountId();
   
     const isLiked = likedImages.includes(image);
@@ -247,7 +246,6 @@ const PrestationViewScreen = () => {
     const date = day.dateString;
 
     if (!availabilityByDate[date]) return;
-
     setSelectedDates((prev: any) => ({
       ...prev,
       [date]: !prev[date], // toggle selection
@@ -256,8 +254,6 @@ const PrestationViewScreen = () => {
 
   const getPrestation = async () => {
     try {
-
-      console.log(prestation_id)
       const response = await fetch(`${config.backendUrl}/api/mission/get-prestation`, {
         method: 'POST',
         headers: {
@@ -424,6 +420,7 @@ const PrestationViewScreen = () => {
         body: JSON.stringify({ worker_id :  worker_id }), // Remplace dynamiquement
       });
       const data = await response.json();
+      const currentDate = new Date();
 
       if (data.success && data.schedule) {
         const map: any = {};
@@ -455,10 +452,7 @@ const PrestationViewScreen = () => {
       });
   
       const data = await response.json();
-      console.log(data)
       if (data.success) {
-        console.log('data.unavailableDates')
-        console.log(data.unavailableDates)
         setUnavailableDates(data.unavailableDates);
       }
     } catch (error) {
