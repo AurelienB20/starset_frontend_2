@@ -17,7 +17,17 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre galerie pour sélectionner des documents.",
         "NSCameraUsageDescription": "Cette application a besoin d'accéder à votre caméra pour prendre des photos.",
-        "NSPhotoLibraryAddUsageDescription": "Cette application a besoin d'accéder à votre galerie pour enregistrer des fichiers."
+        "NSPhotoLibraryAddUsageDescription": "Cette application a besoin d'accéder à votre galerie pour enregistrer des fichiers.",
+        "NSLocationWhenInUseUsageDescription": "Cette application peut utiliser votre position si vous activez la localisation dans la carte.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSExceptionDomains": {
+            "api.starsetfrance.com": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            }
+          }
+        }
       }
     },
     "android": {

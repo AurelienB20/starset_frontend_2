@@ -123,9 +123,9 @@ const ModifyAccountScreen = () => {
       </View>
       <InfoRow
         label="Type de profil"
-        value={user?.is_Company ? 'Entreprise' : 'Particulier'}
+        value={user?.is_company ? 'Entreprise' : 'Particulier'}
         onPress={() => { navigation.navigate('modifyWorkerProfile' as never); }}
-        icon={user?.is_Company
+        icon={user?.is_company
           ? require('../assets/images/company.png')
           : require('../assets/images/people.png')
         }

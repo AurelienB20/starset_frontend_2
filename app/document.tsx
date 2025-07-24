@@ -53,7 +53,6 @@ const DocumentsScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
 const [selectedDocIdForMenu, setSelectedDocIdForMenu] = useState<string | null>(null);
   
-  
   const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -244,6 +243,8 @@ const [showDocModal, setShowDocModal] = useState(false);
         if (!uploadResponse.ok) throw new Error('Échec du téléchargement');
   
         Alert.alert('Succès', 'Document enregistré avec succès.');
+        await fetchWorkerDocs();
+
         setUploadedDocs((prev) => [...prev, selectedDocType]);
         setModalVisible(false);
         setSelectedImage(null);

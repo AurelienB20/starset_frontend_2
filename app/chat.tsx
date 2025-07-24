@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'; // You can use icons for the send button
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Dimensions, Image, Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 import socket from './socket';
@@ -20,6 +20,7 @@ const ChatScreen = () => {
   const screenHeight = Dimensions.get('window').height;
 const [keyboardHeight, setKeyboardHeight] = useState(0);
 const [visibleHeight, setVisibleHeight] = useState(screenHeight);
+const seenMessageIds = useRef<any>(new Set());
 
   const getConversationDetails = async () => {
   try {
@@ -271,12 +272,26 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   
 
   const handleSendMessage = async () => {
-    const trimmedMessage = newMessage.trim();
-    if (!trimmedMessage && !selectedImage) {
-      return; // Rien à envoyer
-    }
-  
     const message_time = getLocalTime();
+    const trimmedMessage = newMessage.trim();
+
+    const pendingMessage = {
+      conversation_id,
+      sender_id,
+      sender_type,
+      message_text: trimmedMessage || '', // même vide si image seule
+      picture_url: selectedImage || null,
+      timestamp: message_time,
+      local_id: Date.now(), // identifiant temporaire si besoin
+    };
+    seenMessageIds.current.add(pendingMessage.local_id);
+
+    // 👇 Affiche immédiatement dans la conversation
+    setMessages((prev: any) => [...prev, pendingMessage]);
+
+    // 👇 Nettoie les inputs immédiatement
+    setNewMessage('');
+    setSelectedImage(null);
   
     // Construction du message de base
     const newMessageObject = {
@@ -365,7 +380,14 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
     socket.emit('joinRoom', conversation_id);
   
     socket.on('newMessage', (message) => {
-      setMessages((prev : any) => [...prev, message]);
+      setMessages((prev: any[]) => {
+        const alreadyExists = prev.some((m) => m.timestamp === message.timestamp);
+        if (!alreadyExists) {
+          return [...prev, message];
+        } else {
+          return prev;
+        }
+      });
     });
   
     return () => {
@@ -446,7 +468,14 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         </TouchableOpacity>
       )}
 
-      <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+      <TouchableOpacity
+        style={[
+          styles.sendButton,
+          !(newMessage.trim() || selectedImage) && { backgroundColor: '#cccccc' } // gris si rien à envoyer
+        ]}
+        disabled={!(newMessage.trim() || selectedImage)}
+        onPress={handleSendMessage}
+      >
         <Ionicons name="send" size={24} color="white" />
       </TouchableOpacity>
     </View>

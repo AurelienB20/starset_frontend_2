@@ -3,7 +3,6 @@ import ExperienceModal from '@/components/ExperienceModal';
 import { useAllWorkerPrestation, useCurrentWorkerPrestation } from '@/context/userContext';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Picker } from '@react-native-picker/picker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import moment from 'moment';
@@ -1016,45 +1015,75 @@ const PrestationScreen = () => {
       <Text style={styles.characterCount}>{maxDescriptionLength - description.length} caractères</Text>
       <View style={{ marginVertical: 20 }}>
         
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}>
-            Mode de prestation
-          </Text>
-          <View style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            overflow: 'hidden'
-          }}>
-            <Picker
-              selectedValue={selectedMode}
-              onValueChange={(itemValue) =>
-                setSelectedMode(itemValue)
-              }>
-              <Picker.Item label="Sur place" value="sur place" />
-              <Picker.Item label="Distanciel" value="distanciel" />
-            </Picker>
-          </View>
-        </View>
-         <View style={{ marginBottom: 20 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 5 }}>
-            Mode de paiement
-          </Text>
-          <View style={{
-            borderWidth: 1,
-            borderColor: '#ccc',
-            borderRadius: 8,
-            overflow: 'hidden'
-          }}>
-            <Picker
-              selectedValue={selectedTarifMode}
-              onValueChange={(itemValue) => handleTarifModeChange(itemValue)}
-            >
-              <Picker.Item label="Tarif par heure" value="heure" />
-              <Picker.Item label="Tarif par prestation" value="prestation" />
-            </Picker>
-          </View>
-        </View>
+      <View style={styles.sectionContainer}>
+  <Text style={styles.sectionTitle}>Mode de tarification</Text>
+  <View style={styles.toggleContainer}>
+    <TouchableOpacity
+      onPress={() => handleTarifModeChange('prestation')}
+      style={[
+        styles.toggleButton,
+        selectedTarifMode === 'prestation' && styles.toggleButtonActive,
+      ]}
+    >
+      <Text style={[
+        styles.toggleText,
+        selectedTarifMode === 'prestation' && styles.toggleTextActive,
+      ]}>
+        /PRESTATION
+      </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      onPress={() => handleTarifModeChange('heure')}
+      style={[
+        styles.toggleButton,
+        selectedTarifMode === 'heure' && styles.toggleButtonActive,
+      ]}
+    >
+      <Text style={[
+        styles.toggleText,
+        selectedTarifMode === 'heure' && styles.toggleTextActive,
+      ]}>
+        /HEURE
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
+<View style={styles.sectionContainer}>
+  <Text style={styles.sectionTitle}>Mode de prestation</Text>
+  <View style={styles.toggleContainer}>
+    <TouchableOpacity
+      onPress={() => setSelectedMode('sur place')}
+      style={[
+        styles.toggleButton,
+        selectedMode === 'sur place' && styles.toggleButtonActiveGray,
+      ]}
+    >
+      <Text style={[
+        styles.toggleText,
+        selectedMode === 'sur place' && styles.toggleTextGrayActive,
+      ]}>
+        PRÉSENTIEL
+      </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      onPress={() => setSelectedMode('distanciel')}
+      style={[
+        styles.toggleButton,
+        selectedMode === 'distanciel' && styles.toggleButtonActive,
+      ]}
+    >
+      <Text style={[
+        styles.toggleText,
+        selectedMode === 'distanciel' && styles.toggleTextActive,
+      ]}>
+        DISTANCIEL
+      </Text>
+    </TouchableOpacity>
+  </View>
+</View>
       </View>
 
       
@@ -2187,6 +2216,52 @@ certificationTextWithMenu: {
 certificationMenuContainer: {
   alignSelf: 'flex-start',
 },
+
+sectionContainer: {
+  marginBottom: 20,
+},
+
+sectionTitle: {
+  fontWeight: 'bold',
+  fontSize: 16,
+  marginBottom: 5,
+},
+
+toggleContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+},
+
+toggleButton: {
+  flex: 1,
+  paddingVertical: 10,
+  borderRadius: 8,
+  alignItems: 'center',
+  backgroundColor: '#e0e0e0',
+  marginHorizontal: 4,
+},
+
+toggleButtonActive: {
+  backgroundColor: '#7ed957',
+},
+
+toggleButtonActiveGray: {
+  backgroundColor: '#e0e0e0',
+},
+
+toggleText: {
+  fontWeight: 'bold',
+  color: '#000',
+},
+
+toggleTextActive: {
+  color: '#fff',
+},
+
+toggleTextGrayActive: {
+  color: '#000',
+},
+
 
 });
 
