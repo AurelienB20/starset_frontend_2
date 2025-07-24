@@ -37,7 +37,12 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.starset77.frontend_starset_2",
-      "permissions": ["CAMERA"]
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
