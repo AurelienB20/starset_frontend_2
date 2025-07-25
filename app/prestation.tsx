@@ -59,8 +59,6 @@ const PrestationScreen = () => {
   const [certificationTitle, setCertificationTitle] = useState('');
   const [certificationInstitution, setCertificationInstitution] = useState('');
   const [certificationDate, setCertificationDate] = useState('');
-  const [certificationDescription, setCertificationDescription] = useState('');
-  const [certificationImage, setCertificationImage] = useState<any>(null);
   const [isImageModalVisible, setImageModalVisible] = useState(false); // Contrôle de la visibilité du modal
   const [selectedImage, setSelectedImage] = useState(null); // Image sélectionnée
   const { allWorkerPrestation, setAllWorkerPrestation } = useAllWorkerPrestation();
@@ -70,7 +68,6 @@ const PrestationScreen = () => {
   const [experienceDate, setExperienceDate] = useState('');
   const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>('sur place');
   const [selectedTarifMode, setSelectedTarifMode] = useState<any>('heure');
-  const [showModeOptions, setShowModeOptions] = useState(false);
   const [certificationImages, setCertificationImages] = useState<any[]>([]);
   const [experienceImages, setExperienceImages] = useState<string[]>([]);
 
@@ -84,6 +81,8 @@ const PrestationScreen = () => {
   const [editImages, setEditImages] = useState<string[]>([]);
   const [showEditCalendar, setShowEditCalendar] = useState(false);
   const [isExperienceModalVisible, setExperienceModalVisible] = useState(false);
+  const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
+const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
  
 
   // Ouvre le menu pour une certification spécifique
