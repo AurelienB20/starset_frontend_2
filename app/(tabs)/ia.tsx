@@ -6,7 +6,6 @@ import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
-  Dimensions,
   Image,
   Keyboard,
   Platform,
@@ -21,6 +20,9 @@ import {
 import ProfileCard from '../../components/ProfileCard';
 import config from '../../config.json';
 
+// NEW 👉 importe ton hook de contexte (adapte le chemin si besoin)
+import { useUser } from '@/context/userContext';
+
 const AiScreen = () => {
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
@@ -28,12 +30,14 @@ const AiScreen = () => {
   const tabBarHeight = useBottomTabBarHeight();
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
+  // NEW
+  const { user } = useUser(); // supposé retourner null/undefined si non connecté
+  const canChat : any= user && Object.keys(user).length > 0;
+
   const [fontsLoaded] = useFonts({
     BebasNeue: BebasNeue_400Regular,
     LexendDeca : LexendDeca_400Regular,
   });
-  const screenHeight = Dimensions.get('window').height;
-const [visibleHeight, setVisibleHeight] = useState(screenHeight);
 
   const typingOpacity = new Animated.Value(0);
 
@@ -57,18 +61,18 @@ const [visibleHeight, setVisibleHeight] = useState(screenHeight);
   }, [loading]);
 
   useEffect(() => {
-  const showSubscription = Keyboard.addListener('keyboardDidShow', (event) => {
-    setKeyboardHeight(event.endCoordinates.height-50);
-  });
-  const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-    setKeyboardHeight(0);
-  });
+    const showSubscription = Keyboard.addListener('keyboardDidShow', (event) => {
+      setKeyboardHeight(event.endCoordinates.height - 50);
+    });
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
 
-  return () => {
-    showSubscription.remove();
-    hideSubscription.remove();
-  };
-}, []);
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const getAccountId = async () => {
     try {
@@ -93,6 +97,7 @@ const [visibleHeight, setVisibleHeight] = useState(screenHeight);
   };
 
   const handleSendAiMessage = async () => {
+    if (!canChat) return; // NEW: sécurité
     if (!newMessage.trim()) return;
 
     const user_id = await getAccountId();
@@ -136,80 +141,95 @@ const [visibleHeight, setVisibleHeight] = useState(screenHeight);
     initAiContext();
   }, []);
 
+  // NEW : injecte un message “créez un compte” si user est vide
+  useEffect(() => {
+    if (!canChat) {
+      setMessages([
+        {
+          message_text: "Si vous voulez profiter du chatbot, vous devez créer un compte.",
+          sended_by_user: false,
+        },
+      ]);
+    }
+  }, [canChat]);
+
   if (!fontsLoaded) return null;
 
   return (
-  <View style={{ flex: 1, backgroundColor: '#D4F1E3', paddingBottom: keyboardHeight }}>
-  <SafeAreaView style={{ flex: 1 }}>
-    
-      {/* Header */}
-      <View style={styles.header}>
-        <Image source={require('../../assets/images/Appel.png')} style={styles.aiAvatar} />
-        <Text style={styles.headerName}>MIRA</Text>
-      </View>
+    <View style={{ flex: 1, backgroundColor: '#D4F1E3', paddingBottom: keyboardHeight }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Image source={require('../../assets/images/Appel.png')} style={styles.aiAvatar} />
+          <Text style={styles.headerName}>MIRA</Text>
+        </View>
 
-      {/* Messages */}
-      <ScrollView
-        style={styles.messageContainer}
-        contentContainerStyle={{ paddingBottom: 140 }}
-        keyboardShouldPersistTaps="handled"
-      >
-        {messages.map((message, index) => (
-          <View
-            key={index}
-            style={[
-              styles.messageBubble,
-              message.sended_by_user ? styles.myMessage : styles.otherMessage,
-            ]}
-          >
+        {/* Messages */}
+        <ScrollView
+          style={styles.messageContainer}
+          contentContainerStyle={{ paddingBottom: 140 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {messages.map((message, index) => (
             <View
-              style={message.sended_by_user ? styles.myTextWrapper : styles.otherTextWrapper}
+              key={index}
+              style={[
+                styles.messageBubble,
+                message.sended_by_user ? styles.myMessage : styles.otherMessage,
+              ]}
             >
-              <Text style={styles.messageText}>{message.message_text}</Text>
-            </View>
-
-            {message.workers?.length > 0 && (
-              <View style={{ marginTop: 10, gap: 10 }}>
-                {message.workers.map((worker: any, i: number) => (
-                  <ProfileCard key={i} item={worker} />
-                ))}
+              <View
+                style={message.sended_by_user ? styles.myTextWrapper : styles.otherTextWrapper}
+              >
+                <Text style={styles.messageText}>{message.message_text}</Text>
               </View>
-            )}
-          </View>
-        ))}
 
-        {loading && (
-          <View style={[styles.messageBubble, styles.otherMessage]}>
-            <Animated.Text style={[styles.typingText, { opacity: typingOpacity }]}>
-              taping...
-            </Animated.Text>
-          </View>
-        )}
-      </ScrollView>
+              {message.workers?.length > 0 && (
+                <View style={{ marginTop: 10, gap: 10 }}>
+                  {message.workers.map((worker: any, i: number) => (
+                    <ProfileCard key={i} item={worker} />
+                  ))}
+                </View>
+              )}
+            </View>
+          ))}
 
-      {/* Input */}
-      <View style={styles.inputContainer}>
-        <TouchableOpacity onPress={() => {}}>
-          <Ionicons name="camera-outline" size={24} color="#008000" />
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={newMessage}
-          onChangeText={setNewMessage}
-          placeholder="Je recherche une babysitter..."
-          placeholderTextColor="#808080"
-          multiline
-        />
-        <TouchableOpacity style={styles.sendButton} onPress={handleSendAiMessage}>
+          {loading && (
+            <View style={[styles.messageBubble, styles.otherMessage]}>
+              <Animated.Text style={[styles.typingText, { opacity: typingOpacity }]}>
+                taping...
+              </Animated.Text>
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Input */}
+        <View style={styles.inputContainer}>
+          <TouchableOpacity onPress={() => {}} disabled={!canChat}>
+            <Ionicons name="camera-outline" size={24} color={canChat ? '#008000' : '#9E9E9E'} />
+          </TouchableOpacity>
+
+          <TextInput
+            style={styles.input}
+            value={newMessage}
+            onChangeText={setNewMessage}
+            placeholder={canChat ? "Je recherche une babysitter..." : "Connectez-vous pour discuter avec MIRA"}
+            placeholderTextColor="#808080"
+            multiline
+            editable={canChat} // NEW
+          />
+
+          <TouchableOpacity
+            style={[styles.sendButton, !canChat && styles.sendButtonDisabled]} // NEW
+            onPress={handleSendAiMessage}
+            disabled={!canChat} // NEW
+          >
           <Ionicons name="send" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    
-    </SafeAreaView>
-</View>
-
-);
-
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -262,7 +282,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 10,
     backgroundColor: '#008000',
-     paddingBottom: Platform.OS === 'ios' ? 65 : 10,
+    paddingBottom: Platform.OS === 'ios' ? 65 : 10,
   },
   input: {
     flex: 1,
@@ -273,7 +293,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 14,
     color: '#000000',
-    fontFamily : 'LexendDeca'
+    fontFamily: 'LexendDeca',
   },
   sendButton: {
     marginLeft: 10,
@@ -282,6 +302,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  // NEW
+  sendButtonDisabled: {
+    backgroundColor: '#9E9E9E',
   },
   myMessage: {
     alignSelf: 'flex-end',
