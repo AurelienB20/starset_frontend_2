@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Image } from 'expo-image';
+
 
 const StarsetScreen = () => {
   const [progress, setProgress] = useState(0);
@@ -46,17 +46,7 @@ const StarsetScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: './assets/images/logo_gif.gif' }}
-        style={styles.logo}
-        
-      />
-      <Image
-        source={require('../assets/images/logo_gif.gif')}
-        style={{ width: '80%', height: 200 }}
-        contentFit="contain"
-        
-      />
+      
 
       
       {/* Remplacer par un objet de style et non un tableau 

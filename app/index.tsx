@@ -1,9 +1,9 @@
 import { useAllWorkerPrestation, useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { Image } from 'expo-image';
+
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import config from '../config.json';
 
 const StarsetScreen = () => {
@@ -139,7 +139,7 @@ const StarsetScreen = () => {
       <Image
         source={require('../assets/images/logo_gif_hd.gif')}
         style={{ width: '80%', height: 200 }}
-        contentFit="contain"
+        resizeMode="contain"
         
       />
 
