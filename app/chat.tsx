@@ -287,7 +287,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
     seenMessageIds.current.add(pendingMessage.local_id);
 
     // 👇 Affiche immédiatement dans la conversation
-    setMessages((prev: any) => [...prev, pendingMessage]);
+    //setMessages((prev: any) => [...prev, pendingMessage]);
 
     // 👇 Nettoie les inputs immédiatement
     setNewMessage('');
