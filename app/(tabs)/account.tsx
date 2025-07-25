@@ -431,13 +431,7 @@ navigation.dispatch(
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.menuItem}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="question-circle" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>Aide</Text>
-  </View>
-</TouchableOpacity>
-
+      
 
 
 

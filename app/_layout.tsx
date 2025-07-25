@@ -45,7 +45,7 @@ function RootLayoutNav() {
                     <Stack.Screen name="prestationView"  options={{ headerShown : false }} />
                     <Stack.Screen name="paymentMethod"  />
                     <Stack.Screen name="modifyAccount"  />
-                    <Stack.Screen name="modifyPseudo"  options={{ headerShown : false }} />
+                    <Stack.Screen name="modifyPseudo"  options={{ headerShown : true }} />
                     <Stack.Screen name="testImage"  options={{ headerShown : false }} />
                     <Stack.Screen name="metierList"  options={{ headerShown : false }} />
                     <Stack.Screen name="workerByField"  options={{ headerShown : false }} />

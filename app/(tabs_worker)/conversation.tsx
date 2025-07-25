@@ -2,7 +2,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -20,7 +20,6 @@ import config from '../../config.json';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 const SkeletonMessage = () => {
-  
   const shimmerAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -77,7 +76,6 @@ const ConversationScreen = () => {
 
   const getFormattedTime = (timestamp: string) => {
     const date = new Date(timestamp);
-    
     return date.toLocaleString('fr-FR', {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       hour: '2-digit',
@@ -88,31 +86,25 @@ const ConversationScreen = () => {
     });
   };
 
-  // === Ajoute cette fonction pour accepter une conversation ===
-const acceptConversation = async (conversation_id: string) => {
-  try {
-    const response = await fetch(`${config.backendUrl}/api/conversation/accept-conversation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ conversation_id }),
-    });
+  const acceptConversation = async (conversation_id: string) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/conversation/accept-conversation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ conversation_id }),
+      });
 
-    if (!response.ok) {
-      throw new Error('Erreur lors de l’acceptation de la conversation');
+      if (!response.ok) {
+        throw new Error('Erreur lors de l’acceptation de la conversation');
+      }
+
+      await getAllConversation();
+    } catch (error) {
+      console.error('Erreur lors de l’acceptation:', error);
     }
-
-    const data = await response.json();
-    console.log('Conversation acceptée:', data);
-
-    // Après acceptation, recharge les conversations
-    await getAllConversation();
-  } catch (error) {
-    console.error('Erreur lors de l’acceptation:', error);
-  }
-};
-
+  };
 
   const gotoChat = async (conversationId: string, contactProfilePictureUrl: string, contactFirstname: string) => {
     const worker_id = await getWorkerId();
@@ -161,7 +153,13 @@ const acceptConversation = async (conversation_id: string) => {
       }
 
       const data = await response.json();
-      if(data) setConversations(data.conversations);
+      if (data) {
+        const sorted = [...data.conversations].sort(
+          (a: any, b: any) =>
+            new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime()
+        );
+        setConversations(sorted);
+      }
     } catch (error) {
       console.error('Erreur récupération des conversations:', error);
     } finally {
@@ -173,28 +171,35 @@ const acceptConversation = async (conversation_id: string) => {
     getAllConversation();
   }, []);
 
-  const filteredConversations = conversations.filter(
-    (conv: any) =>
-      conv.accepted === true &&
-      conv.firstname.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredConversations = useMemo(() => {
+    return [...conversations]
+      .filter(
+        (conv: any) =>
+          conv.accepted === true &&
+          conv.firstname.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime()
+      );
+  }, [conversations, searchTerm]);
 
   return (
     <View style={styles.container}>
       <View style={styles.messagerieContainer}>
-         <Image
-                  source={ require('../../assets/images/Messagerie.png') }
-                  style={styles.messagerie}
-                />
+        <Image
+          source={ require('../../assets/images/Messagerie.png') }
+          style={styles.messagerie}
+        />
       </View>
       <View style={styles.searchContainer}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Rechercher"
-        placeholderTextColor="#666"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Rechercher"
+          placeholderTextColor="#666"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
         <TouchableOpacity style={styles.searchButton} onPress={() => setModalVisible(true)}>
           <View style={styles.searchButton}>
             <FontAwesome name="user" size={25} color="#000" style={styles.searchIcon} />
@@ -221,7 +226,6 @@ const acceptConversation = async (conversation_id: string) => {
         />
       )}
 
-
       <Modal
         transparent={true}
         animationType="slide"
@@ -232,7 +236,6 @@ const acceptConversation = async (conversation_id: string) => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Demandes de conversation</Text>
 
-            {/* Afficher seulement les conversations non acceptées */}
             <FlatList
               data={conversations.filter((conv : any) => conv.accepted === false)}
               keyExtractor={(item) => item.id.toString()}

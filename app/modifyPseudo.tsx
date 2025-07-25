@@ -3,7 +3,6 @@ import { useUser } from '@/context/userContext';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Assurez-vous d'avoir installé cette bibliothèque
 import config from '../config.json';
 
 const ModifyPseudoScreen = () => {
@@ -71,32 +70,10 @@ const ModifyPseudoScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* 🔥 HEADER INTÉGRÉ DANS LE JSX */}
-      <View style={styles.header}>
-        {/* Flèche retour */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-back" size={30} color="black" />
-        </TouchableOpacity>
+      
+      
 
-        {/* Icônes à droite */}
-        <View style={styles.headerIcons}>
-          <TouchableOpacity
-            onPress={() => console.log("✅ Mail cliqué")}
-            style={styles.iconButton}
-          >
-            <Icon name="mail" size={30} color="black" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => console.log("✅ Icône paramètres cliquée !")}
-            style={styles.iconButton}
-          >
-            <Icon name="more-vert" size={30} color="black" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* 🔥 CONTENU PRINCIPAL */}
+      {/*CONTENU PRINCIPAL */}
       <View style={styles.content}>
         <Text style={styles.label}>Pseudo</Text>
         <View style={styles.inputWrapper}>

@@ -53,6 +53,8 @@ const SkeletonMessage = () => {
   );
 };
 
+// ...imports inchangés
+
 const ConversationScreen = () => {
   const navigation = useNavigation();
   const [conversations, setConversations] = useState<any>([]);
@@ -69,6 +71,7 @@ const ConversationScreen = () => {
   };
 
   const getFormattedTime = (timestamp: string) => {
+    if (!timestamp) return '';
     const date = new Date(timestamp);
     return date.toLocaleString('fr-FR', {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -95,34 +98,33 @@ const ConversationScreen = () => {
   };
 
   const renderItem = ({ item }: any) => (
-  <TouchableOpacity
-    style={styles.messageContainer}
-    onPress={() => gotoChat(item.id, item.profile_picture_url, item.firstname)}
-  >
-    <Image
-      source={{ uri: item.profile_picture_url || "https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg" }}
-      style={styles.profileImage}
-    />
-    <View style={styles.messageContent}>
-      <Text style={styles.name}>
-        {item.firstname}
-        {!item.accepted && <Text style={styles.notAccepted}> (non acceptée)</Text>}
-      </Text>
-      <Text style={styles.message}>{item.message_text}</Text>
-    </View>
-    <Text style={styles.time}>{getFormattedTime(item.timestamp)}</Text>
-  </TouchableOpacity>
-);
+    <TouchableOpacity
+      style={styles.messageContainer}
+      onPress={() => gotoChat(item.id, item.profile_picture_url, item.firstname)}
+    >
+      <Image
+        source={{ uri: item.profile_picture_url || "https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg" }}
+        style={styles.profileImage}
+      />
+      <View style={styles.messageContent}>
+        <Text style={styles.name}>
+          {item.firstname}
+          {!item.accepted && <Text style={styles.notAccepted}> (non acceptée)</Text>}
+        </Text>
+        <Text style={styles.message}>{item.message_text}</Text>
+      </View>
+      <Text style={styles.time}>{getFormattedTime(item.timestamp)}</Text>
+    </TouchableOpacity>
+  );
 
   const getAllConversation = async () => {
     try {
-
       const worker_id = await getAccountId();
-
       if (!worker_id) {
         setIsLoading(false);
         return;
       }
+
       const response = await fetch(`${config.backendUrl}/api/conversation/get-all-worker-conversation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,15 +132,20 @@ const ConversationScreen = () => {
       });
 
       const data = await response.json();
-      if(data)
-      {
-        setConversations(data.conversations);
 
-        // ✅ Rejoindre toutes les rooms socket correspondantes
-        const conversationIds = data.conversations.map((conv: any) => conv.id);
+      if (data) {
+        // ⬇️ Tri du plus récent au plus ancien
+        const sorted = [...data.conversations].sort(
+          (a: any, b: any) =>
+            new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime()
+        );
+
+        setConversations(sorted);
+
+        // Rejoindre les rooms socket
+        const conversationIds = sorted.map((conv: any) => conv.id);
         socket.emit('joinUserConversations', conversationIds);
       }
-
     } catch (error) {
       console.error('Erreur lors de la récupération des conversations:', error);
     } finally {
@@ -146,23 +153,23 @@ const ConversationScreen = () => {
     }
   };
 
- 
-
   useEffect(() => {
     getAllConversation();
 
-    // ✅ Optionnel : écouter les nouveaux messages entrants pour la liste
     socket.on('newMessage', (message: any) => {
-      setConversations((prev : any) => {
-        const updated = prev.map((conv: { id: any; }) =>
+      setConversations((prev: any) => {
+        const updated = prev.map((conv: any) =>
           conv.id === message.conversation_id
             ? { ...conv, message_text: message.message_text, timestamp: message.timestamp }
             : conv
         );
-      
-        // ✅ Reclasse les conversations : la plus récente en haut
-        updated.sort((a : any, b : any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      
+
+        // On re-trie pour garder la plus récente en haut
+        updated.sort(
+          (a: any, b: any) =>
+            new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime()
+        );
+
         return updated;
       });
     });
@@ -172,17 +179,15 @@ const ConversationScreen = () => {
     };
   }, []);
 
-  
-
   return (
     <View style={styles.container}>
-      
       <View style={styles.messagerieContainer}>
         <Image
           source={ require('../../assets/images/Messagerie.png') }
           style={styles.messagerie}
         />
       </View>
+
       <TextInput
         style={styles.searchBar}
         placeholder="Rechercher"
@@ -203,6 +208,9 @@ const ConversationScreen = () => {
     </View>
   );
 };
+
+// ...styles identiques
+
 
 
 const styles = StyleSheet.create({
