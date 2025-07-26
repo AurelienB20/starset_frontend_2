@@ -82,6 +82,28 @@ const AccountScreen = () => {
     navigation.navigate('modifyAccount' as never);
   };
 
+  const cryptData = async () => {
+   try {
+    const account_id =user?.id
+              const response = await fetch(`${config.backendUrl}/api/auth/migrate-sensitive-data`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                
+              });
+  
+              if (!response.ok) throw new Error('Échec de l’annulation');
+  
+              // Recharge les prestations après annulation
+              await getUserPlannedPrestation();
+              Alert.alert('Succès', 'Prestation annulée avec succès.');
+            } catch (err) {
+              console.error(err);
+              Alert.alert('Erreur', 'Impossible d’annuler la prestation.');
+            }
+  };
+
   const goToGetLocation = async () => {
     navigation.navigate('getLocation' as never);
   };
@@ -118,6 +140,8 @@ const AccountScreen = () => {
   const getAccountId = async () => {
     try {
       const account_id = await AsyncStorage.getItem('account_id');
+      console.log("account_id 123")
+      console.log(account_id)
       if (account_id !== null) {
         return account_id;
       }
@@ -178,6 +202,8 @@ const AccountScreen = () => {
       const data = await response.json();
       if(data)
       {
+        console.log(2);
+        console.log('Planned Prestation:', data.plannedPrestations);
         setPlannedPrestations(data.plannedPrestations);
       }
     } catch (error) {
@@ -233,7 +259,6 @@ navigation.dispatch(
   };
 
   const cancelPrestation = (prestationId: string) => {
-    console.log(prestationId);
     Alert.alert(
       'Confirmation',
       'Êtes-vous sûr de vouloir annuler cette prestation ?',
@@ -246,13 +271,12 @@ navigation.dispatch(
           text: 'Oui',
           onPress: async () => {
             try {
-              console.log(prestationId);
-              const response = await fetch(`${config.backendUrl}/api/planned-prestation/cancel-planned-prestation`, {
+              const response = await fetch(`${config.backendUrl}/api/mission/cancel-prestation`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ id : prestationId }),
+                body: JSON.stringify({ prestationId }),
               });
   
               if (!response.ok) throw new Error('Échec de l’annulation');
@@ -435,10 +459,18 @@ navigation.dispatch(
 
 
 
+
 <TouchableOpacity style={styles.menuItem} onPress={goToModifyAccount}>
   <View style={styles.iconWithText}>
     <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Paramètres</Text>
+  </View>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={cryptData}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>Cryptage des données</Text>
   </View>
 </TouchableOpacity>
 
@@ -544,7 +576,7 @@ navigation.dispatch(
                               </View>
                               <TouchableOpacity
                                 style={styles.cancelButton}
-                                onPress={() => cancelPrestation(prestation.id)} // <-- Utilise l'ID de la prestation
+                                onPress={() => cancelPrestation(prestation._id)} // <-- Utilise l'ID de la prestation
                               >
                                 <Text style={styles.cancelButtonText}>Annuler</Text>
                               </TouchableOpacity>
@@ -647,7 +679,7 @@ navigation.dispatch(
                     </View>
                     <TouchableOpacity
                       style={styles.cancelButton}
-                      onPress={() => cancelPrestation(prestation.id)}
+                      onPress={() => cancelPrestation(prestation._id)}
                     >
                       <Text style={styles.cancelButtonText}>Annuler</Text>
                     </TouchableOpacity>

@@ -24,7 +24,7 @@ const ModifyPhoneScreen = () => {
       const updatedUser = { ...user, phone };
       setUser(updatedUser);
 
-      const response = await fetch(`${config.backendUrl}/api/auth/update-account`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/update-account-new`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ account: updatedUser }),

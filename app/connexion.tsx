@@ -24,7 +24,7 @@ const ConnexionScreen = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/login`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/login-crypt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
