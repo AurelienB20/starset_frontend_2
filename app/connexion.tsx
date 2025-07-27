@@ -55,12 +55,14 @@ const ConnexionScreen = () => {
 
 const getProfile = async (accountId: string) => {
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/get-account-by-id`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/get-account-by-id-crypt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ accountId }),
       });
       const data = await response.json();
+      console.log("ici 27/07/25")
+      console.log(data.account)
       setUser(data.account);
     } catch (error) {
       console.error('Erreur lors du chargement du profil:', error);

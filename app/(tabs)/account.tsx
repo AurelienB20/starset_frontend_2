@@ -85,7 +85,7 @@ const AccountScreen = () => {
   const cryptData = async () => {
    try {
     const account_id =user?.id
-              const response = await fetch(`${config.backendUrl}/api/auth/migrate-sensitive-data`, {
+              const response = await fetch(`${config.backendUrl}/api/auth/migrate-location-data`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -464,13 +464,6 @@ navigation.dispatch(
   <View style={styles.iconWithText}>
     <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Paramètres</Text>
-  </View>
-</TouchableOpacity>
-
-<TouchableOpacity style={styles.menuItem} onPress={cryptData}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>Cryptage des données</Text>
   </View>
 </TouchableOpacity>
 
