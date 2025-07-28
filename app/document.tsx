@@ -56,17 +56,52 @@ const [selectedDocIdForMenu, setSelectedDocIdForMenu] = useState<string | null>(
   const [uploadedDocs, setUploadedDocs] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [mandatoryDocs, setMandatoryDocs] = useState<string[]>([]);
-  const [recommendedDocs, setRecommendedDocs] = useState<string[]>([]);
+  
   const [mandatoryWorkerDocs, setMandatoryWorkerDocs] = useState<any[]>([]);
   const [recommendedWorkerDocs, setRecommendedWorkerDocs] = useState<any[]>([]);
   const [allDocTypes, setAllDocTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDocUrl, setSelectedDocUrl] = useState<string | null>(null);
-const [showDocModal, setShowDocModal] = useState(false);
+  const [showDocModal, setShowDocModal] = useState(false);
+  const [documentStatusList, setDocumentStatusList] = useState<any[]>([]);
+
+  const mandatoryDocs = documentStatusList.filter(doc => doc.type === 'mandatory');
+const recommendedDocs = documentStatusList.filter(doc => doc.type === 'recommended');
+
+const availableDocTypes = documentStatusList
+  .filter(doc => !doc.uploaded)
+  .map(doc => doc.name);
+
+const filteredDocs = availableDocTypes.filter(doc =>
+  doc.toLowerCase().includes(searchQuery.toLowerCase())
+);
 
 
   const fetchWorkerDocs = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(`${config.backendUrl}/api/document/get-worker-document-status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ worker_id }),
+      });
+  
+      const data = await res.json();
+  
+      if (data.success) {
+        setDocumentStatusList(data.documents || []);
+      } else {
+        setDocumentStatusList([]);
+      }
+    } catch (err) {
+      console.error('Erreur lors du chargement des documents :', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+  const fetchWorkerDocsAncien = async () => {
     try {
       setIsLoading(true); // démarrer le chargement
       const res = await fetch(`${config.backendUrl}/api/mission/get-worker-document`, {
@@ -125,65 +160,60 @@ const [showDocModal, setShowDocModal] = useState(false);
     fetchWorkerDocs();
   }, [worker_id]);
 
-  const renderDocument = (doc: any, isMandatory: boolean) => {
-    const openMenu = () => {
-      setSelectedDocIdForMenu(doc.id);
-      setMenuVisible(true);
-    };
-  
-    const closeMenu = () => {
-      setMenuVisible(false);
-      setSelectedDocIdForMenu(null);
-    };
-  
+  const renderDocument = (doc: any) => {
     return (
       <View
-  key={doc.id}
-  style={[
-    styles.docButton,
-    isMandatory ? styles.okButton : styles.recommendedMissingButton,
-    { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  ]}
->
-  <View style={{ flex: 1, paddingRight: 10 }}>
-    <Text
-      style={styles.docText}
-      numberOfLines={1}
-      ellipsizeMode="tail"
-    >
-      {doc.document_type}
-    </Text>
-  </View>
-
-  <Menu
-    visible={menuVisible && selectedDocIdForMenu === doc.id}
-    onDismiss={() => {
-      setMenuVisible(false);
-      setSelectedDocIdForMenu(null);
-    }}
-    anchor={
-      <IconButton
-        icon="dots-vertical"
-        iconColor="white"
-        size={20}
-        onPress={() => {
-          setSelectedDocIdForMenu(doc.id);
-          setMenuVisible(true);
-        }}
-      />
-    }
-  >
-    <Menu.Item
-      onPress={() => {
-        setMenuVisible(false);
-        handleDeleteDocument(doc.id);
-      }}
-      title="Supprimer"
-      leadingIcon="delete"
-    />
-  </Menu>
-</View>
-
+        key={doc.name}
+        style={[
+          styles.docButton,
+          doc.uploaded ? styles.okButton : styles.recommendedMissingButton,
+          { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+        ]}
+      >
+        <TouchableOpacity
+          style={{ flex: 1, paddingRight: 10 }}
+          onPress={() => {
+            if (doc.uploaded && doc.url) {
+              setSelectedDocUrl(doc.url);
+              setShowDocModal(true);
+            }
+          }}
+        >
+          <Text style={styles.docText} numberOfLines={1} ellipsizeMode="tail">
+            {doc.name}
+          </Text>
+        </TouchableOpacity>
+  
+        {doc.uploaded && (
+          <Menu
+            visible={menuVisible && selectedDocIdForMenu === doc.name}
+            onDismiss={() => {
+              setMenuVisible(false);
+              setSelectedDocIdForMenu(null);
+            }}
+            anchor={
+              <IconButton
+                icon="dots-vertical"
+                iconColor="white"
+                size={20}
+                onPress={() => {
+                  setSelectedDocIdForMenu(doc.name);
+                  setMenuVisible(true);
+                }}
+              />
+            }
+          >
+            <Menu.Item
+              onPress={() => {
+                setMenuVisible(false);
+                handleDeleteDocument(doc.name);
+              }}
+              title="Supprimer"
+              leadingIcon="delete"
+            />
+          </Menu>
+        )}
+      </View>
     );
   };
   
@@ -262,7 +292,7 @@ const [showDocModal, setShowDocModal] = useState(false);
     }
   };
 
-  const handleDeleteDocument = async (documentId: string) => {
+  const handleDeleteDocument = async (documentType: string) => {
     Alert.alert(
       "Confirmer la suppression",
       "Voulez-vous vraiment supprimer ce document ?",
@@ -273,16 +303,18 @@ const [showDocModal, setShowDocModal] = useState(false);
           style: "destructive",
           onPress: async () => {
             try {
+              const normalizedType = documentType.replace(/\s+/g, '_');
+  
               const response = await fetch(`${config.backendUrl}/api/mission/delete-worker-document`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ document_id: documentId }),
+                body: JSON.stringify({ document_id: normalizedType }),
               });
   
               const data = await response.json();
               if (data.success) {
                 Alert.alert('Succès', 'Document supprimé.');
-                fetchWorkerDocs(); // Recharger la liste
+                fetchWorkerDocs();
               } else {
                 Alert.alert('Erreur', 'La suppression a échoué.');
               }
@@ -296,41 +328,28 @@ const [showDocModal, setShowDocModal] = useState(false);
     );
   };
   
-  
-
-  const filteredDocs = allDocTypes.filter(doc =>
-    doc.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.sectionTitle}>DOCUMENTS OBLIGATOIRES</Text>
-      {isLoading ? (
-        Array.from({ length: 3 }).map((_, i) => <SkeletonDoc key={`mand-${i}`} />)
-      ) : mandatoryWorkerDocs.length === 0 ? (
-        <Text>Aucun document obligatoire envoyé.</Text>
-      ) : (
-        mandatoryWorkerDocs.map(doc => renderDocument(doc, true))
-      )}
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => <SkeletonDoc key={`mand-${i}`} />)
+        ) : mandatoryDocs.length === 0 ? (
+          <Text>Aucun document obligatoire.</Text>
+        ) : (
+          mandatoryDocs.map(renderDocument)
+        )}
 
-      <Text style={[styles.sectionTitle, { marginTop: 30 }]}>DOCUMENTS RECOMMANDÉS</Text>
-      {isLoading ? (
-        Array.from({ length: 2 }).map((_, i) => <SkeletonDoc key={`rec-${i}`} />)
-      ) : recommendedWorkerDocs.length === 0 ? (
-        <Text>Aucun document recommandé envoyé.</Text>
-      ) : (
-        recommendedWorkerDocs.map(doc => renderDocument(doc, false))
-      )}
+        <Text style={[styles.sectionTitle, { marginTop: 30 }]}>DOCUMENTS RECOMMANDÉS</Text>
+        {isLoading ? (
+          Array.from({ length: 2 }).map((_, i) => <SkeletonDoc key={`rec-${i}`} />)
+        ) : recommendedDocs.length === 0 ? (
+          <Text>Aucun document recommandé.</Text>
+        ) : (
+          recommendedDocs.map(renderDocument)
+        )}
 
-      <Text style={[styles.sectionTitle, { marginTop: 30 }]}>DOCUMENTS D'IDENTITÉ</Text>
-{isLoading ? (
-  Array.from({ length: 1 }).map((_, i) => <SkeletonDoc key={`id-${i}`} />)
-) : identityDocs.length === 0 ? (
-  <Text>Aucun document d'identité envoyé.</Text>
-) : (
-  identityDocs.map(doc => renderDocument(doc, true)) // tu peux aussi le mettre à false
-)}
-
+      
       <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.addButtonText}>AJOUTER UN DOCUMENT</Text>
       </TouchableOpacity>

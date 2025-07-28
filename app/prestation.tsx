@@ -83,6 +83,8 @@ const PrestationScreen = () => {
   const [isExperienceModalVisible, setExperienceModalVisible] = useState(false);
   const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
 const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
+const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
+
  
 
   // Ouvre le menu pour une certification spécifique
@@ -576,6 +578,33 @@ const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure'
     setRemuneration(formatted);
   };
 
+  const fetchMetierDocuments = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/document/get-metier-document-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ metier_name: prestation?.metier }),
+      });
+  
+      if (!response.ok) {
+        console.warn("Erreur lors de la récupération des documents métier.");
+        return;
+      }
+  
+      const data = await response.json();
+  
+      if (data.success && data.documents) {
+        const mandatory = data.documents.filter((doc: any) => doc.type === 'mandatory');
+        setMandatoryDocuments(mandatory);
+      }
+    } catch (error) {
+      console.error("Erreur lors de fetchMetierDocuments :", error);
+    }
+  };
+  
+
   const getAllCertification = async () => {
     try {
       
@@ -903,6 +932,7 @@ const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure'
     }).catch((error: any) => console.error(error));
 
     getAllCertification();
+    fetchMetierDocuments();
   }, []);
 
   useLayoutEffect(() => {
@@ -1163,6 +1193,17 @@ const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure'
           <FontAwesome name="calendar" size={30} color="black" />
         </TouchableOpacity>
       </View>
+
+      {mandatoryDocuments.length > 0 && (
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Documents obligatoires</Text>
+          {mandatoryDocuments.map((doc, index) => (
+            <Text key={index} style={styles.documentItem}>
+              • {doc.name}
+            </Text>
+          ))}
+        </View>
+      )}
 
 
       <View style={styles.buttonContainer}>
@@ -2259,6 +2300,12 @@ toggleTextActive: {
 
 toggleTextGrayActive: {
   color: '#000',
+},
+
+documentItem: {
+  fontSize: 14,
+  color: '#d63031',
+  marginVertical: 2,
 },
 
 
