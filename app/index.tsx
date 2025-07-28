@@ -62,7 +62,7 @@ const StarsetScreen = () => {
       return;
     }
 
-    const response = await fetch(`${config.backendUrl}/api/auth/get-account-by-id`, {
+    const response = await fetch(`${config.backendUrl}/api/auth/get-account-by-id-crypt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ accountId }),

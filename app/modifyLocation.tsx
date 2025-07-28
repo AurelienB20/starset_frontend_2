@@ -74,14 +74,15 @@ const ModifyLocationScreen = () => {
       const updatedUser = { ...user, address: query, location: coordinates };
       setUser(updatedUser);
 
-      const response = await fetch(`${config.backendUrl}/api/auth/update-account`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/update-location-and-adress`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ account: updatedUser }),
+        body: JSON.stringify({ id: user?.id, address : query, location : coordinates }),
       });
 
-      if (!response.ok) throw new Error('Erreur de réseau');
+      
       const data = await response.json();
+      if (!data.success) throw new Error('Erreur de réseau');
       console.log('Mise à jour réussie:', data);
     } catch (error) {
       console.error('Erreur lors de la mise à jour du compte:', error);
