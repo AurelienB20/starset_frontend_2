@@ -1,14 +1,17 @@
 import { HapticTab } from '@/components/HapticTab';
+import PrestationConfirmation from '@/components/PrestationConfirmationModal';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
+import { useUser } from '@/context/userContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { Tabs } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import config from '../../config.json';
 
 
 const Tab = createBottomTabNavigator();
@@ -17,13 +20,51 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['nam
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-
-
 export default function TabNavigator() {
   const [isPopupVisible, setPopupVisible] = useState(false);
     const navigation = useNavigation();
     const colorScheme = useColorScheme();
-    
+    const [errorMessage, setErrorMessage] = useState('');
+    const [prestationModal, setPrestationModal] = useState(false);
+    const [prestation, setPrestation] = useState(null);
+    const [isTime, setIsTime] = useState(false);
+    const { user } = useUser();
+   
+    useEffect( () => {
+      getPrestation();
+    })
+
+    const getPrestation = async () =>{
+      const workerId = user?.worker
+      try {
+        const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ worker_id:workerId }),
+      });
+    const data = await response.json();
+      if(response.ok)
+      {
+        for(let i=0; data.plannedPrestations[i]; i++)
+        {
+          if (new Date() > data.plannedPrestations[i].start_date && data.plannedPrestations[i].status == "waiting")
+          {
+            setPrestation(data.plannedPrestations[0].id)
+            setIsTime(true)
+          }
+        }
+      }  
+      if(isTime){
+        setPrestationModal(true);
+      }
+    }
+    catch (error) {
+      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+    }
+  }
+
     const goToUserTabs = () => {
       navigation.dispatch(
         CommonActions.reset({
@@ -45,7 +86,15 @@ export default function TabNavigator() {
 
   return (
     <>
-    
+    <PrestationConfirmation
+    visible={prestationModal}
+    onClose={() => {
+        setPrestationModal(false);
+        setIsTime(false);
+      }}
+    prestation={prestation}
+/>
+  
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: '#00A65A',
@@ -88,10 +137,10 @@ export default function TabNavigator() {
         }}
       />
       <Tabs.Screen
-  name="addJob"
-  options={{
-    title: '',
-    tabBarIcon: ({ color }) => (
+      name="addJob"
+      options={{
+      title: '',
+      tabBarIcon: ({ color }) => (
       <View style={{
         width: 32,
         height: 32,
@@ -126,7 +175,6 @@ export default function TabNavigator() {
           {...innerProps}
           onLongPress={() => {
             setPopupVisible(true);
-            console.log(123);
             console.log(isPopupVisible);
           }}
           onPress={innerProps.onPress}

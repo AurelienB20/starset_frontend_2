@@ -38,8 +38,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
   }
 
   const goToPrestationView = (prestation : any) => {
-    const id = prestation.id
-    console.log(123)
+    const id = prestation.metiers[0].id
     navigation.navigate({
       name: 'prestationView',
       params: { id },
