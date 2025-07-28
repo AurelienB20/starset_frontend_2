@@ -274,6 +274,7 @@ navigation.dispatch(
   };
 
   const cancelPrestation = (prestationId: string) => {
+console.log(prestationId);
     Alert.alert(
       'Confirmation',
       'Êtes-vous sûr de vouloir annuler cette prestation ?',
@@ -286,14 +287,14 @@ navigation.dispatch(
           text: 'Oui',
           onPress: async () => {
             try {
-              const response = await fetch(`${config.backendUrl}/api/mission/cancel-prestation`, {
+              const response = await fetch(`${config.backendUrl}/api/planned-prestation/cancel-planned-prestation`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ prestationId }),
+                body: JSON.stringify({ id:prestationId }),
               });
-  
+              console.log(response);
               if (!response.ok) throw new Error('Échec de l’annulation');
   
               // Recharge les prestations après annulation
@@ -582,7 +583,7 @@ navigation.dispatch(
                               </View>
                               <TouchableOpacity
                                 style={styles.cancelButton}
-                                onPress={() => cancelPrestation(prestation._id)} // <-- Utilise l'ID de la prestation
+                                onPress={() => cancelPrestation(prestation.id)} // <-- Utilise l'ID de la prestation
                               >
                                 <Text style={styles.cancelButtonText}>Annuler</Text>
                               </TouchableOpacity>
@@ -595,7 +596,7 @@ navigation.dispatch(
                               </View>
                               <TouchableOpacity
                                 style={styles.doneButton}
-                                onPress={() => handlePrestationFinished(prestation._id)}
+                                onPress={() => handlePrestationFinished(prestation.prestation_id)}
                               >
                                 <Text style={styles.doneButtonText}>La prestation est finie</Text>
                               </TouchableOpacity>
@@ -685,7 +686,7 @@ navigation.dispatch(
                     </View>
                     <TouchableOpacity
                       style={styles.cancelButton}
-                      onPress={() => cancelPrestation(prestation._id)}
+                      onPress={() => cancelPrestation(prestation.id)}
                     >
                       <Text style={styles.cancelButtonText}>Annuler</Text>
                     </TouchableOpacity>
