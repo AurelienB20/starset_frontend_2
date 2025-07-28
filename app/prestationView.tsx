@@ -612,6 +612,7 @@ const unlikeImage = async (imageId: string) => {
       }
     }
   }, [arrivalHour, arrivalMinute]);
+  
 
   const handleAddToCart = () => {
      // Si aucune date de début n'est sélectionnée, afficher une alerte
@@ -804,6 +805,39 @@ const unlikeImage = async (imageId: string) => {
         </View>
       </View>
 
+      {!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
+ !prestation?.type_of_remuneration?.toLowerCase().includes('hourly') ? (
+        <View style={styles.seeMoreContainer}>
+          <TouchableOpacity style={styles.seeMoreButton} onPress={goToChoosePrestation}>
+            <Text style={styles.seeMoreText}>Voir les autres prestations</Text>
+            <Icon name="arrow-forward" size={20} color="white" style={{ marginLeft: 10 }} />
+          </TouchableOpacity>
+
+         
+        </View>
+      ) : (
+        <View style={styles.pricingContainer}>
+  <Text style={styles.pricingText}>
+    {prestation.remuneration ? `${prestation.remuneration}€/heure` : "Tarif non défini"}
+  </Text>
+
+  <TouchableOpacity
+    style={styles.calendarButton}
+    onPress={() => {
+      if (!user || Object.keys(user).length === 0) {
+        setSignupPromptModalVisible(true);
+      } else {
+        toggleCalendar();
+      }
+    }}
+  >
+    <Text style={styles.calendarButtonText}>Voir le calendrier</Text>
+  </TouchableOpacity>
+
+  
+</View>
+      )}
+
       {/* Onglets pour Photos, Expériences, Certifications */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
@@ -950,7 +984,7 @@ const unlikeImage = async (imageId: string) => {
       {/* Tarification */}
       
 
-      {!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
+      {/*{!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
  !prestation?.type_of_remuneration?.toLowerCase().includes('hourly') ? (
         <View style={styles.seeMoreContainer}>
           <TouchableOpacity style={styles.seeMoreButton} onPress={goToChoosePrestation}>
@@ -983,7 +1017,7 @@ const unlikeImage = async (imageId: string) => {
   <View style={styles.diagonal} />
   <View style={styles.diagonal2} />
 </View>
-      )}
+      )}*/}
 
       {/* Date Picker Modal */}
       
@@ -1104,6 +1138,8 @@ const unlikeImage = async (imageId: string) => {
     </View>
   </TouchableOpacity>
 </Modal>
+
+ <View style={{height : 120 }}></View>    
       
     </Animated.ScrollView>
 
@@ -1146,7 +1182,7 @@ const unlikeImage = async (imageId: string) => {
     {/* Ajouter au panier */}
     
     <View style={styles.addButtonFixedContainer}>
-        
+   
     <TouchableOpacity
   style={[
     styles.addButton,
@@ -1160,6 +1196,7 @@ const unlikeImage = async (imageId: string) => {
     <Icon name="shopping-cart" size={24} color="white" style={{ marginLeft: 8 }} />
   </View>
 </TouchableOpacity>
+
       </View>
     </View>
   );
@@ -1378,7 +1415,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 120,
+    //marginBottom: 120,
     backgroundColor: '#00743C',
     height: 100,
     marginHorizontal: 10,
@@ -1442,6 +1479,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     width: '90%',
+    marginTop : 120,
+
   },
 
   addButtonText: {
@@ -1767,7 +1806,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     position: 'relative',
     overflow: 'hidden',
-    marginBottom: 120,
+    //marginBottom: 120,
     marginTop: 10,
     paddingRight : 60
   },

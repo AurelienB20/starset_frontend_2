@@ -22,10 +22,11 @@ const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
 const serviceFee = totalRemuneration * 0.10;
 const transactionFee = totalRemuneration * 0.015 + 0.25;
 const finalTotal = totalRemuneration + serviceFee + transactionFee;
+const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
 
 
   useEffect(() => {
-    initialisePaymentSheet();
+    
     fetchSavedCards();
   }, []);
 
@@ -86,18 +87,20 @@ const finalTotal = totalRemuneration + serviceFee + transactionFee;
     };
 
     const fetchSavedCards = async () => {
-      const user_id = await getAccountId();
-      const res = await fetch(`${config.backendUrl}/api/stripe/get-customer-payment-methods-with-account-id`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ account_id: user_id }),
-      });
-    
-      const data = await res.json();
-      if (data.success) {
-        setSavedCards(data.cards);
-      }
-    };
+  const user_id = await getAccountId();
+  const res = await fetch(`${config.backendUrl}/api/stripe/get-customer-payment-methods-with-account-id`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ account_id: user_id }),
+  });
+
+  const data = await res.json();
+  if (data.success && data.cards.length > 0) {
+    setSavedCards(data.cards);
+    setSelectedPaymentMethodId(data.cards[0].id); // Sélection par défaut
+    if (data.customer_id) setStripeCustomerId(data.customer_id); // <--- stocke le customer_id si renvoyé
+  }
+};
 
     const fetchPaymentSheetParams = async () =>{
       const user_id = await getAccountId();
@@ -127,20 +130,16 @@ const finalTotal = totalRemuneration + serviceFee + transactionFee;
     return;
   }
 
+  if (!selectedPaymentMethodId) {
+    Alert.alert('Paiement', 'Veuillez sélectionner un moyen de paiement.');
+    return;
+  }
+
   setIsLoading(true);
 
   try {
-    const { error } = await presentPaymentSheet();
-
-    if (error) {
-      Alert.alert(`Erreur de paiement`, error.message);
-      setIsLoading(false);
-      return;
-    }
-
     const user_id = await getAccountId();
 
-    // Envoyer une requête pour chaque prestation dans le panier
     for (const item of cart) {
       const {
         prestation,
@@ -171,28 +170,27 @@ const finalTotal = totalRemuneration + serviceFee + transactionFee;
           instruction,
           custom_prestation_id: customPrestationId,
           profile_picture_url: profilePictureUrl,
+          payment_method_id: selectedPaymentMethodId, 
+          stripe_customer_id: stripeCustomerId, 
         }),
       });
 
       const data = await response.json();
-
       if (!data.success) {
-        throw new Error(`Erreur lors de la création de la prestation : ${prestation.metier}`);
+        throw new Error(`Erreur création prestation : ${prestation.metier}`);
       }
     }
 
-    setIsLoading(false);
-    setReady(false);
-    Alert.alert('Succès', 'Le paiement et les prestations ont bien été enregistrés.');
+    Alert.alert('Succès', 'Le paiement différé a été préparé avec succès.');
     navigation.navigate('validation' as never);
-
   } catch (error) {
-    console.error('Erreur paiement :', error);
-    Alert.alert('Erreur', 'Impossible de valider le paiement. Vérifiez votre connexion.');
+    console.error('Erreur paiement différé :', error);
+    Alert.alert('Erreur', 'Une erreur est survenue lors de l’enregistrement.');
+  } finally {
     setIsLoading(false);
-    setReady(false);
   }
 };
+
 
     
 
@@ -230,11 +228,56 @@ const finalTotal = totalRemuneration + serviceFee + transactionFee;
       <View style={styles.separator} />
       <Text style={styles.totalText}>Total à payer : {finalTotal.toFixed(2)} €</Text>
 
+      <View style={{ width: '100%', marginTop: 20 }}>
+  <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Méthode de paiement</Text>
+
+  {savedCards.length > 0 ? (
+    savedCards.map((card) => (
+      <TouchableOpacity
+        key={card.id}
+        onPress={() => setSelectedPaymentMethodId(card.id)}
+        style={{
+          padding: 12,
+          marginBottom: 10,
+          borderRadius: 8,
+          borderWidth: 1,
+          borderColor: card.id === selectedPaymentMethodId ? 'green' : '#ccc',
+          backgroundColor: '#fff',
+        }}
+      >
+        <Text style={{ fontSize: 16 }}>
+          {`${card.card.brand.toUpperCase()} •••• ${card.card.last4}`}
+        </Text>
+        <Text style={{ fontSize: 12, color: '#666' }}>
+          {`Expire ${card.card.exp_month}/${card.card.exp_year}`}
+        </Text>
+      </TouchableOpacity>
+    ))
+  ) : (
+    <Text>Aucune carte enregistrée.</Text>
+  )}
+
+  <TouchableOpacity
+    style={{
+      marginTop: 10,
+      padding: 12,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: 'green',
+      alignItems: 'center',
+    }}
+    onPress={handleAddCard}
+  >
+    <Text style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter une carte</Text>
+  </TouchableOpacity>
+</View>
+
+
       
       <TouchableOpacity
         style={[styles.button, isLoading && { backgroundColor: '#666' }]}
         onPress={handlePayment}
-        disabled={isLoading || !ready} 
+        disabled={isLoading || !selectedPaymentMethodId}
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>
