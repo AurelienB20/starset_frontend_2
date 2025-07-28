@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { usePaymentSheet } from '@stripe/stripe-react-native';
+import { usePaymentSheet, useStripe } from '@stripe/stripe-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -15,6 +15,8 @@ const PaymentScreen = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [savedCards, setSavedCards] = useState<any[]>([]);
+  const { confirmSetupIntent } = useStripe();
+
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
 const serviceFee = totalRemuneration * 0.10;
@@ -26,6 +28,35 @@ const finalTotal = totalRemuneration + serviceFee + transactionFee;
     initialisePaymentSheet();
     fetchSavedCards();
   }, []);
+
+  const handleAddCard = async () => {
+    try {
+      const userId = await getAccountId();
+      const response = await fetch(`${config.backendUrl}/api/stripe/create-setup-intent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account_id: userId }),
+      });
+  
+      const data = await response.json();
+      if (!data.success) throw new Error(data.message || 'Erreur setup intent');
+  
+      const result = await confirmSetupIntent(data.clientSecret, {
+        paymentMethodType: 'Card',
+      });
+  
+      if (result.error) {
+        Alert.alert('Erreur', result.error.message);
+      } else {
+        Alert.alert('Succès', 'Carte enregistrée avec succès');
+        fetchSavedCards(); // recharge les cartes
+      }
+    } catch (err: any) {
+      console.error('Erreur ajout carte:', err);
+      Alert.alert('Erreur', err.message || 'Impossible d’ajouter la carte');
+    }
+  };
+  
 
   const getAccountId = async () => {
     try {

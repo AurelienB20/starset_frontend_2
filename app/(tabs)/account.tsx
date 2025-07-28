@@ -1,3 +1,4 @@
+import NoteModal from '@/components/NoteModal';
 import { useUser } from '@/context/userContext';
 import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -58,6 +59,9 @@ const AccountScreen = () => {
   const [selectedStatusTitle, setSelectedStatusTitle] = useState('');
   const [statusModalVisible, setStatusModalVisible] = useState(false);
   const { user, setUser } = useUser()
+  const [noteModalVisible, setNoteModalVisible] = useState(false);
+  const [selectedPrestationForNote, setSelectedPrestationForNote] = useState(null);
+
 
   const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
@@ -116,20 +120,27 @@ const AccountScreen = () => {
     navigation.navigate('identityDocument' as never);
   };
 
-  const goToHistory = async () => {
-    navigation.navigate('history' as never);
-  };
-
-  const goToAvailability = async () => {
-    navigation.navigate('availability' as never);
-  };
-
-  const goToLanguage = async () => {
-    navigation.navigate('language' as never);
-  };
-
   const goToAbout = async () => {
     navigation.navigate('about' as never);
+  };
+
+  const getWorkerDocumentStatus = async () => {
+    try {
+      
+        const response = await fetch(`${config.backendUrl}/api/document/get-worker-document-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ worker_id : user?.worker}),
+                  
+      });      
+                
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Erreur', 'Impossible d’annuler la prestation.');
+    }
+    
   };
 
   const goToConfidentiality = async () => {
@@ -224,16 +235,20 @@ const AccountScreen = () => {
         {
           text: 'Oui',
           onPress: () => {
-            
-            navigation.navigate({
-              name: 'note',
-              params: {planned_prestation },
-            } as never);
+            // Fermer le modal précédent
+            setStatusModalVisible(false);
+  
+            // Définir la prestation sélectionnée
+            setSelectedPrestationForNote(planned_prestation);
+  
+            // Ouvrir le NoteModal
+            setNoteModalVisible(true);
           },
         },
       ]
     );
   };
+  
 
   const confirmLogout = async () => {
     // Logique pour déconnecter l'utilisateur
@@ -455,11 +470,6 @@ navigation.dispatch(
         </TouchableOpacity>
       </View>
 
-      
-
-
-
-
 <TouchableOpacity style={styles.menuItem} onPress={goToModifyAccount}>
   <View style={styles.iconWithText}>
     <FontAwesome name="cogs" size={20} color="#000" style={styles.menuIcon} />
@@ -488,6 +498,9 @@ navigation.dispatch(
     <Text style={styles.menuItemText}>A Propos</Text>
   </View>
 </TouchableOpacity>
+
+
+
 
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
   <View style={styles.iconWithText}>
@@ -716,6 +729,11 @@ navigation.dispatch(
           </View>
         </View>
       </Modal>
+      <NoteModal
+        visible={noteModalVisible}
+        onClose={() => setNoteModalVisible(false)}
+        planned_prestation={selectedPrestationForNote}
+      />
     </View>
     </ScrollView>
     )}
