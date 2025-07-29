@@ -9,7 +9,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { Tabs } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import config from '../../config.json';
 
@@ -27,43 +27,76 @@ export default function TabNavigator() {
     const [errorMessage, setErrorMessage] = useState('');
     const [prestationModal, setPrestationModal] = useState(false);
     const [prestation, setPrestation] = useState(null);
+    const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
+    const [shownPrestationIds, setShownPrestationIds] = useState<Set<number>>(new Set());
     const [isTime, setIsTime] = useState(false);
     const { user } = useUser();
-   
-    useEffect( () => {
-      getPrestation();
-    })
 
-    const getPrestation = async () =>{
-      const workerId = user?.worker
+    const intervalRef : any = useRef<NodeJS.Timeout | null>(null);
+   
+    const loadPlannedPrestations = async () => {
+      const workerId = user?.worker;
+      if (!workerId) return;
+  
       try {
         const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ worker_id:workerId }),
-      });
-    const data = await response.json();
-      if(response.ok)
-      {
-        for(let i=0; data.plannedPrestations[i]; i++)
-        {
-          if (new Date() > data.plannedPrestations[i].start_date && data.plannedPrestations[i].status == "waiting")
-          {
-            setPrestation(data.plannedPrestations[0].id)
-            setIsTime(true)
-          }
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ worker_id: workerId }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok && Array.isArray(data.plannedPrestations)) {
+          setPlannedPrestations(data.plannedPrestations);
         }
-      }  
-      if(isTime){
-        setPrestationModal(true);
+      } catch (error) {
+        console.error('Erreur lors du chargement des prestations :', error);
+        setErrorMessage('Une erreur est survenue.');
       }
-    }
-    catch (error) {
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
-    }
-  }
+    };
+  
+    // Vérifie toutes les 30s si une prestation doit déclencher le popup
+    const checkIfPrestationIsDue = () => {
+      const now = new Date();
+  
+      for (let p of plannedPrestations) {
+        const start = new Date(p.start_date);
+        if (
+          now > start &&
+          p.status === 'waiting' &&
+          !shownPrestationIds.has(p.id)
+        ) {
+          setPrestation(p.id);
+          setPrestationModal(true);
+          setShownPrestationIds((prev) => {
+            const updated = new Set(prev);
+            updated.add(p.id);
+            return updated;
+          });
+          break; // on n’affiche qu’un seul popup à la fois
+        }
+      }
+    };
+  
+    useEffect(() => {
+      if (!user?.worker) return;
+  
+      // Charger les prestations une seule fois
+      loadPlannedPrestations();
+  
+      // Démarrer l’interval pour vérifier régulièrement
+      intervalRef.current = setInterval(() => {
+        checkIfPrestationIsDue();
+      }, 30000); // toutes les 30s
+  
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }, [user?.worker]); // `plannedPrestations` fixé au chargement initial
+  
 
     const goToUserTabs = () => {
       navigation.dispatch(
@@ -87,13 +120,13 @@ export default function TabNavigator() {
   return (
     <>
     <PrestationConfirmation
-    visible={prestationModal}
-    onClose={() => {
-        setPrestationModal(false);
-        setIsTime(false);
-      }}
-    prestation={prestation}
-/>
+      visible={prestationModal}
+      onClose={() => {
+          setPrestationModal(false);
+          setIsTime(false);
+        }}
+      prestation={prestation}
+    />
   
     <Tabs
       screenOptions={{

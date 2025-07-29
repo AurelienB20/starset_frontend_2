@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { StyleSheet } from 'react-native';
-import config from '../config.json';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import config from '../config.json';
 
 
 const InterestsScreen = () => {
@@ -29,11 +28,15 @@ const InterestsScreen = () => {
 
       console.log("data.fields", data.fields);
       if (data.success) {
-        setInterests(
-          data.fields
-            .map((field: string) => field.trim())
-            .filter((field: string) => field.length > 0)
+        const cleanedFields : any = Array.from(
+          new Set(
+            data.fields
+              .map((field: string) => field.trim().toLowerCase()) // si tu veux ignorer la casse
+              .filter((field: string) => field.length > 0)
+          )
         );
+        
+        setInterests(cleanedFields);
       } else {
         Alert.alert('Erreur', 'Impossible de récupérer les centres d’intérêts');
       }

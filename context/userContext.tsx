@@ -46,6 +46,11 @@ interface CartContextType {
   clearCart: () => void;
 }
 
+interface AllWorkerPlannedPrestationContextType {
+  allWorkerPlannedPrestation: PlannedPrestation[] | null;
+  setAllWorkerPlannedPrestation: (prestations: PlannedPrestation[]) => void;
+}
+
 // Contexts
 const UserContext = createContext<UserContextType | undefined>(undefined);
 const CurrentWorkerPrestationContext = createContext<CurrentWorkerPrestationContextType | undefined>(undefined);
@@ -54,6 +59,8 @@ const PlannedPrestationContext = createContext<PlannedPrestationContextType | un
 const UserConversationContext = createContext<UserConversationContextType | undefined>(undefined);
 const WorkerConversationContext = createContext<WorkerConversationsContextType | undefined>(undefined);
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const AllWorkerPlannedPrestationContext = createContext<AllWorkerPlannedPrestationContextType | undefined>(undefined);
+
 
 
 // Providers
@@ -106,6 +113,17 @@ export const WorkerConversationProvider: React.FC<{ children: React.ReactNode }>
     </WorkerConversationContext.Provider>
   );
 };
+
+export const AllWorkerPlannedPrestationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [allWorkerPlannedPrestation, setAllWorkerPlannedPrestation] = useState<PlannedPrestation[] | null>(null);
+
+  return (
+    <AllWorkerPlannedPrestationContext.Provider value={{ allWorkerPlannedPrestation, setAllWorkerPlannedPrestation }}>
+      {children}
+    </AllWorkerPlannedPrestationContext.Provider>
+  );
+};
+
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -182,6 +200,14 @@ export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
     throw new Error('useCart doit être utilisé à l’intérieur de CartProvider');
+  }
+  return context;
+};
+
+export const useAllWorkerPlannedPrestation = () => {
+  const context = useContext(AllWorkerPlannedPrestationContext);
+  if (!context) {
+    throw new Error('useAllWorkerPlannedPrestation doit être utilisé à l’intérieur de AllWorkerPlannedPrestationProvider');
   }
   return context;
 };

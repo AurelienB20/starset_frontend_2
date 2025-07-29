@@ -9,7 +9,7 @@ import config from '../config.json';
 const StarsetScreen = () => {
   const [progress, setProgress] = useState(0);
   const [showGif, setShowGif] = useState(true); // État pour afficher le GIF ou l'image statique
-  const { setUser } = useUser()
+  const { user, setUser } = useUser()
   const { setAllWorkerPrestation } = useAllWorkerPrestation()
   const navigation = useNavigation();
 
@@ -23,6 +23,24 @@ const StarsetScreen = () => {
       console.error('Erreur lors de la récupération du type de compte', e);
     }
   };
+
+  const getPrestation = async () =>{
+        const workerId = user?.worker
+        try {
+          const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ worker_id:workerId }),
+        });
+      const data = await response.json();
+        
+      }
+      catch (error) {
+        
+      }
+    }
 
   const getAllWorkerPrestation = async () => {
     try {
