@@ -1,4 +1,4 @@
-import { useAllWorkerPrestation, useUser } from '@/context/userContext';
+import { useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +11,7 @@ const StarsetScreen = () => {
   const [showGif, setShowGif] = useState(true); // État pour afficher le GIF ou l'image statique
   const { user, setUser } = useUser()
   const { setAllWorkerPrestation } = useAllWorkerPrestation()
+  const { allWorkerPlannedPrestation, setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
   const navigation = useNavigation();
 
   const getAccountId = async () => {
@@ -24,8 +25,19 @@ const StarsetScreen = () => {
     }
   };
 
+  const getWorkerId = async () => {
+    try {
+      const worker_id = await AsyncStorage.getItem('worker_id');
+      if (worker_id !== null) {
+        return worker_id;
+      }
+    } catch (e) {
+      console.error('Erreur lors de la récupération du type de compte', e);
+    }
+  };
+
   const getPrestation = async () =>{
-        const workerId = user?.worker
+        const workerId = await getWorkerId()
         try {
           const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
           method: 'POST',
@@ -35,6 +47,10 @@ const StarsetScreen = () => {
           body: JSON.stringify({ worker_id:workerId }),
         });
       const data = await response.json();
+      console.log("ici dans la page index")
+      console.log("ici dans la page index")
+      console.log(data.plannedPrestations)
+      setAllWorkerPlannedPrestation(data.plannedPrestations)
         
       }
       catch (error) {
@@ -134,6 +150,7 @@ const StarsetScreen = () => {
           hasLoaded = true; // ✅ stop les appels multiples
           getProfile();
           getAllWorkerPrestation();
+          getPrestation()
         }
 
         return prev;

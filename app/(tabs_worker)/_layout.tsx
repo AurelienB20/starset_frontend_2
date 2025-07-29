@@ -28,74 +28,109 @@ export default function TabNavigator() {
     const [prestationModal, setPrestationModal] = useState(false);
     const [prestation, setPrestation] = useState(null);
     const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
-    const [shownPrestationIds, setShownPrestationIds] = useState<Set<number>>(new Set());
+    const [shownPrestationIds, setShownPrestationIds] = useState<any[]>([]);
     const [isTime, setIsTime] = useState(false);
     const { user } = useUser();
 
     const intervalRef : any = useRef<NodeJS.Timeout | null>(null);
    
     const loadPlannedPrestations = async () => {
-      const workerId = user?.worker;
-      if (!workerId) return;
-  
-      try {
-        const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ worker_id: workerId }),
-        });
-  
-        const data = await response.json();
-  
-        if (response.ok && Array.isArray(data.plannedPrestations)) {
-          setPlannedPrestations(data.plannedPrestations);
-        }
-      } catch (error) {
-        console.error('Erreur lors du chargement des prestations :', error);
-        setErrorMessage('Une erreur est survenue.');
-      }
-    };
-  
-    // Vérifie toutes les 30s si une prestation doit déclencher le popup
-    const checkIfPrestationIsDue = () => {
-      const now = new Date();
-  
-      for (let p of plannedPrestations) {
-        const start = new Date(p.start_date);
-        if (
-          now > start &&
-          p.status === 'waiting' &&
-          !shownPrestationIds.has(p.id)
-        ) {
-          setPrestation(p.id);
-          setPrestationModal(true);
-          setShownPrestationIds((prev) => {
-            const updated = new Set(prev);
-            updated.add(p.id);
-            return updated;
-          });
-          break; // on n’affiche qu’un seul popup à la fois
-        }
-      }
-    };
-  
-    useEffect(() => {
-      if (!user?.worker) return;
-  
-      // Charger les prestations une seule fois
-      loadPlannedPrestations();
-  
-      // Démarrer l’interval pour vérifier régulièrement
-      intervalRef.current = setInterval(() => {
-        checkIfPrestationIsDue();
-      }, 30000); // toutes les 30s
-  
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-        }
-      };
-    }, [user?.worker]); // `plannedPrestations` fixé au chargement initial
+  const workerId = user?.worker;
+  if (!workerId) {
+    console.log('Aucun worker ID trouvé');
+    return;
+  }
+
+  try {
+    console.log('Chargement des prestations pour le worker :', workerId);
+
+    const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ worker_id: workerId }),
+    });
+
+    const data = await response.json();
+    console.log('Réponse reçue du serveur :', data);
+
+    if (response.ok) {
+      console.log('Prestations planifiées chargées : ',data.plannedPrestations);
+      setPlannedPrestations(data.plannedPrestations);
+    } else {
+      console.warn('Réponse inattendue ou format incorrect :', data);
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des prestations :', error);
+    setErrorMessage('Une erreur est survenue.');
+  }
+};
+const combineDateTime = (dateStr: string, timeStr?: string) => {
+  const date = new Date(dateStr);
+  const [hours, minutes, seconds] = (timeStr ?? '23:59:00').split(':');
+  date.setHours(+hours, +minutes, +seconds || 0, 0);
+  return date;
+};
+
+const checkIfPrestationIsDue = () => {
+  const now = new Date();
+  console.log('⏰ Vérification des prestations à', now.toISOString());
+  console.log(plannedPrestations)
+
+  for (let p of plannedPrestations) {
+    const start = combineDateTime(p.start_date, p.start_time);
+    const end = combineDateTime(p.end_date || p.start_date, p.end_time || '23:59:00');
+
+    console.log(`➡️ Prestation ${p.id}`);
+    console.log(`   - Statut       : ${p.status}`);
+    console.log(`   - Début réel   : ${start.toISOString()}`);
+    console.log(`   - Fin réelle   : ${end.toISOString()}`);
+    console.log(`   - Déjà montré ? : ${shownPrestationIds.includes(p.id)}`);
+
+    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 3 * 60 * 1000; // dans moins de 10 minutes
+
+    if (
+      p.status === 'inProgress' &&
+      !shownPrestationIds.includes(p.id) &&
+      (
+        (now >= start && now < end) || startsSoon
+      )
+    ) {
+      console.log(`✅ Affichage du popup pour la prestation ${p.id}`);
+      setPrestation(p.id);
+      setPrestationModal(true);
+      setShownPrestationIds((prev) => [...prev, p.id]);
+      console.log(shownPrestationIds)
+      break; // Un seul popup à la fois
+    }
+  }
+};
+
+
+
+useEffect(() => {
+  if (!user?.worker) {
+    console.log('Aucun worker détecté dans useEffect.');
+    return;
+  }
+
+  console.log("Initialisation : chargement des prestations et démarrage de l'interval");
+
+  // Charger les prestations une seule fois
+  loadPlannedPrestations();
+
+  // Démarrer l’interval pour vérifier régulièrement
+  intervalRef.current = setInterval(() => {
+    checkIfPrestationIsDue();
+  }, 30000); // toutes les 30s
+
+  return () => {
+    if (intervalRef.current) {
+      console.log("Nettoyage de l'interval");
+      clearInterval(intervalRef.current);
+    }
+  };
+}, [user?.worker]);
+
   
 
     const goToUserTabs = () => {
