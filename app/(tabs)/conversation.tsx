@@ -209,7 +209,7 @@ const ConversationScreen = () => {
   );
 };
 
-// ...styles identiques
+
 
 
 

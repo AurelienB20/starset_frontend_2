@@ -198,9 +198,6 @@ const [showCardField, setShowCardField] = useState(false);
   }
 };
 
-
-    
-
   // Affichage résumé des prestations dans le panier
   return (
     <ScrollView contentContainerStyle={styles.container}>
