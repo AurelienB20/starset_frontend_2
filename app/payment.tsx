@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { usePaymentSheet, useStripe } from '@stripe/stripe-react-native';
+import { CardField, usePaymentSheet, useStripe } from '@stripe/stripe-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -23,6 +23,9 @@ const serviceFee = totalRemuneration * 0.10;
 const transactionFee = totalRemuneration * 0.015 + 0.25;
 const finalTotal = totalRemuneration + serviceFee + transactionFee;
 const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
+const [cardDetails, setCardDetails] = useState<any>(null);
+const [showCardField, setShowCardField] = useState(false);
+
 
 
   useEffect(() => {
@@ -32,6 +35,10 @@ const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
 
   const handleAddCard = async () => {
     try {
+
+      setShowCardField(false);
+      setCardDetails(null);
+
       const userId = await getAccountId();
       const response = await fetch(`${config.backendUrl}/api/stripe/create-setup-intent`, {
         method: 'POST',
@@ -257,19 +264,12 @@ const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
     <Text>Aucune carte enregistrée.</Text>
   )}
 
-  <TouchableOpacity
-    style={{
-      marginTop: 10,
-      padding: 12,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: 'green',
-      alignItems: 'center',
-    }}
-    onPress={handleAddCard}
-  >
-    <Text style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter une carte</Text>
-  </TouchableOpacity>
+<TouchableOpacity
+  onPress={() => setShowCardField(true)}
+  style={{ marginTop: 10, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'green', alignItems: 'center' }}
+>
+  <Text style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter une carte</Text>
+</TouchableOpacity>
 </View>
 
 
@@ -281,6 +281,32 @@ const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
       >
         <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
       </TouchableOpacity>
+      {showCardField && (
+        <>
+          <CardField
+            postalCodeEnabled={false}
+            onCardChange={setCardDetails}
+            style={{
+              width: '100%',
+              height: 50,
+              marginBottom: 10,
+            }}
+          />
+
+          <TouchableOpacity
+            onPress={handleAddCard}
+            style={{
+              marginTop: 10,
+              padding: 12,
+              borderRadius: 8,
+              backgroundColor: 'green',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>Valider cette carte</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 };

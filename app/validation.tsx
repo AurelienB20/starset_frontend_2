@@ -4,8 +4,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-
-
 const ValidationScreen = () => {
   
   const navigation = useNavigation();

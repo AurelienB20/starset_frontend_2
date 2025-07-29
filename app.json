@@ -3,7 +3,7 @@
     "name": "starset",
     "slug": "frontend_starset_2",
     "owner": "starset77",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/starset-icon.png",
     "scheme": "starset",
@@ -62,19 +62,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-font",
-
-      [
-        "react-native-maps",
-        {
-          "ios": {
-            "googleMapsApiKey": "AIzaSyC_07oJe9HJiwO4X5uvqvyGBB8B5IggSZM"
-          },
-          "android": {
-            "apiKey": "AIzaSyC_07oJe9HJiwO4X5uvqvyGBB8B5IggSZM"
-          }
-        }
-      ]
+      "expo-font"
       
     ],
     "experiments": {
