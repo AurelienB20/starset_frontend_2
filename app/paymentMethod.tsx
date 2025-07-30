@@ -3,8 +3,7 @@ import { CardField, useStripe } from '@stripe/stripe-react-native';
 import React, { useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const API_URL = 'https://api.starsetfrance.com';
+import config from '../config.json';
 
 const PaymentMethodScreen = () => {
   const { confirmSetupIntent } = useStripe();
@@ -20,7 +19,7 @@ const PaymentMethodScreen = () => {
         if (!user_id) return;
 
         // Appel backend pour récupérer ou créer le customer Stripe
-        const customerRes = await fetch(`${API_URL}/api/stripe/create-stripe-customer`, {
+        const customerRes = await fetch(`${config.backendUrl}/api/stripe/create-stripe-customer`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id }),
@@ -32,11 +31,8 @@ const PaymentMethodScreen = () => {
           return;
         }
 
-        //const id = customerData.stripe_customer_id;
-        //setCustomerId(id);
-
         // Ensuite, récupérer les cartes liées à ce customer
-        const response = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
+        const response = await fetch(`${config.backendUrl}/api/stripe/get-customer-payment-methods`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ account_id: user_id }),
@@ -44,6 +40,7 @@ const PaymentMethodScreen = () => {
 
         const data = await response.json();
         if (data.success) {
+          console.log(data.cards)
           setCards(data.cards.map((card: any) => ({
             id: card.id,
             name: card.card.brand,
@@ -68,7 +65,7 @@ const PaymentMethodScreen = () => {
     try {
 
        const user_id = await AsyncStorage.getItem('account_id');
-      const intentRes = await fetch(`${API_URL}/api/stripe/create-setup-intent`, {
+      const intentRes = await fetch(`${config.backendUrl}/api/stripe/create-setup-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ account_id: user_id }),
@@ -86,7 +83,19 @@ const PaymentMethodScreen = () => {
         return;
       }
 
-      const updatedCards = await fetch(`${API_URL}/api/stripe/get-customer-payment-methods`, {
+     updateCard();
+      setModalVisible(false);
+      setCardDetails(null);
+    } catch (error) {
+      console.log("Erreur ajout carte:", error);
+      Alert.alert("Erreur", "Impossible d'ajouter la carte.");
+    }
+  };
+
+  const updateCard = async () => {
+     const user_id = await AsyncStorage.getItem('account_id');
+
+      const updatedCards = await fetch(`${config.backendUrl}/api/stripe/get-customer-payment-methods`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ account_id: user_id }),
@@ -101,14 +110,22 @@ const PaymentMethodScreen = () => {
           status: 'Valide',
         })));
       }
+  }
 
-      setModalVisible(false);
-      setCardDetails(null);
-    } catch (error) {
-      console.log("Erreur ajout carte:", error);
-      Alert.alert("Erreur", "Impossible d'ajouter la carte.");
+  const deleteCard = async(cardId : string) => {
+    try{
+        const response = await fetch(`${config.backendUrl}/api/stripe/delete-card`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId: cardId }),
+        });
+        const responseJson = await response.json();
+        updateCard();
     }
-  };
+    catch(err){
+      Alert.alert("Erreur", "Impossible de supprimer la carte")
+    }
+  }
 
   const renderCard = ({ item }: any) => (
     <View style={styles.cardContainer}>
@@ -117,6 +134,9 @@ const PaymentMethodScreen = () => {
         <Text style={styles.cardName}>{item.name}</Text>
         <Text style={item.status === 'Valide' ? styles.cardStatusValid : styles.cardStatusExpired}>{item.status}</Text>
         <Text style={styles.cardNumber}>**** {item.lastFour}</Text>
+          <TouchableOpacity onPress={()=>deleteCard(item.id)}>
+        <Text style={styles.cancelButtonText}>Supprimer carte</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
