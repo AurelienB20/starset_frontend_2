@@ -35,10 +35,6 @@ const [showCardField, setShowCardField] = useState(false);
 
   const handleAddCard = async () => {
     try {
-
-      setShowCardField(false);
-      setCardDetails(null);
-
       const userId = await getAccountId();
       const response = await fetch(`${config.backendUrl}/api/stripe/create-setup-intent`, {
         method: 'POST',
@@ -263,22 +259,10 @@ const [showCardField, setShowCardField] = useState(false);
 
 <TouchableOpacity
   onPress={() => setShowCardField(true)}
-  style={{ marginTop: 10, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'green', alignItems: 'center' }}
+  style={{ marginTop: 10, marginBottom: 10, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: 'green', alignItems: 'center' }}
 >
   <Text style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter une carte</Text>
-</TouchableOpacity>
-</View>
-
-
-      
-      <TouchableOpacity
-        style={[styles.button, isLoading && { backgroundColor: '#666' }]}
-        onPress={handlePayment}
-        disabled={isLoading || !selectedPaymentMethodId}
-      >
-        <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
-      </TouchableOpacity>
-      {showCardField && (
+  {showCardField && (
         <>
           <CardField
             postalCodeEnabled={false}
@@ -304,6 +288,15 @@ const [showCardField, setShowCardField] = useState(false);
           </TouchableOpacity>
         </>
       )}
+</TouchableOpacity>
+</View>
+      <TouchableOpacity
+        style={[styles.button, isLoading && { backgroundColor: '#666' }]}
+        onPress={handlePayment}
+        disabled={isLoading || !selectedPaymentMethodId}
+      >
+        <Text style={styles.buttonText}>{isLoading ? 'Traitement...' : 'Valider le paiement'}</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
