@@ -105,13 +105,13 @@ const checkIfPrestationIsDue = () => {
     const startsSoon = now < start && (start.getTime() - now.getTime()) <= 5 * 60 * 1000; // dans moins de 5 minutes
 
     if (
-      p.status === 'inProgress' &&
+      p.status === 'inProgress' || p.status === 'started' &&
       
       (
         (now >= start && now < end) || startsSoon
       )
     ) {
-      console.log(`✅ Affichage du popup pour la prestation ${p.id}`);
+      console.log(` Affichage du popup pour la prestation ${p.id}`);
       
       setPrestation(p);
       setPrestationModal(true);
