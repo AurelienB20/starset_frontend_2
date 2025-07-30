@@ -11,7 +11,7 @@ import config from '../config.json';
 const ConnexionScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // 👈
+  const [showPassword, setShowPassword] = useState(false); // 
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
   const { setUser } = useUser()
@@ -22,7 +22,7 @@ const { setAllWorkerPrestation } = useAllWorkerPrestation();
   const handleEmailChange = (text: string) => setEmail(text);
   //const handleEmailChange = (text: string) => setEmail(text.toLocaleLowerCase());
   const handlePasswordChange = (text: string) => setPassword(text);
-  const togglePasswordVisibility = () => setShowPassword(prev => !prev); // 👈
+  const togglePasswordVisibility = () => setShowPassword(prev => !prev); // 
 
   const goToCreate = () => navigation.navigate('creation' as never);
   const goToForgotPassword = () => navigation.navigate('forgotPassword' as never);
@@ -184,6 +184,9 @@ const getProfile = async (accountId: string) => {
           <Text style={styles.createAccount}>inscrivez-vous !</Text>
         </Text>
       </TouchableOpacity>
+      <View style={styles.footer}>
+  <Text style={styles.footerText}>StarSet</Text>
+</View>
     </View>
   );
 };
@@ -313,10 +316,24 @@ forgotPassword: {
   alignSelf : 'flex-end'
 },
 forgotPasswordText: {
-  color: 'blue',
+  
   fontSize: 12,
   textAlign : 'right'
 },
+
+footer: {
+  position: 'absolute',
+  bottom: 20,
+  width: '100%',
+  alignItems: 'center',
+},
+
+footerText: {
+  fontSize: 16,
+  color: '#666',
+  fontWeight: '600',
+},
+
 
 });
 
