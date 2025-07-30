@@ -1,4 +1,4 @@
-import { useUser } from '@/context/userContext';
+/*import { useUser } from '@/context/userContext';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
@@ -83,4 +83,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+});*/

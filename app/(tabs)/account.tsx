@@ -565,7 +565,7 @@ console.log(prestationId);
                     <TouchableOpacity key={index} style={styles.missionItem}>
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image
-                          source={dayImages[new Date(prestation.start_date).getUTCDate()]}
+                          source={dayImages[new Date(prestation.start_date).getDate()]}
                           style={styles.dayImage}
                         />
                         
@@ -643,7 +643,12 @@ console.log(prestationId);
             <ScrollView style={{ width: '100%' }}>
             {(() => {
   // 1. Filtrer les prestations par statut
-  const filtered = plannedPrestations.filter(p => p.status === statusFilter);
+  const filtered = plannedPrestations.filter(p => {
+    if (statusFilter === 'inProgress') {
+      return p.status === 'inProgress' || p.status === 'started';
+    }
+    return p.status === statusFilter;
+  });
 
   // 2. Trier par date de début
   const sorted = filtered.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
@@ -671,7 +676,7 @@ console.log(prestationId);
           <TouchableOpacity key={i} style={styles.missionItem}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
               <Image
-                source={dayImages[new Date(prestation.start_date).getUTCDate()]}
+                source={dayImages[new Date(prestation.start_date).getDate()]}
                 style={styles.dayImage}
               />
               <View style={{ marginLeft: 10 }}>
@@ -692,19 +697,24 @@ console.log(prestationId);
                     </TouchableOpacity>
                   </>
                 )}
-                {prestation.status === "inProgress" && (
+                {(prestation.status === "inProgress" || prestation.status === "started") && (
                   <>
                     <View style={[styles.statusBadge, { backgroundColor: '#00cc66' }]}>
-                      <Text style={styles.statusText}>In Progress</Text>
+                      <Text style={styles.statusText}>
+                        {prestation.status === "started" ? "Started" : "In Progress"}
+                      </Text>
                     </View>
-                    <TouchableOpacity
-                      style={styles.doneButton}
-                      onPress={() => handlePrestationFinished(prestation)}
-                    >
-                      <Text style={styles.doneButtonText}>La prestation est finie</Text>
-                    </TouchableOpacity>
+                    
+                      <TouchableOpacity
+                        style={styles.doneButton}
+                        onPress={() => handlePrestationFinished(prestation)}
+                      >
+                        <Text style={styles.doneButtonText}>La prestation est finie</Text>
+                      </TouchableOpacity>
+                    
                   </>
                 )}
+
                 {prestation.status === "rejected" && (
                   <View style={[styles.statusBadge, { backgroundColor: 'red' }]}>
                     <Text style={styles.statusText}>Rejected</Text>

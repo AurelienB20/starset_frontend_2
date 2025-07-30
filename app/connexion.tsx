@@ -1,10 +1,12 @@
-import { useUser } from '@/context/userContext';
+
+import { useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
+
 
 const ConnexionScreen = () => {
   const [email, setEmail] = useState('');
@@ -13,6 +15,9 @@ const ConnexionScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
   const { setUser } = useUser()
+  
+const { setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation();
+const { setAllWorkerPrestation } = useAllWorkerPrestation();
 
   const handleEmailChange = (text: string) => setEmail(text);
   //const handleEmailChange = (text: string) => setEmail(text.toLocaleLowerCase());
@@ -32,16 +37,17 @@ const ConnexionScreen = () => {
 
       const data = await response.json();
       if (data.success) {
-        // Rediriger ou faire autre chose en cas de succès
-        getProfile(data.account['id'])
-        saveData(data.account)
-       
-        
+        const account = data.account;
+        setUser(account);
+        saveData(account);
+      
+        await getWorkerPlannedPrestation(account.worker);
+        await getAllWorkerPrestation(account.id);
+      
         navigation.navigate({
           name: '(tabs)',
           params: { screen: 'home' },
         } as never);
-        
       } else {
         setErrorMessage('Email ou mot de passe incorrect');
       }
@@ -52,6 +58,35 @@ const ConnexionScreen = () => {
       setPassword('');
     }
   };
+
+  const getWorkerPlannedPrestation = async (workerId: string) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ worker_id: workerId }),
+      });
+      const data = await response.json();
+      setAllWorkerPlannedPrestation(data.plannedPrestations);
+    } catch (err) {
+      console.error('Erreur getWorkerPlannedPrestation:', err);
+    }
+  };
+  
+  const getAllWorkerPrestation = async (accountId: string) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/mission/get-all-prestation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account_id: accountId }),
+      });
+      const data = await response.json();
+      setAllWorkerPrestation(data.prestations);
+    } catch (err) {
+      console.error('Erreur getAllWorkerPrestation:', err);
+    }
+  };
+  
 
 const getProfile = async (accountId: string) => {
     try {

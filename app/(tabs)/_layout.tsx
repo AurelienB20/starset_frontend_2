@@ -13,6 +13,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import config from '../../config.json';
 
+import {
+  debugLog
+} from '../../api/prestationApi';
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
@@ -22,7 +26,7 @@ export default function TabLayout() {
       BebasNeue: BebasNeue_400Regular,
   });
   const [prestationModal, setPrestationModal] = useState(false);
-      const [prestation, setPrestation] = useState(null);
+      const [prestation, setPrestation] = useState<any>(null);
       const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
       const [shownPrestationIds, setShownPrestationIds] = useState<any[]>([]);
       const [isTime, setIsTime] = useState(false);
@@ -72,10 +76,15 @@ const combineDateTime = (dateStr: string, timeStr?: string) => {
 const checkIfPrestationIsDue = () => {
   const now = new Date();
   console.log('⏰ Vérification des prestations à', now.toISOString());
-  
-  console.log(allWorkerPlannedPrestation)
+  debugLog(allWorkerPlannedPrestation)
 
-  for (let p of plannedPrestations) {
+  if (!allWorkerPlannedPrestation || allWorkerPlannedPrestation.length === 0) {
+    console.log('Aucune prestation planifiée détectée.');
+    debugLog('Aucune prestation planifiée détectée.')
+    return;
+  }
+
+  for (let p of allWorkerPlannedPrestation) {
     const start = combineDateTime(p.start_date, p.start_time);
     const end = combineDateTime(p.end_date || p.start_date, p.end_time || '23:59:00');
 
@@ -85,30 +94,35 @@ const checkIfPrestationIsDue = () => {
     console.log(`   - Fin réelle   : ${end.toISOString()}`);
     console.log(`   - Déjà montré ? : ${p.shown}`);
 
-    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 3 * 60 * 1000; // dans moins de 10 minutes
+    debugLog([
+      `➡️ Prestation ${p.id}`,
+      `   - Statut       : ${p.status}`,
+      `   - Début réel   : ${start.toISOString()}`,
+      `   - Fin réelle   : ${end.toISOString()}`,
+      `   - Déjà montré ? : ${p.shown}`
+    ].join('\n'));
+
+    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 5 * 60 * 1000; // dans moins de 5 minutes
 
     if (
-  p.status === 'inProgress' &&
-  !p.shown &&
-  (
-    (now >= start && now < end) || startsSoon
-  )
-) {
-  console.log(`✅ Affichage du popup pour la prestation ${p.id}`);
-  setPrestation(p.id);
-  setPrestationModal(true);
+      p.status === 'inProgress' &&
+      
+      (
+        (now >= start && now < end) || startsSoon
+      )
+    ) {
+      console.log(`✅ Affichage du popup pour la prestation ${p.id}`);
+      
+      setPrestation(p);
+      setPrestationModal(true);
 
-  // Marquer cette prestation comme affichée
-  setPlannedPrestations((prev) =>
-    prev.map((item) =>
-      item.id === p.id ? { ...item, shown: true } : item
-    )
-  );
-
-  break;
-}
+      // Marquer cette prestation comme affichée (dans le contexte, si possible)
+      // Sinon tu peux stocker localement les ID affichés pour éviter la répétition
+      break;
+    }
   }
 };
+
 
 
 
@@ -122,14 +136,14 @@ useEffect(() => {
   }
 
   console.log("Initialisation : chargement des prestations et démarrage de l'interval");
-
+  checkIfPrestationIsDue();
   // Charger les prestations une seule fois
-  loadPlannedPrestations();
+  
 
   // Démarrer l’interval pour vérifier régulièrement
-  intervalRef.current = setInterval(() => {
-    checkIfPrestationIsDue();
-  }, 10000); // toutes les 30s
+  //intervalRef.current = setInterval(() => {
+    //checkIfPrestationIsDue();
+  //}, 10000); // toutes les 30s
 
   return () => {
     if (intervalRef.current) {

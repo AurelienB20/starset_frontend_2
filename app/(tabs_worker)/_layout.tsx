@@ -2,7 +2,7 @@ import { HapticTab } from '@/components/HapticTab';
 import PrestationConfirmation from '@/components/PrestationConfirmationModal';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useUser } from '@/context/userContext';
+import { useAllWorkerPlannedPrestation, useUser } from '@/context/userContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -12,6 +12,7 @@ import { Tabs } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import config from '../../config.json';
+
 
 
 const Tab = createBottomTabNavigator();
@@ -26,9 +27,10 @@ export default function TabNavigator() {
     const colorScheme = useColorScheme();
     const [errorMessage, setErrorMessage] = useState('');
     const [prestationModal, setPrestationModal] = useState(false);
-    const [prestation, setPrestation] = useState(null);
+    const [prestation, setPrestation] = useState<any>(null);
     const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
     const [shownPrestationIds, setShownPrestationIds] = useState<any[]>([]);
+    const { allWorkerPlannedPrestation, setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
     const [isTime, setIsTime] = useState(false);
     const { user } = useUser();
 
@@ -71,12 +73,17 @@ const combineDateTime = (dateStr: string, timeStr?: string) => {
   return date;
 };
 
+
 const checkIfPrestationIsDue = () => {
   const now = new Date();
   console.log('⏰ Vérification des prestations à', now.toISOString());
-  console.log(plannedPrestations)
 
-  for (let p of plannedPrestations) {
+  if (!allWorkerPlannedPrestation || allWorkerPlannedPrestation.length === 0) {
+    console.log('Aucune prestation planifiée détectée.');
+    return;
+  }
+
+  for (let p of allWorkerPlannedPrestation) {
     const start = combineDateTime(p.start_date, p.start_time);
     const end = combineDateTime(p.end_date || p.start_date, p.end_time || '23:59:00');
 
@@ -84,27 +91,27 @@ const checkIfPrestationIsDue = () => {
     console.log(`   - Statut       : ${p.status}`);
     console.log(`   - Début réel   : ${start.toISOString()}`);
     console.log(`   - Fin réelle   : ${end.toISOString()}`);
-    console.log(`   - Déjà montré ? : ${shownPrestationIds.includes(p.id)}`);
+    console.log(`   - Déjà montré ? : ${p.shown}`);
 
-    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 3 * 60 * 1000; // dans moins de 10 minutes
+    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 5 * 60 * 1000; // dans moins de 5 minutes
 
     if (
       p.status === 'inProgress' &&
-      !shownPrestationIds.includes(p.id) &&
+      
       (
         (now >= start && now < end) || startsSoon
       )
     ) {
       console.log(`✅ Affichage du popup pour la prestation ${p.id}`);
-      setPrestation(p.id);
+      setPrestation(p);
       setPrestationModal(true);
-      setShownPrestationIds((prev) => [...prev, p.id]);
-      console.log(shownPrestationIds)
-      break; // Un seul popup à la fois
+
+      // Marquer cette prestation comme affichée (dans le contexte, si possible)
+      // Sinon tu peux stocker localement les ID affichés pour éviter la répétition
+      break;
     }
   }
 };
-
 
 
 useEffect(() => {
@@ -114,14 +121,14 @@ useEffect(() => {
   }
 
   console.log("Initialisation : chargement des prestations et démarrage de l'interval");
-
+  checkIfPrestationIsDue();
   // Charger les prestations une seule fois
-  loadPlannedPrestations();
+  
 
   // Démarrer l’interval pour vérifier régulièrement
-  intervalRef.current = setInterval(() => {
-    checkIfPrestationIsDue();
-  }, 30000); // toutes les 30s
+  //intervalRef.current = setInterval(() => {
+    //checkIfPrestationIsDue();
+  //}, 10000); // toutes les 30s
 
   return () => {
     if (intervalRef.current) {

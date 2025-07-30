@@ -48,7 +48,7 @@ const PrestationConfirmation = ({
                      </TouchableOpacity>
                      <TouchableOpacity
                        style={styles.acceptButton}
-                       onPress={() => {handleChangePlannedPrestationStatus(prestation.id, 'inProgress'); onClose()}}
+                       onPress={() => {handleChangePlannedPrestationStatus(prestation.id, 'started'); onClose()}}
                      >
                     <Text style={styles.modalButtonText}>Oui</Text>
                     </TouchableOpacity>

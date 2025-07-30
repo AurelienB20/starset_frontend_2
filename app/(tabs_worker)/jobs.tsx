@@ -426,8 +426,8 @@ const onRefresh = React.useCallback(() => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>MISSIONS EN COURS</Text>
             <ScrollView contentContainerStyle={styles.missionInProgressItemContainer}>
-  {workerPlannedPrestations.filter(p => p.status === 'inProgress').length > 0 ? (
-    groupMissionsByMonth(workerPlannedPrestations.filter(p => p.status === 'inProgress')).map(([key, prestations]) => {
+  {workerPlannedPrestations.filter(p => p.status === 'inProgress' || p.status === 'started').length > 0 ? (
+    groupMissionsByMonth(workerPlannedPrestations.filter(p => p.status === 'inProgress' || p.status === 'started')).map(([key, prestations]) => {
       const [monthIndex, year] = key.split('-');
       const monthLabel = `${monthNames[+monthIndex]} ${year}`;
 
