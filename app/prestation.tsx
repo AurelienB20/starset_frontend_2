@@ -66,7 +66,8 @@ const PrestationScreen = () => {
   const [showExperienceForm, setShowExperienceForm] = useState(false);
   const [showExperienceCalendar, setShowExperienceCalendar] = useState(false);
   const [experienceDate, setExperienceDate] = useState('');
-  const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>('sur place');
+  const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>(prestation?.is_remote ? 'distanciel' : 'sur place');
+
   const [selectedTarifMode, setSelectedTarifMode] = useState<any>('heure');
   const [certificationImages, setCertificationImages] = useState<any[]>([]);
   const [experienceImages, setExperienceImages] = useState<string[]>([]);
@@ -84,6 +85,7 @@ const PrestationScreen = () => {
   const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
 const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
 const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
+
 
  
 
@@ -299,6 +301,52 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
     } catch (error) {
       console.error(error);
       Alert.alert('Erreur', 'Impossible de mettre à jour la certification');
+    }
+  };
+
+  const confirmToggleIsRemote = () => {
+    const nextMode = selectedMode === 'sur place' ? 'distanciel' : 'sur place';
+  
+    Alert.alert(
+      "Confirmer le changement",
+      `Voulez-vous vraiment passer en mode ${nextMode.toUpperCase()} ?`,
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Confirmer",
+          onPress: toggleIsRemote, // Appelle la vraie fonction ici
+        },
+      ]
+    );
+  };
+
+  const toggleIsRemote = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/mission/toggle-is-remote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prestation_id: prestation_id }), // ou prestation.id si c’est déjà dans le state
+      });
+  
+      if (!response.ok) throw new Error('Erreur réseau');
+  
+      const data = await response.json();
+  
+      if (data.success) {
+        setSelectedMode(prev => (prev === 'sur place' ? 'distanciel' : 'sur place'));
+        setCurrentWorkerPrestation((prev: any) => ({
+          ...prev,
+          is_remote: !prev?.is_remote,
+        }));
+        Alert.alert('Succès', `Mode de prestation mis à jour.`);
+      } else {
+        Alert.alert('Erreur', data.message || "Une erreur est survenue.");
+      }
+    } catch (error) {
+      console.error('Erreur toggleIsRemote :', error);
+      Alert.alert('Erreur', 'Impossible de modifier le mode de prestation.');
     }
   };
   
@@ -1083,22 +1131,22 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
   <Text style={styles.sectionTitle}>Mode de prestation</Text>
   <View style={styles.toggleContainer}>
     <TouchableOpacity
-      onPress={() => setSelectedMode('sur place')}
+      onPress={() => selectedMode !== 'sur place' && confirmToggleIsRemote()}
       style={[
         styles.toggleButton,
-        selectedMode === 'sur place' && styles.toggleButtonActiveGray,
+        selectedMode === 'sur place' && styles.toggleButtonActive,
       ]}
     >
       <Text style={[
         styles.toggleText,
-        selectedMode === 'sur place' && styles.toggleTextGrayActive,
+        selectedMode === 'sur place' && styles.toggleTextActive,
       ]}>
         PRÉSENTIEL
       </Text>
     </TouchableOpacity>
 
     <TouchableOpacity
-      onPress={() => setSelectedMode('distanciel')}
+      onPress={() => selectedMode !== 'distanciel' && confirmToggleIsRemote()}
       style={[
         styles.toggleButton,
         selectedMode === 'distanciel' && styles.toggleButtonActive,
@@ -1113,6 +1161,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
     </TouchableOpacity>
   </View>
 </View>
+
       </View>
 
       

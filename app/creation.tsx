@@ -25,6 +25,8 @@ const CreationScreen = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
+  const [cguModalVisible, setCguModalVisible] = useState(false);
   
 
   const navigation = useNavigation();
@@ -49,8 +51,8 @@ const CreationScreen = () => {
       return;
     }
   
-    if (!acceptedPrivacy) {
-      setErrorMessage('Vous devez accepter la politique de confidentialité.');
+    if (!acceptedPrivacy || !acceptedCGU) {
+      setErrorMessage('Vous devez accepter la politique de confidentialité ET les conditions générales d\'utilisation.');
       return;
     }
   
@@ -158,13 +160,25 @@ const CreationScreen = () => {
           </Text>
         </Pressable>
       </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+        <Checkbox
+          value={acceptedCGU}
+          onValueChange={setAcceptedCGU}
+        />
+        <Pressable onPress={() => setCguModalVisible(true)}>
+          <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
+            J’accepte les conditions générales d’utilisation
+          </Text>
+        </Pressable>
+      </View>
+
 
       {errorMessage !== '' && <Text style={styles.errorText}>{errorMessage}</Text>}
 
       <TouchableOpacity
         onPress={handleSubmit}
         style={styles.submitbutton}
-        disabled={!isEmailValid || !acceptedPrivacy}
+        disabled={!isEmailValid || !acceptedPrivacy || !acceptedCGU}
       >
         <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>Suivant</Text>
       </TouchableOpacity>
@@ -256,15 +270,112 @@ const CreationScreen = () => {
       <Text style={styles.policyTitle}>12. Contact</Text>
       <Text style={styles.policyText}>
         contact@starsetfrance.com{"\n"}
-        23 rue de la Garenne, Champs sur Marne, 77420
       </Text>
 
       <Text style={{ fontStyle: 'italic', marginTop: 20, color: '#555' }}>
-        📱 Conforme aux règles App Store (section 5.1)
+        Conforme aux règles App Store (section 5.1)
       </Text>
     </ScrollView>
   </View>
 </Modal>
+
+<Modal visible={cguModalVisible} animationType="slide">
+  <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
+      <TouchableOpacity onPress={() => setCguModalVisible(false)}>
+        <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
+      </TouchableOpacity>
+    </View>
+
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
+        📜 Conditions Générales d'Utilisation – STARSET
+      </Text>
+
+      <Text style={styles.policyTitle}>1. ÉDITEUR DE L’APPLICATION</Text>
+      <Text style={styles.policyText}>
+        Star Set, Société par Actions Simplifiée – RCS Champs-sur-Marne{"\n"}
+        23 rue de la Garenne, 77420{"\n"}
+        📧 contact@starsetfrance.com | 📞 06.52.18.25.02
+      </Text>
+
+      <Text style={styles.policyTitle}>2. OBJET</Text>
+      <Text style={styles.policyText}>
+        Définir les modalités d’accès et d’utilisation des services proposés par l’Application.{"\n"}
+        Régies par le droit français, RGPD, LCEN, Code civil et de la consommation.
+      </Text>
+
+      <Text style={styles.policyTitle}>3. ACCEPTATION DES CONDITIONS</Text>
+      <Text style={styles.policyText}>
+        En installant l'application, l'utilisateur reconnaît avoir lu et accepté les présentes CGU.
+      </Text>
+
+      <Text style={styles.policyTitle}>4. ACCÈS À L’APPLICATION</Text>
+      <Text style={styles.policyText}>
+        Application disponible gratuitement sur App Store et Google Play.{"\n"}
+        Certaines fonctionnalités nécessitent un compte, Internet ou permissions (caméra, géoloc.).
+      </Text>
+
+      <Text style={styles.policyTitle}>5. PROPRIÉTÉ INTELLECTUELLE</Text>
+      <Text style={styles.policyText}>
+        Tous les contenus sont protégés et appartiennent à Star Set ou ses partenaires.{"\n"}
+        Toute reproduction non autorisée est interdite.
+      </Text>
+
+      <Text style={styles.policyTitle}>6. DONNÉES PERSONNELLES</Text>
+      <Text style={styles.policyText}>
+        Collecte conforme au RGPD et à la loi Informatique et Libertés.{"\n"}
+        Droits d’accès, de rectification, suppression, opposition et portabilité.
+      </Text>
+
+      <Text style={styles.policyTitle}>7. RESPONSABILITÉ</Text>
+      <Text style={styles.policyText}>
+        L’accès est sécurisé mais non garanti sans bugs, interruptions ou virus.{"\n"}
+        Utilisation aux risques de l’utilisateur.
+      </Text>
+
+      <Text style={styles.policyTitle}>8. MODIFICATION DES CGU</Text>
+      <Text style={styles.policyText}>
+        Star Set peut modifier les CGU à tout moment.{"\n"}
+        L'utilisation continue vaut acceptation.
+      </Text>
+
+      <Text style={styles.policyTitle}>9. LOI APPLICABLE ET JURIDICTION</Text>
+      <Text style={styles.policyText}>
+        Droit français. Litiges soumis aux juridictions compétentes selon le Code de la consommation.
+      </Text>
+
+      <Text style={styles.policyTitle}>10. MISSIONS ET RÈGLES POUR WORKERS / PRESTATAIRES</Text>
+      <Text style={styles.policyText}>
+        - Acceptation d’une mission = engagement contractuel.{"\n"}
+        - 5 min pour accepter une mission urgente.{"\n"}
+        - Annulation = frais Stripe + gestion. Abus = suspension.{"\n"}
+        - Respect attendu. Début et fin de mission à signaler via l’app.
+      </Text>
+
+      <Text style={styles.policyTitle}>11. MISE EN RELATION ET RÔLE DE STAR SET</Text>
+      <Text style={styles.policyText}>
+        - Star Set est une plateforme d’intermédiation.{"\n"}
+        - Pas responsable de la qualité de la prestation.{"\n"}
+        - Insatisfactions à signaler au support.{"\n"}
+        - Communication préalable entre utilisateurs recommandée.
+      </Text>
+
+      <Text style={styles.policyTitle}>12. PAIEMENT & TRANSACTIONS (via STRIPE)</Text>
+      <Text style={styles.policyText}>
+        - Blocage du créneau à la réservation.{"\n"}
+        - Débit automatique J-1 de la mission.{"\n"}
+        - Paiement au worker 7 jours après prestation.{"\n"}
+        - Suivi via interfaces utilisateur et worker.
+      </Text>
+
+      <Text style={{ fontStyle: 'italic', marginTop: 20, color: '#555' }}>
+        Dernière mise à jour : 23 juillet 2025
+      </Text>
+    </ScrollView>
+  </View>
+</Modal>
+
     </ScrollView>
   );
 };

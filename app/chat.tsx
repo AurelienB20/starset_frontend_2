@@ -3,7 +3,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Dimensions, Image, Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Menu, Provider } from 'react-native-paper';
+import { Provider } from 'react-native-paper';
 import config from '../config.json';
 import socket from './socket';
 
@@ -339,41 +339,28 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
       {/* Scrollable message list */}
       {/*<ScrollView style={styles.messageContainer} contentContainerStyle={{ flexGrow: 1 }}> */}
       <ScrollView style={styles.messageContainer}>
-  {messages.map((message: any, index: number) => {
-    const isMyMessage = message.sender_id === sender_id;
-    return (
-      <View
-        key={index}
-        style={[
-          styles.messageBubble,
-          isMyMessage ? styles.myMessage : styles.otherMessage,
-        ]}
-      >
-        <TouchableOpacity
-          ref={isMyMessage ? menuAnchorRef : null}
-          onLongPress={() => {
-            if (isMyMessage) {
-              setSelectedMessageId(message.id);
-              setMenuVisible(true);
-            }
-          }}
-        >
-          <View style={isMyMessage ? styles.myTextWrapper : styles.otherTextWrapper}>
-            <Text style={styles.messageText}>{message.message_text}</Text>
-            {message.picture_url ? (
-              <Image
-                source={{ uri: message.picture_url }}
-                style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
-                resizeMode="cover"
-              />
-            ) : null}
+        {messages.map((message: any, index: React.Key | null | undefined) => (
+          <View
+            key={index}
+            style={[
+              styles.messageBubble,
+              message.sender_id === sender_id ? styles.myMessage : styles.otherMessage,
+            ]}
+          >
+            <View style={message.sender_id === sender_id ? styles.myTextWrapper : styles.otherTextWrapper}>
+              <Text style={styles.messageText}>{message.message_text}</Text>
+              {message.picture_url ? (
+                <Image
+                  source={{ uri: message.picture_url }}
+                  style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
+                  resizeMode="cover"
+                />
+              ) : null}
+              
+            </View>
           </View>
-        </TouchableOpacity>
-      </View>
-    );
-  })}
-</ScrollView>
-
+        ))}
+      </ScrollView>
 
       {/* Fixed input bar */}
       <View style={styles.inputContainer}>
@@ -408,37 +395,6 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         <Ionicons name="send" size={24} color="white" />
       </TouchableOpacity>
     </View>
-
-    <Menu
-  visible={menuVisible}
-  onDismiss={() => setMenuVisible(false)}
-  anchor={menuAnchorRef.current}
->
-  <Menu.Item
-    onPress={() => {
-      setMenuVisible(false);
-      Alert.alert(
-        'Supprimer ce message ?',
-        'Cette action est irréversible.',
-        [
-          { text: 'Annuler', style: 'cancel' },
-          {
-            text: 'Supprimer',
-            style: 'destructive',
-            onPress: () => {
-              if (selectedMessageId) {
-                handleDeleteMessage(selectedMessageId);
-              }
-            },
-          },
-        ]
-      );
-    }}
-    title="Supprimer"
-    leadingIcon="delete"
-  />
-</Menu>
-
     </SafeAreaView>
     </View>
     </Provider>
