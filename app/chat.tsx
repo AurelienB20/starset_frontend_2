@@ -3,8 +3,10 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Dimensions, Image, Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Menu, Provider } from 'react-native-paper';
 import config from '../config.json';
 import socket from './socket';
+
 
 
 const ChatScreen = () => {
@@ -18,9 +20,13 @@ const ChatScreen = () => {
   const [isSending, setIsSending] = useState(false);
   const [otherId, setOtherId] = useState<string | null>(null);
   const screenHeight = Dimensions.get('window').height;
-const [keyboardHeight, setKeyboardHeight] = useState(0);
-const [visibleHeight, setVisibleHeight] = useState(screenHeight);
-const seenMessageIds = useRef<any>(new Set());
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [visibleHeight, setVisibleHeight] = useState(screenHeight);
+  const seenMessageIds = useRef<any>(new Set());
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+  const menuAnchorRef = useRef(null);
+
 
   const getConversationDetails = async () => {
   try {
@@ -123,52 +129,8 @@ const seenMessageIds = useRef<any>(new Set());
     }
   };
 
-  const handleSendImage = async () => {
-    if (!selectedImage) return;
   
-    const message_time = getLocalTime();
-  
-    const file = {
-      filename: `image-${Date.now()}.jpg`,
-      mimetype: 'image/jpeg',
-      data: selectedImage, // Contient déjà le préfixe data:image/jpeg;base64,...
-    };
-  
-    const payload = {
-      conversation_id,
-      sender_id,
-      sender_type,
-      file,
-    };
-  
-    try {
-      const response = await fetch(`${config.backendUrl}/api/conversation/send-image-message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-  
-      if (!response.ok) throw new Error('Erreur réseau');
-  
-      const data = await response.json();
-  
-      // Émettre via Socket
-      socket.emit('newMessage', {
-        ...data.message,
-        conversation_id,
-      });
-  
-      // Ajouter à l'affichage localement
-      //setMessages((prev : any) => [...prev, data.message]);
-      setSelectedImage(null); // Nettoyer l'image sélectionnée
-  
-    } catch (error) {
-      console.error('Erreur envoi image :', error);
-      Alert.alert('Erreur', 'Impossible d\'envoyer l\'image');
-    }
-  };
+ 
 
   const goToPrestationViewWithId = (id: any) => {
   navigation.navigate({
@@ -176,6 +138,30 @@ const seenMessageIds = useRef<any>(new Set());
     params: { id },
   } as never);
 };
+
+const handleDeleteMessage = async (message_id: string) => {
+  try {
+    const res = await fetch(`${config.backendUrl}/api/conversation/delete-message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message_id }),
+    });
+
+    if (!res.ok) throw new Error('Erreur lors de la suppression');
+    
+    // Mise à jour locale
+    setMessages((prev: any[]) =>
+      prev.map((msg) =>
+        msg.id === message_id
+          ? { ...msg, message_text: 'Ce message a été supprimé', picture_url: null }
+          : msg
+      )
+    );
+  } catch (err) {
+    Alert.alert('Erreur', 'Impossible de supprimer le message.');
+  }
+};
+
 
 const fetchPrestationIdByWorker = async (workerId: any) => {
   try {
@@ -199,77 +185,6 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   }
 };
 
-  const handleSendMessageMultipleImage = async () => {
-    const trimmedMessage = newMessage.trim();
-  
-    if (!trimmedMessage && (!selectedImages || selectedImages.length === 0)) {
-      return; // Rien à envoyer
-    }
-  
-    const message_time = getLocalTime();
-  
-    const newMessageObject = {
-      conversation_id,
-      sender_id,
-      sender_type,
-      message_text: trimmedMessage,
-      timestamp: message_time,
-    };
-  
-    // ✅ Envoi avec plusieurs images
-    if (selectedImages && selectedImages.length > 0) {
-      const files = selectedImages.map((img: any, index: any) => ({
-        filename: `image-${Date.now()}-${index}.jpg`,
-        mimetype: 'image/jpeg',
-        data: img,
-      }));
-  
-      const payload = {
-        ...newMessageObject,
-        files, // 👈 liste d'images ici
-      };
-  
-      try {
-        const response = await fetch(`${config.backendUrl}/api/conversation/send-multiple-images-message`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-  
-        if (!response.ok) throw new Error('Erreur réseau');
-        const data = await response.json();
-  
-        socket.emit('newMessage', { ...data.message, conversation_id });
-        //setMessages((prev: any) => [...prev, data.message]);
-      } catch (error) {
-        console.error('Erreur envoi images/message :', error);
-        Alert.alert('Erreur', "Impossible d'envoyer le message.");
-      }
-  
-    } else {
-      // ✅ Envoi texte seul
-      try {
-        const response = await fetch(`${config.backendUrl}/api/conversation/send-message`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ newMessageObject }),
-        });
-  
-        if (!response.ok) throw new Error('Erreur réseau');
-  
-        const data = await response.json();
-        socket.emit('newMessage', { ...data.message, conversation_id });
-        //setMessages((prev: any) => [...prev, data.message]);
-      } catch (error) {
-        console.error('Erreur envoi message texte :', error);
-      }
-    }
-  
-    // Nettoyage
-    setNewMessage('');
-    setSelectedImages([]);
-  };
-  
 
   const handleSendMessage = async () => {
     const message_time = getLocalTime();
@@ -396,6 +311,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   }, [conversation_id]);
   
   return (
+    <Provider>
     <View style={[styles.container, { paddingBottom: keyboardHeight }]}>
       <SafeAreaView style={{ flex: 1 }}>
       {/* Placeholder image at the top center */}
@@ -423,28 +339,41 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
       {/* Scrollable message list */}
       {/*<ScrollView style={styles.messageContainer} contentContainerStyle={{ flexGrow: 1 }}> */}
       <ScrollView style={styles.messageContainer}>
-        {messages.map((message: any, index: React.Key | null | undefined) => (
-          <View
-            key={index}
-            style={[
-              styles.messageBubble,
-              message.sender_id === sender_id ? styles.myMessage : styles.otherMessage,
-            ]}
-          >
-            <View style={message.sender_id === sender_id ? styles.myTextWrapper : styles.otherTextWrapper}>
-              <Text style={styles.messageText}>{message.message_text}</Text>
-              {message.picture_url ? (
-                <Image
-                  source={{ uri: message.picture_url }}
-                  style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
-                  resizeMode="cover"
-                />
-              ) : null}
-              
-            </View>
+  {messages.map((message: any, index: number) => {
+    const isMyMessage = message.sender_id === sender_id;
+    return (
+      <View
+        key={index}
+        style={[
+          styles.messageBubble,
+          isMyMessage ? styles.myMessage : styles.otherMessage,
+        ]}
+      >
+        <TouchableOpacity
+          ref={isMyMessage ? menuAnchorRef : null}
+          onLongPress={() => {
+            if (isMyMessage) {
+              setSelectedMessageId(message.id);
+              setMenuVisible(true);
+            }
+          }}
+        >
+          <View style={isMyMessage ? styles.myTextWrapper : styles.otherTextWrapper}>
+            <Text style={styles.messageText}>{message.message_text}</Text>
+            {message.picture_url ? (
+              <Image
+                source={{ uri: message.picture_url }}
+                style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
+                resizeMode="cover"
+              />
+            ) : null}
           </View>
-        ))}
-      </ScrollView>
+        </TouchableOpacity>
+      </View>
+    );
+  })}
+</ScrollView>
+
 
       {/* Fixed input bar */}
       <View style={styles.inputContainer}>
@@ -479,8 +408,40 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         <Ionicons name="send" size={24} color="white" />
       </TouchableOpacity>
     </View>
+
+    <Menu
+  visible={menuVisible}
+  onDismiss={() => setMenuVisible(false)}
+  anchor={menuAnchorRef.current}
+>
+  <Menu.Item
+    onPress={() => {
+      setMenuVisible(false);
+      Alert.alert(
+        'Supprimer ce message ?',
+        'Cette action est irréversible.',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          {
+            text: 'Supprimer',
+            style: 'destructive',
+            onPress: () => {
+              if (selectedMessageId) {
+                handleDeleteMessage(selectedMessageId);
+              }
+            },
+          },
+        ]
+      );
+    }}
+    title="Supprimer"
+    leadingIcon="delete"
+  />
+</Menu>
+
     </SafeAreaView>
     </View>
+    </Provider>
   );
 };
 

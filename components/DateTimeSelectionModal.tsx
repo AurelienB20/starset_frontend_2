@@ -57,6 +57,8 @@ const DateTimeSelectionModal = ({
   onConfirm,
 }: Props) => {
 
+
+
  
 
 const handleDateSelect = (day: any) => {
@@ -100,6 +102,35 @@ const handleDateSelect = (day: any) => {
   setEndDate(date);
   
 };
+
+const isHourWithinAvailability = () => {
+  if (!startDate || !arrivalHour || !arrivalMinute || !departureHour || !departureMinute) return false;
+
+  const selectedStart = moment(`${startDate}T${arrivalHour.padStart(2, '0')}:${arrivalMinute.padStart(2, '0')}`, moment.ISO_8601);
+  const selectedEnd = moment(`${endDate || startDate}T${departureHour.padStart(2, '0')}:${departureMinute.padStart(2, '0')}`, moment.ISO_8601);
+
+  const selectedDates = getSelectedRangeArray();
+
+  for (const date of selectedDates) {
+    const availableRanges = availabilityByDate[date] || [];
+
+    // Une date doit avoir au moins une plage qui englobe toute la période
+    const hasValidRange = availableRanges.some((range: string) => {
+      const [rangeStart, rangeEnd] = range.split(' - ');
+      const availableStart = moment(`${date}T${rangeStart}`);
+      const availableEnd = moment(`${date}T${rangeEnd}`);
+      return (
+        selectedStart.isSameOrAfter(availableStart) &&
+        selectedEnd.isSameOrBefore(availableEnd)
+      );
+    });
+
+    if (!hasValidRange) return false;
+  }
+
+  return true;
+};
+
 
 const getSelectedRange = () => {
   if (!startDate || !endDate) return {};
@@ -267,7 +298,15 @@ const getMarkedDates = () => {
                 <Text style={styles.timeSeparator}>:</Text>
                 <TextInput style={styles.input} keyboardType="numeric" placeholder="MM" value={departureMinute} onChangeText={onDepartureMinuteChange} />
               </View>
-              <TouchableOpacity style={styles.horairesButton} onPress={onConfirm}>
+              <TouchableOpacity style={styles.horairesButton} 
+                onPress={() => {
+                  if (isHourWithinAvailability()) {
+                    onConfirm();
+                  } else {
+                    alert("Les horaires sélectionnés ne correspondent pas aux disponibilités.");
+                  }
+                }}
+              >
                 <Text style={styles.horairesButtonText}>Confirmer</Text>
               </TouchableOpacity>
             </>

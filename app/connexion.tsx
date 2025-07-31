@@ -96,7 +96,6 @@ const getProfile = async (accountId: string) => {
         body: JSON.stringify({ accountId }),
       });
       const data = await response.json();
-      console.log("ici 27/07/25")
       console.log(data.account)
       setUser(data.account);
     } catch (error) {

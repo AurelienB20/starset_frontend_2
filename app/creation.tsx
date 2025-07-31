@@ -43,23 +43,45 @@ const CreationScreen = () => {
       setErrorMessage('Veuillez entrer une adresse e-mail valide.');
       return;
     }
+  
     if (password !== confirmPassword) {
       setErrorMessage('Les mots de passe ne correspondent pas.');
       return;
     }
+  
     if (!acceptedPrivacy) {
       setErrorMessage('Vous devez accepter la politique de confidentialité.');
       return;
     }
-
+  
     try {
+      // Vérifie d'abord si l'email est disponible
+      const checkResponse = await fetch(`${config.backendUrl}/api/auth/check-email-availability`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+  
+      if (!checkResponse.ok) throw new Error('Erreur réseau');
+  
+      const checkData = await checkResponse.json();
+  
+      if (!checkData.available) {
+        setErrorMessage("Cette adresse e-mail est déjà utilisée.");
+        return;
+      }
+  
+      // Ensuite, envoie l'email de vérification
       const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code-if-exists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
+  
       if (!response.ok) throw new Error('Erreur réseau.');
+  
       const data = await response.json();
+  
       if (data.success === true) {
         setErrorMessage('e-mail existe déjà');
       } else {
@@ -68,11 +90,13 @@ const CreationScreen = () => {
           params: { email, password },
         } as never);
       }
+  
     } catch (error) {
-      setErrorMessage('Erreur lors de l’envoi de l’e-mail. Veuillez réessayer.');
       console.error(error);
+      setErrorMessage("Erreur lors de l'enregistrement. Veuillez réessayer.");
     }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
