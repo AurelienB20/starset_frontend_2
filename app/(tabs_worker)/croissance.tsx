@@ -266,8 +266,8 @@ const styles = StyleSheet.create({
   },
   
   workerImage: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 10,
   },
   
@@ -285,8 +285,8 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 10,
     paddingHorizontal: 10,
-    width: 100,
-    height : 100
+    width: 80,
+    height : 80
   },
   jobIcon: {
     width: 50,

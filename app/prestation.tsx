@@ -1164,6 +1164,29 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 
       </View>
 
+         {/* Section pour les horaires */}
+      
+      <View style={styles.availabilitySection}>
+        <Text style={styles.availabilityTitle}>Ajouter mes disponibilités</Text>
+        
+        <TouchableOpacity
+          style={styles.availabilityButton}
+          onPress={goToAvailability}
+        >
+          <FontAwesome name="calendar" size={30} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      {mandatoryDocuments.length > 0 && (
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Documents obligatoires</Text>
+          {mandatoryDocuments.map((doc, index) => (
+            <Text key={index} style={styles.documentItem}>
+              • {doc.name}
+            </Text>
+          ))}
+        </View>
+      )}
       
       {/* Section pour les tarifs */}
       {!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
@@ -1229,31 +1252,6 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
           </View>
         </View>
       </Modal>
-
-      {/* Section pour les horaires */}
-      
-      <View style={styles.availabilitySection}>
-        <Text style={styles.availabilityTitle}>Ajouter mes disponibilités</Text>
-        
-        <TouchableOpacity
-          style={styles.availabilityButton}
-          onPress={goToAvailability}
-        >
-          <FontAwesome name="calendar" size={30} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {mandatoryDocuments.length > 0 && (
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Documents obligatoires</Text>
-          {mandatoryDocuments.map((doc, index) => (
-            <Text key={index} style={styles.documentItem}>
-              • {doc.name}
-            </Text>
-          ))}
-        </View>
-      )}
-
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
