@@ -82,10 +82,10 @@ const AccountScreen = () => {
     navigation.navigate('modifyAccount' as never);
   };
 
-  const resetCustomerIds = async () => {
+  const resetAccountIds = async () => {
    try {
     const account_id =user?.id
-              const response = await fetch(`${config.backendUrl}/api/stripe/reset-stripe-customer-ids`, {
+              const response = await fetch(`${config.backendUrl}/api/stripe/reset-stripe-account-ids`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -490,6 +490,8 @@ console.log(prestationId);
     <Text style={styles.menuItemText}>A Propos</Text>
   </View>
 </TouchableOpacity>
+
+
 
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
   <View style={styles.iconWithText}>
