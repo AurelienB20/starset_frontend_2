@@ -63,9 +63,7 @@ const CreationScreen = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-  
-      if (!checkResponse.ok) throw new Error('Erreur réseau');
-  
+        
       const checkData = await checkResponse.json();
   
       if (!checkData.available) {

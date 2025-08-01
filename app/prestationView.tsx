@@ -671,30 +671,6 @@ const unlikeImage = async (imageId: string) => {
     setModalType('date')
   };
 
-  /*const goToSummary = () => {
-    const arrivalTime = new Date();
-    arrivalTime.setHours(parseInt(arrivalHour, 10), parseInt(arrivalMinute, 10),  0);
-    const departureTime = new Date();
-
-    departureTime.setHours(parseInt(departureHour, 10), parseInt(departureMinute, 10),  0);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const daysWorked = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1; // inclure le dernier jour
-
-    toggleCalendar()
-    setCalendarVisible(false); // Toggle the visibility of the calendar
-
-    const hoursWorked = (departureTime.getTime() - arrivalTime.getTime()) / (1000 * 60 * 60); // conversion ms → heures
-
-    const totalRemuneration = prestation.remuneration * hoursWorked * daysWorked;
-    console.log('Total Rémunération:', totalRemuneration);
-
-    navigation.navigate({
-      name: 'summary',
-      params: {startDate : startDate, endDate: endDate, arrivalTime : arrivalTime, departureTime : departureTime, prestation : prestation, profilePictureUrl : profilePictureUrl, totalRemuneration: totalRemuneration, },
-    } as never);
-  }*/
-
     const goToSummary = () => {
       navigation.navigate({
         name: 'summary',
@@ -838,7 +814,7 @@ const unlikeImage = async (imageId: string) => {
 </View>
       )}
 
-      {/* Onglets pour Photos, Expériences, Certifications */}
+      {/* Onglets pour Photos, Expériences, Certifications, Avis */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tabButton, selectedTab === 'photos' && styles.activeTabButton]}
@@ -858,6 +834,11 @@ const unlikeImage = async (imageId: string) => {
         >
           <Text style={styles.tabButtonText}>Certifications</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, selectedTab === 'avis' && styles.activeTabButton]}
+          onPress={() => setSelectedTab('avis')}>
+          <Text style={styles.tabButtonText}>Avis</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Contenu des onglets */}
@@ -868,7 +849,6 @@ const unlikeImage = async (imageId: string) => {
               <Image source={{ uri: photo.adress }} style={styles.photo} />
             </TouchableOpacity>
           ))}
-          
         </View>
         
       )}
@@ -962,11 +942,10 @@ const unlikeImage = async (imageId: string) => {
       </View>
       )}
 
-      {/* Avis */}
-      <View style={styles.reviewsContainer}>
-        <Text style={styles.avisHeader}>Avis ({comments.length})</Text>
-
-        <FlatList
+      {selectedTab === 'avis' && (
+         <View>         
+          {comments.lenght > 0 ? (
+          <FlatList
           data={comments}
           keyExtractor={(item : any) => item.comment}
           horizontal
@@ -978,8 +957,11 @@ const unlikeImage = async (imageId: string) => {
               <Text style={styles.reviewText}>{item.comment}</Text>
             </View>
           )}
-        />
-      </View>
+        />) :(
+            <Text style={{ textAlign: 'center' }}>Aucun Avis disponible</Text>
+            )}
+        </View>
+      )}
 
       {/* Tarification */}
       
@@ -1070,7 +1052,7 @@ const unlikeImage = async (imageId: string) => {
         <View style={styles.conversationModalContainer}>
           <View style={styles.conversationModalContent}>
             <Text style={styles.conversationModalText}>
-              Voulez-vous envoyer un message à {account?.firstname} ?
+              Souhaites-vous envoyer un message ?
             </Text>
 
             <View style={styles.conversationModalButtonContainer}>
@@ -1130,10 +1112,11 @@ const unlikeImage = async (imageId: string) => {
       <Text style={styles.popupTitle}>Informations</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Prénom :</Text> {account?.firstname}</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo || 'mariemmm'}</Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> Étudiante</Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de métiers effectués :</Text>105</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> {account?.Statut}</Text>
+      <Text></Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de métiers effectués :</Text>{account?.completed_prestation}</Text>
       <Text style={styles.popupText}>
-        <Text style={styles.bold}>Métier favori :</Text>  Petsitting
+        <Text style={styles.bold}>Prestation favori :</Text>  <Text style={styles.underline}>Petsitting</Text>
       </Text>
     </View>
   </TouchableOpacity>
@@ -1275,6 +1258,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 20,
+    width: '90%'
   },
 
   stat: {
@@ -1315,11 +1299,11 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 20,
-    marginLeft : 10
+    marginVertical: 20
   },
+
   tabButton: {
-    padding: 10,
+    padding: 8,
     borderRadius: 20,
     margin : 5,
     marginHorizontal : 10,
@@ -2082,9 +2066,11 @@ certificationInstitution: {
   
   bold: {
     fontWeight: 'bold',
+  },
+  
+  underline: {
+    textDecorationLine: 'underline',
   }
-  
-  
 });
 
 export default PrestationViewScreen;
