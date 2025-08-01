@@ -22,7 +22,7 @@ function RootLayoutNav() {
     <AllWorkerPlannedPrestationProvider>
     <CartProvider>
     <StripeProvider
-      publishableKey={config.publishableKeyTest} // <- ta clé publique Stripe ici
+      publishableKey={config.publishableKey} // <- ta clé publique Stripe ici
     >
       <UserProvider>
         <WorkerConversationProvider>
