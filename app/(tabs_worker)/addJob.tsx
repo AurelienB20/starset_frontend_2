@@ -86,6 +86,7 @@ const AddJobScreen = () => {
       });
 
       const data = await response.json();
+      console.log(data.fields)
       if (data) setFields(data.fields || []);
     } catch (error) {
       console.error('Erreur récupération catégories :', error);
@@ -137,7 +138,10 @@ const AddJobScreen = () => {
                   }}
                   style={styles.jobImageFiltered}
                 />
-                <Text style={styles.jobTitleFiltered}>{metier.name.toUpperCase()}</Text>
+                <Text style={styles.jobTitleFiltered}>
+  {(metier.name ?? '').toUpperCase()}
+</Text>
+
               </TouchableOpacity>
             ))
           )}
@@ -150,7 +154,7 @@ const AddJobScreen = () => {
     return (
       <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
         <CategorySkeleton />
-        {index + 1 < 6 ? <CategorySkeleton /> : <View style={{ width: (SCREEN_WIDTH - 60) / 2 }} />} {/* Pour équilibrer si nombre impair */}
+        
       </View>
     );
   }
