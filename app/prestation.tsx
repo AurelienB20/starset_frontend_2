@@ -68,7 +68,7 @@ const PrestationScreen = () => {
   const [experienceDate, setExperienceDate] = useState('');
   const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>(prestation?.is_remote ? 'distanciel' : 'sur place');
 
-  const [selectedTarifMode, setSelectedTarifMode] = useState<any>('heure');
+  const [selectedTarifMode, setSelectedTarifMode] = useState<'heure' | 'prestation'>(prestation?.type_of_remuneration === 'hourly' ? 'heure' : 'prestation');
   const [certificationImages, setCertificationImages] = useState<any[]>([]);
   const [experienceImages, setExperienceImages] = useState<string[]>([]);
 
@@ -978,7 +978,6 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       
       setExperiences(data.experiences);
     }).catch((error: any) => console.error(error));
-
     getAllCertification();
     fetchMetierDocuments();
   }, []);
@@ -1093,7 +1092,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       <View style={{ marginVertical: 20 }}>
         
       <View style={styles.sectionContainer}>
-  <Text style={styles.sectionTitle}>Mode de tarification</Text>
+  <Text style={styles.sectionTitle}>Mode de tarification<Text style={[{color: 'red'}]}> *</Text></Text>
   <View style={styles.toggleContainer}>
     <TouchableOpacity
       onPress={() => handleTarifModeChange('prestation')}
@@ -1128,7 +1127,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 </View>
 
 <View style={styles.sectionContainer}>
-  <Text style={styles.sectionTitle}>Mode de prestation</Text>
+  <Text style={styles.sectionTitle}>Mode de prestation<Text style={[{color: 'red'}]}> *</Text></Text>
   <View style={styles.toggleContainer}>
     <TouchableOpacity
       onPress={() => selectedMode !== 'sur place' && confirmToggleIsRemote()}
@@ -1164,6 +1163,29 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 
       </View>
 
+         {/* Section pour les horaires */}
+      
+      <View style={styles.availabilitySection}>
+        <Text style={styles.availabilityTitle}>Ajouter mes disponibilités</Text>
+        
+        <TouchableOpacity
+          style={styles.availabilityButton}
+          onPress={goToAvailability}
+        >
+          <FontAwesome name="calendar" size={30} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      {mandatoryDocuments.length > 0 && (
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>Documents obligatoires</Text>
+          {mandatoryDocuments.map((doc, index) => (
+            <Text key={index} style={styles.documentItem}>
+              • {doc.name}
+            </Text>
+          ))}
+        </View>
+      )}
       
       {/* Section pour les tarifs */}
       {!prestation?.type_of_remuneration?.toLowerCase().includes('heure') &&
@@ -1229,31 +1251,6 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
           </View>
         </View>
       </Modal>
-
-      {/* Section pour les horaires */}
-      
-      <View style={styles.availabilitySection}>
-        <Text style={styles.availabilityTitle}>Ajouter mes disponibilités</Text>
-        
-        <TouchableOpacity
-          style={styles.availabilityButton}
-          onPress={goToAvailability}
-        >
-          <FontAwesome name="calendar" size={30} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {mandatoryDocuments.length > 0 && (
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Documents obligatoires</Text>
-          {mandatoryDocuments.map((doc, index) => (
-            <Text key={index} style={styles.documentItem}>
-              • {doc.name}
-            </Text>
-          ))}
-        </View>
-      )}
-
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity

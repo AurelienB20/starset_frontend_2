@@ -74,22 +74,18 @@ const AccountScreen = () => {
     } as never);
   };
 
-  
-
   const goToCard = async () => {
     navigation.navigate('paymentMethod' as never);
   };
-
-  
 
   const goToModifyAccount = async () => {
     navigation.navigate('modifyAccount' as never);
   };
 
-  const cryptData = async () => {
+  const resetAccountIds = async () => {
    try {
     const account_id =user?.id
-              const response = await fetch(`${config.backendUrl}/api/auth/migrate-location-data`, {
+              const response = await fetch(`${config.backendUrl}/api/stripe/reset-stripe-account-ids`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -486,12 +482,7 @@ console.log(prestationId);
   </View>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem} onPress={goToIdentityDocument}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="file-text" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>Identiy Document</Text>
-  </View>
-</TouchableOpacity>
+
 
 <TouchableOpacity style={styles.menuItem} onPress={goToAbout}>
   <View style={styles.iconWithText}>
@@ -499,7 +490,6 @@ console.log(prestationId);
     <Text style={styles.menuItemText}>A Propos</Text>
   </View>
 </TouchableOpacity>
-
 
 
 
