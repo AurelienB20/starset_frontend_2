@@ -1352,16 +1352,8 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
     ))}
 
     {/* Formulaire d’édition ou de création */}
-    <TouchableOpacity
-      style={styles.addButton}
-      onPress={() => setExperienceModalVisible(true)}
-    >
-      <Text style={styles.addButtonText}>
-        Ajouter une experience
-      </Text>
-    </TouchableOpacity>
-
-    <ExperienceModal
+    {isExperienceModalVisible && (
+  <ExperienceModal
       visible={isExperienceModalVisible}
       onClose={() => {
         setExperienceModalVisible(false);
@@ -1386,7 +1378,15 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       onAddImage={editType === 'experience' ? pickEditImage : pickExperienceImage}
       onSubmit={editType === 'experience' ? updateExperience : createExperience}
       onToggleCalendar={() => setShowExperienceCalendar(!showExperienceCalendar)}
-    />
+    />)}
+    <TouchableOpacity
+      style={styles.addButton}
+      onPress={() => setExperienceModalVisible(true)}
+    >
+      <Text style={styles.addButtonText}>
+        Ajouter une experience
+      </Text>
+    </TouchableOpacity>
     </View>
   )}
 
@@ -1502,21 +1502,10 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       <Text style={{ textAlign: 'center' }}>Aucune certification disponible</Text>
     )}
 
-<TouchableOpacity
-      style={styles.addButton}
-      onPress={() => setCertificationFormVisible(true)}
-    >
-      <Text style={styles.addButtonText}>
-        Ajouter une certification
-      </Text>
-    </TouchableOpacity>
-    
-    <CertificationFormModal
-      visible={isCertificationFormVisible}
+{isCertificationFormVisible && (
+<CertificationFormModal
       onClose={() => {
         setCertificationFormVisible(false);
-        setEditType(null);
-        setSelectedItem(null);
       }}
       isEditMode={editType === 'certification'}
       item={selectedItem || {
@@ -1537,7 +1526,18 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
         setSelectedItem((prev: any) => ({ ...prev, date }));
         setShowCalendar(false);
       }}
-    />
+    />)}
+
+<TouchableOpacity
+      style={styles.addButton}
+      onPress={() => setCertificationFormVisible(true)}
+    >
+      <Text style={styles.addButtonText}>
+        Ajouter une certification
+      </Text>
+    </TouchableOpacity>
+    
+    
       </View>
       )}
       <View style={styles.publishContainer}>
@@ -1658,8 +1658,8 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   categoryButton: {
-    padding: 10,
-    borderRadius: 20,
+    padding: 15,
+    borderRadius: 30,
     margin : 5,
     backgroundColor: '#00cc66',
   },
@@ -1668,7 +1668,7 @@ const styles = StyleSheet.create({
   },
   categoryButtonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   photoGrid: {
