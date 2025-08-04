@@ -1234,15 +1234,16 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 
             <Text style={styles.modalTitle}>TARIF PAR HEURE</Text>
             
-            <TextInput
-              style={styles.inputModal}
-              placeholder="0,00"
-              keyboardType="numeric"
-              value={remuneration}
-              onChangeText={handleFormattedRemuneration}
-            />
-            
-            <Text style={styles.currency}>€</Text>
+            <View style={styles.inputWithCurrency}>
+              <TextInput
+                style={styles.inputModal}
+                placeholder="0,00"
+                keyboardType="numeric"
+                value={remuneration}
+                onChangeText={handleFormattedRemuneration}
+              />
+              <Text style={styles.currency}>€</Text>
+            </View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSaveRemuneration}>
               <Text style={styles.saveButtonText}>ENREGISTRER</Text>
@@ -1833,33 +1834,45 @@ const styles = StyleSheet.create({
     color: '#006400',
     marginBottom: 20,
   },
+  inputWithCurrency: {
+    position: 'relative',
+    backgroundColor: '#ccc',
+    borderRadius: 10,
+    width: '80%',
+    alignSelf: 'center',
+  },
+  
   inputModal: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    width: '80%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    color: '#000',
+    textAlign: 'center',     
+    paddingVertical: 10,
+    paddingRight: 50,         
+    paddingLeft: 15,
   },
+  
   currency: {
+    position: 'absolute',         
+    right: 15,
+    top: '50%',
+    transform: [{ translateY: -15 }],
     fontSize: 30,
     fontWeight: 'bold',
     color: '#333',
-    position: 'absolute',
-    right: 40,
-    top: 80,
   },
+  
+  
   saveButton: {
     backgroundColor: '#006400',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
     marginTop: 20,
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 10,
     fontWeight: 'bold',
   },
 

@@ -4,13 +4,24 @@ import {
   Modal,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
 import { Calendar as BigCalendar } from 'react-native-big-calendar';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import WheelPicker from 'react-native-wheel-picker-expo';
+
+const minutes = Array.from({ length: 60 }, (_, i) => {
+  const value = i.toString().padStart(2, '0');
+  return { label: value, value };
+});
+
+const hours = Array.from({ length: 24 }, (_, i) => {
+  const value = i.toString().padStart(2, '0');
+  return { label: value, value };
+});
+
 
 interface Props {
   visible: boolean;
@@ -57,9 +68,6 @@ const DateTimeSelectionModal = ({
   onConfirm,
 }: Props) => {
 
-
-
- 
 
 const handleDateSelect = (day: any) => {
   const date = day.dateString;
@@ -279,9 +287,50 @@ const getMarkedDates = () => {
             <>
               <Text style={styles.modalTitle}>Heure d'arrivée</Text>
               <View style={styles.inputRow}>
-                <TextInput style={styles.input} keyboardType="numeric" placeholder="HH" value={arrivalHour} onChangeText={onArrivalHourChange} />
+                {/*<TextInput style={styles.input} keyboardType="numeric" placeholder="HH" value={arrivalHour} onChangeText={onArrivalHourChange} />
                 <Text style={styles.timeSeparator}>:</Text>
-                <TextInput style={styles.input} keyboardType="numeric" placeholder="MM" value={arrivalMinute} onChangeText={onArrivalMinuteChange} />
+                <TextInput style={styles.input} keyboardType="numeric" placeholder="MM" value={arrivalMinute} onChangeText={onArrivalMinuteChange} />*/}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }}>
+                <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
+                  <WheelPicker
+                    height={350} // Garder une grande hauteur pour scroll fluide
+                    width={100}
+                    initialSelectedIndex={parseInt(arrivalHour || '12')}
+                    items={hours}
+                    onChange={({ index }) => onArrivalHourChange(hours[index].value)}
+                    renderItem={(item) => (
+                      <Text style={{
+                        fontSize: 60,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}>
+                        {item.label}
+                      </Text>
+                    )}
+                  />
+                </View>
+                
+                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, }}>:</Text>
+                  <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
+                  <WheelPicker
+                    height={350} // Garder une grande hauteur pour scroll fluide
+                    width={100}
+                    initialSelectedIndex={parseInt(arrivalMinute || '0')}
+                    items={minutes}
+                    onChange={({ index }) => onArrivalMinuteChange(minutes[index].value)}
+                    renderItem={(item) => (
+                      <Text style={{
+                        fontSize: 60,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}>
+                        {item.label}
+                      </Text>
+                    )}
+                  />
+                </View>
+                  
+              </View>
               </View>
               <TouchableOpacity style={styles.horairesButton} onPress={() => setModalType('departure')}>
                 <Text style={styles.horairesButtonText}>Suivant</Text>
@@ -294,9 +343,47 @@ const getMarkedDates = () => {
             <>
               <Text style={styles.modalTitle}>Heure de départ</Text>
               <View style={styles.inputRow}>
-                <TextInput style={styles.input} keyboardType="numeric" placeholder="HH" value={departureHour} onChangeText={onDepartureHourChange} />
-                <Text style={styles.timeSeparator}>:</Text>
-                <TextInput style={styles.input} keyboardType="numeric" placeholder="MM" value={departureMinute} onChangeText={onDepartureMinuteChange} />
+                <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', width: '100%' }}>
+                <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
+                  <WheelPicker
+                    height={350} // Garder une grande hauteur pour scroll fluide
+                    width={100}
+                    initialSelectedIndex={parseInt(departureHour || '12')}
+                    items={hours}
+                    onChange={({ index }) => onDepartureHourChange(hours[index].value)}
+                    renderItem={(item) => (
+                      <Text style={{
+                        fontSize: 60,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}>
+                        {item.label}
+                      </Text>
+                    )}
+                  />
+                </View>
+                
+                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, }}>:</Text>
+                  <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
+                  <WheelPicker
+                    height={350} // Garder une grande hauteur pour scroll fluide
+                    width={100}
+                    initialSelectedIndex={parseInt(departureMinute || '0')}
+                    items={minutes}
+                    onChange={({ index }) => onDepartureMinuteChange(minutes[index].value)}
+                    renderItem={(item) => (
+                      <Text style={{
+                        fontSize: 60,
+                        textAlign: 'center',
+                        fontWeight: 'bold',
+                      }}>
+                        {item.label}
+                      </Text>
+                    )}
+                  />
+                </View>
+                  
+              </View>
               </View>
               <TouchableOpacity style={styles.horairesButton} 
                 onPress={() => {

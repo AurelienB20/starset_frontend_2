@@ -111,7 +111,7 @@ const ReceivePayoutScreen = () => {
       <Text style={styles.headerText}>Réception de paiements</Text>
 
       {checkingStatus ? (
-        <ActivityIndicator size="large" color="green" />
+        <ActivityIndicator size="large" color="green"/>
       ) : payoutsEnabled ? (
         <Text style={styles.successText}>✅ Vos paiements sont activés !</Text>
       ) : (

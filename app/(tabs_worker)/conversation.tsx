@@ -184,11 +184,15 @@ const ConversationScreen = () => {
       );
   }, [conversations, searchTerm]);
 
+  const renderSeparator = () => (
+    <View style={styles.separator} />
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.messagerieContainer}>
         <Image
-          source={ require('../../assets/images/Messagerie.png') }
+          source={ require('../../assets/images/Messagerie-vert.png') }
           style={styles.messagerie}
         />
       </View>
@@ -223,6 +227,7 @@ const ConversationScreen = () => {
           data={filteredConversations}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
+          ItemSeparatorComponent={renderSeparator}
         />
       )}
 
@@ -460,6 +465,15 @@ badgeText: {
   fontSize: 12,
   fontWeight: 'bold',
 },
+
+separator: {
+  height: 1,
+  backgroundColor: '#ddd',
+  marginVertical: 3,
+  marginLeft: 60,  // Pour ne pas passer sous la photo de profil
+  marginRight: 10,
+},
+
 
 });
 

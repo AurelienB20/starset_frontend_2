@@ -1,3 +1,4 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { CardField, usePaymentSheet, useStripe } from '@stripe/stripe-react-native';
@@ -11,11 +12,13 @@ const PaymentScreen = () => {
   const navigation = useNavigation();
   const {initPaymentSheet, presentPaymentSheet} = usePaymentSheet();
   // On récupère cart, instruction, totalRemuneration depuis params
-  const { cart = [], instruction = '', totalRemuneration = 0 } = route.params || {};
+  const [cart, setCart] = useState(route.params?.cart || []);
 
   const [isLoading, setIsLoading] = useState(false);
   const [savedCards, setSavedCards] = useState<any[]>([]);
   const { confirmSetupIntent } = useStripe();
+  const totalRemuneration = route.params?.total_remuneration || 0
+  const instruction = route.params?.instruction || ""
 
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
@@ -26,12 +29,28 @@ const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
 const [cardDetails, setCardDetails] = useState<any>(null);
 const [showCardField, setShowCardField] = useState(false);
 
-
-
   useEffect(() => {
     
     fetchSavedCards();
   }, []);
+
+  const removePrestationFromCart = (indexToRemove: number) => {
+    Alert.alert(
+      'Supprimer la prestation',
+      'Êtes-vous sûr de vouloir supprimer cette prestation du panier ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: () => {
+            setCart((prevCart: any[]) => prevCart.filter((_, i) => i !== indexToRemove));
+          },
+        },
+      ]
+    );
+  };
+  
 
   const handleAddCard = async () => {
     try {
@@ -208,14 +227,23 @@ const [showCardField, setShowCardField] = useState(false);
 
         return (
           <View key={index} style={styles.prestationContainer}>
-            
+            {/* Icône poubelle en haut à droite */}
+            <TouchableOpacity
+              onPress={() => removePrestationFromCart(index)}
+              style={styles.deleteIcon}
+            >
+              <MaterialIcons name="delete" size={24} color="#900" />
+            </TouchableOpacity>
+
             <Image
               source={{ uri: profilePictureUrl || prestation.picture_url }}
               style={styles.profilePicture}
             />
             <Text style={styles.prestationTitle}>{prestation.metier}</Text>
             <Text style={styles.descriptionText}>{prestation.description}</Text>
-            <Text style={styles.paymentAmount}>Montant : {itemRemuneration?.toFixed(2)} €</Text>
+            <Text style={styles.paymentAmount}>
+              Montant : {itemRemuneration?.toFixed(2)} €
+            </Text>
           </View>
         );
       })}
@@ -365,6 +393,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+
+  deleteIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+  },
+  
 });
 
 export default PaymentScreen;

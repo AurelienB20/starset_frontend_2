@@ -597,7 +597,7 @@ const unlikeImage = async (imageId: string) => {
     prestationRef.current = prestation;  // Met à jour la référence à chaque changement de prestation
   }, [prestation]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (
       modalType === 'arrival' &&
       arrivalHour.length === 2 &&
@@ -611,7 +611,7 @@ const unlikeImage = async (imageId: string) => {
         }, 300); // Petite pause pour laisser le champ se remplir visuellement
       }
     }
-  }, [arrivalHour, arrivalMinute]);
+  }, [arrivalHour, arrivalMinute]);*/
   
 
   const handleAddToCart = () => {
@@ -792,7 +792,7 @@ const unlikeImage = async (imageId: string) => {
          
         </View>
       ) : (
-        <View style={styles.pricingContainer}>
+<View style={styles.pricingContainer}>
   <Text style={styles.pricingText}>
     {prestation.remuneration ? `${prestation.remuneration}€/heure` : "Tarif non défini"}
   </Text>
@@ -807,11 +807,14 @@ const unlikeImage = async (imageId: string) => {
       }
     }}
   >
+    <Image
+      source={require('@/assets/images/calendrier.png')}
+      style={styles.calendarIcon}
+    />
     <Text style={styles.calendarButtonText}>Voir le calendrier</Text>
   </TouchableOpacity>
-
-  
 </View>
+
       )}
 
       {/* Onglets pour Photos, Expériences, Certifications, Avis */}
@@ -1431,16 +1434,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFF',
   },
-  calendarButton: {
-    color: 'white',
-    padding: 10,
-    borderRadius: 5,
-  },
-  calendarButtonText: {
-    fontSize: 18,
-    color: '#FFF',
-    fontWeight : 'bold'
-  },
+  
+  
   addButtoncontainer: {
     width: '100%',
     alignItems: 'center',
@@ -2070,7 +2065,25 @@ certificationInstitution: {
   
   underline: {
     textDecorationLine: 'underline',
-  }
+  },
+
+  calendarButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  calendarIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+    marginBottom: 4,
+  },
+  
+  calendarButtonText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: '600',
+  },
 });
 
 export default PrestationViewScreen;

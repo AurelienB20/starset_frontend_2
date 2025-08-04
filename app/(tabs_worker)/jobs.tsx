@@ -625,7 +625,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   jobCard: {
-    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#000', // noir
     padding: 15,
     borderRadius: 10,
     marginBottom: 15,

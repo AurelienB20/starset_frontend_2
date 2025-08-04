@@ -48,6 +48,8 @@ const PrestationsScreen = () => {
   const { currentWorkerPrestation: prestation } = useCurrentWorkerPrestation();
   const [prestationImages, setPrestationImages] = useState<string[]>([]);
   const [menuVisibleId, setMenuVisibleId] = useState<number | null>(null);
+  const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
+
 
 
   const getCustomPrestations = async () => {
@@ -185,64 +187,70 @@ const PrestationsScreen = () => {
     setModalVisible(true);
   };
 
-  const renderPrestation = ({ item }: any) => (
-  <View style={styles.prestationCard}>
-    <View style={{ position: 'absolute', top: 10, right: 10 }}>
-      <Menu
-        visible={menuVisibleId === item.id}
-        onDismiss={() => setMenuVisibleId(null)}
-        anchor={
-          <TouchableOpacity onPress={() => setMenuVisibleId(item.id)} style = {{ paddingHorizontal : 20}}  >
-            <Icon name="more-vert" size={30} color="#333"  />
-          </TouchableOpacity>
-        }
+  const renderPrestation = ({ item, index }: any) => {
+    const isSelected = selectedCardId === item.id;
+  
+    return (
+      <TouchableOpacity
+        style={styles.prestationCard}
+        onPress={() => setSelectedCardId(isSelected ? null : item.id)}
+        activeOpacity={0.9}
       >
-        <Menu.Item
-          onPress={() => {
-            setMenuVisibleId(null);
-            handleDeleteCustomPrestation(item.id);
-          }}
-          title="Supprimer"
-          leadingIcon="delete"
-        />
-      </Menu>
-    </View>
-
-    <View style={{ flexDirection: 'row' }}>
-      <View
-        style={[
-          styles.certificationImagesColumn,
-          {
-            width: item.images && item.images.length > 0 ? 80 : 0,
-            marginRight: item.images && item.images.length > 0 ? 10 : 0,
-          },
-        ]}
-      >
-        {item.images && item.images.length === 3 ? (
-          <>
-            <Image source={{ uri: item.images[0] }} style={styles.certificationBigImage} />
-            <View style={styles.certificationSmallImagesRow}>
-              <Image source={{ uri: item.images[1] }} style={styles.certificationSmallImage} />
-              <Image source={{ uri: item.images[2] }} style={styles.certificationSmallImage} />
-            </View>
-          </>
-        ) : (
-          item.images?.map((uri: string, i: number) => (
-            <Image key={i} source={{ uri }} style={styles.certificationMiniImage} />
-          ))
-        )}
-      </View>
-
-      <View style={styles.prestationDetails}>
-        <Text style={styles.prestationTitle}>{item.title}</Text>
-        <Text style={styles.prestationPrice}>{item.price} €</Text>
-        {item.description ? (
-          <Text style={{ color: '#666', marginTop: 4 }}>{item.description}</Text>
-        ) : null}
-      </View>
-    </View>
-  </View>
-);
+        {/* Menu contextuel */}
+        <View style={{ position: 'absolute', top: 10, right: 10 }}>
+          <Menu
+            visible={menuVisibleId === item.id}
+            onDismiss={() => setMenuVisibleId(null)}
+            anchor={
+              <TouchableOpacity onPress={() => setMenuVisibleId(item.id)} style={{ paddingHorizontal: 20 }}>
+                <Icon name="more-vert" size={30} color="#333" />
+              </TouchableOpacity>
+            }
+          >
+            <Menu.Item
+              onPress={() => {
+                setMenuVisibleId(null);
+                handleDeleteCustomPrestation(item.id);
+              }}
+              title="Supprimer"
+              leadingIcon="delete"
+            />
+          </Menu>
+        </View>
+  
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.prestationHeader}>PRESTATION {index + 1}</Text>
+          <Text style={styles.prestationTitleCentered}>{item.title}</Text>
+  
+          {isSelected && (
+            <>
+              {item.description ? (
+                <Text style={{ textAlign: 'center', color: '#666', marginVertical: 10 }}>
+                  {item.description}
+                </Text>
+              ) : null}
+  
+              {item.images?.length > 0 && (
+                <View style={styles.imageRow}>
+                  {item.images.slice(0, 3).map((uri: string, i: number) => (
+                    <Image key={i} source={{ uri }} style={styles.squareImage} />
+                  ))}
+                </View>
+              )}
+            </>
+          )}
+  
+          <View style={styles.priceContainer}>
+            <Text style={styles.priceText}>
+              {parseFloat(item.price).toFixed(2).replace('.', ',')}€
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  
+  
 
   return (
     <PaperProvider>
@@ -318,7 +326,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
   addButton: { backgroundColor: '#008000', padding: 15, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonText: { color: '#fff', fontWeight: 'bold' },
-  prestationCard: { padding: 15, backgroundColor: '#f5f5f5', marginBottom: 10, borderRadius: 8 },
+  
   prestationTitle: { fontWeight: 'bold', fontSize: 16 },
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 20, width: '90%' },
@@ -371,4 +379,60 @@ const styles = StyleSheet.create({
     color: '#333',
     marginTop: 8,
   },
+
+
+  prestationCard: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 15,
+    position: 'relative',
+  },
+  
+  prestationHeader: {
+    fontWeight: 'bold',
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'center',
+  },
+  
+  prestationTitleCentered: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 5,
+  },
+  
+  priceContainer: {
+    marginTop: 10,
+    backgroundColor: '#FFC107',
+    paddingVertical: 10,
+    paddingHorizontal: 25,
+    borderRadius: 6,
+  },
+  
+  priceText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  
+  imageRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+    gap: 10,
+  },
+  
+  squareImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 6,
+    resizeMode: 'cover',
+  },
+  
+  
 });
