@@ -684,18 +684,7 @@ const unlikeImage = async (imageId: string) => {
   return (
     <View>
       <Animated.View style={[styles.profileContainer]}>
-        {account && (
-            <View style={styles.peopleIconContainer}>
-              <Image
-                source={
-                  account.is_company
-                    ? require('../assets/images/company.png')
-                    : require('../assets/images/people.png')
-                }
-                style={styles.peopleIcon}
-              />
-            </View>
-          )}      
+       
         
         <TouchableOpacity onPress={() => setProfileInfoVisible(true)}>
           <Animated.Image
@@ -1139,6 +1128,18 @@ const unlikeImage = async (imageId: string) => {
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Icon name="arrow-back" size={30} color="black" />
       </TouchableOpacity>
+      {account && (
+            <View style={styles.peopleIconContainerHeader}>
+              <Image
+                source={
+                  account.is_company
+                    ? require('../assets/images/company.png')
+                    : require('../assets/images/people.png')
+                }
+                style={styles.peopleIcon}
+              />
+            </View>
+          )}      
             {/* Icônes à droite */}
       <View style={styles.headerIcons}>
       <TouchableOpacity
@@ -1306,7 +1307,7 @@ const styles = StyleSheet.create({
 
   tabContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     marginVertical: 20
   },
 
@@ -1323,7 +1324,7 @@ const styles = StyleSheet.create({
   tabButtonText: {
     color: '#FFF',
     fontSize: 14,
-    fontFamily : 'JosefinSans_700Bold',
+    fontFamily : 'LexendDeca',
     textAlign: 'center'
   },
 
@@ -2034,6 +2035,13 @@ certificationInstitution: {
     left: 8,
     top : 8,
   },
+
+  peopleIconContainerHeader: {
+    position : 'absolute',
+    left: 65,
+    top : 25,
+  },
+
   peopleIcon: {
     width: 40,
     height: 40,

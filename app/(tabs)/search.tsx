@@ -270,9 +270,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
       ListHeaderComponent={
         <View style={styles.container}>
           <Image style ={styles.tinyLogo}source={require('../../assets/images/starset-icon.png')}/>
-          <TouchableOpacity style={styles.bellIconContainer} onPress={() => console.log('Notifications')}>
-            <Ionicons name="notifications-outline" size={28} color="#000" />
-          </TouchableOpacity>
+          
           {/*}
           <TouchableOpacity style={styles.fakeSearchBar} onPress={goToNearbyWorkersMap}>
             <Ionicons name="location-sharp" size={16} color="#999" style={{ marginRight: 8 }} />
