@@ -4,6 +4,7 @@ import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userCont
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { JosefinSans_100Thin, JosefinSans_700Bold } from '@expo-google-fonts/josefin-sans';
 import { Lexend_400Regular, Lexend_700Bold } from '@expo-google-fonts/lexend';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -79,6 +80,7 @@ const PrestationViewScreen = () => {
       Lexend_700Bold,
       JosefinSans_700Bold,
       JosefinSans_100Thin,
+      LexendDeca : LexendDeca_400Regular 
     });
 
 
@@ -946,23 +948,26 @@ const unlikeImage = async (imageId: string) => {
       )}
 
       {selectedTab === 'avis' && (
-         <View>         
-          {comments.lenght > 0 ? (
-          <FlatList
-          data={comments}
-          keyExtractor={(item : any) => item.comment}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.reviewsList}
-          renderItem={({ item } : any) => (
-            <View style={styles.reviewCard}>
-              <Text style={styles.reviewName}>{item.firstname} {item.lastname}</Text>
-              <Text style={styles.reviewText}>{item.comment}</Text>
-            </View>
-          )}
-        />) :(
-            <Text style={{ textAlign: 'center' }}>Aucun Avis disponible</Text>
-            )}
+         <View >         
+          {Array.isArray(comments) && comments.length > 0 ? (
+  <View style={{ maxHeight: 200 }}>
+    <FlatList
+      data={comments}
+      keyExtractor={(item : any, index) => index.toString()}
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.reviewsList}
+      renderItem={({ item } : any) => (
+        <View style={styles.reviewCard}>
+          <Text style={styles.reviewName}>{item.firstname} {item.lastname}</Text>
+          <Text style={styles.reviewText}>{item.comment}</Text>
+        </View>
+      )}
+    />
+  </View>
+) : (
+  <Text style={{ textAlign: 'center' }}>Aucun avis disponible</Text>
+)}
         </View>
       )}
 
@@ -1161,7 +1166,7 @@ const unlikeImage = async (imageId: string) => {
     />
   }
 >
-  <Menu.Item onPress={confirmReport} title="Signaler" />
+  <Menu.Item onPress={confirmReport} title="Signaler" titleStyle={{ fontFamily: 'LexendDeca'}} />
 </Menu>
       </View>
     </View>
@@ -1178,7 +1183,7 @@ const unlikeImage = async (imageId: string) => {
   disabled={!user || Object.keys(user).length === 0}
 >
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <Text style={styles.addButtonText}>Ajouter</Text>
+    <Text style={styles.addButtonText}>AJOUTER</Text>
     <Icon name="shopping-cart" size={24} color="white" style={{ marginLeft: 8 }} />
   </View>
 </TouchableOpacity>
@@ -1445,12 +1450,13 @@ const styles = StyleSheet.create({
   
   addButtonFixedContainer: {
     position: 'absolute', // Position fixe
+    
     bottom: 0, // Positionné à 10px du bas de l'écran
     left: 0,
     right: 0,
     alignItems: 'center', // Centré horizontalement
     paddingVertical: 10, // Espacement autour du bouton
-    zIndex: 1000, // Toujours au-dessus du contenu
+   
   },
 
   addButton: {
@@ -1459,7 +1465,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     width: '90%',
-    marginTop : 120,
+   
+    zIndex : 1000
 
   },
 
@@ -1824,6 +1831,7 @@ const styles = StyleSheet.create({
 
   reviewsList: {
     paddingHorizontal: 10,
+    backgroundColor : 'blue'
   },
   
   reviewCard: {
