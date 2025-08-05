@@ -1,3 +1,6 @@
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
+import { useFonts } from 'expo-font';
 import moment from 'moment';
 import React from 'react';
 import {
@@ -67,6 +70,13 @@ const DateTimeSelectionModal = ({
   onDepartureMinuteChange,
   onConfirm,
 }: Props) => {
+
+  let [fontsLoaded] = useFonts({
+      
+      LexendDeca : LexendDeca_400Regular,
+      
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
 
 
 const handleDateSelect = (day: any) => {
@@ -276,7 +286,14 @@ const getMarkedDates = () => {
                 </>
               )}
               
-              <TouchableOpacity onPress={() => setModalType('arrival')} style={styles.horairesButton}>
+              <TouchableOpacity
+                style={styles.horairesButton}
+                onPress={() => {
+                  if (!arrivalHour) onArrivalHourChange('00');
+                  if (!arrivalMinute) onArrivalMinuteChange('00');
+                  setModalType('departure');
+                }}
+              >
                 <Text style={styles.horairesButtonText}>Suivant</Text>
               </TouchableOpacity>
             </>
@@ -387,12 +404,16 @@ const getMarkedDates = () => {
               </View>
               <TouchableOpacity style={styles.horairesButton} 
                 onPress={() => {
+                  if (!departureHour) onDepartureHourChange('00');
+                  if (!departureMinute) onDepartureMinuteChange('00');
+
                   if (isHourWithinAvailability()) {
                     onConfirm();
                   } else {
                     alert("Les horaires sélectionnés ne correspondent pas aux disponibilités.");
                   }
                 }}
+
               >
                 <Text style={styles.horairesButtonText}>Confirmer</Text>
               </TouchableOpacity>
@@ -411,12 +432,12 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '85%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center',
   },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
+  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold' },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   input: { width: 60, height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, textAlign: 'center', fontSize: 24 },
   timeSeparator: { fontSize: 40, marginHorizontal: 10 },
   horairesButton: { backgroundColor: '#00cc66', padding: 10, borderRadius: 8, marginTop: 20, width: '100%', alignItems: 'center' },
-  horairesButtonText: { color: '#fff', fontSize: 16 },
+  horairesButtonText: { color: '#fff', fontSize: 16, fontFamily : 'LexendDeca' },
   closeIcon: { position: 'absolute', top: 10, right: 10, padding: 5 },
   backIcon: { position: 'absolute', top: 10, left: 10, padding: 5 },
   calendar: { alignSelf: 'center' },

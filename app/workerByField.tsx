@@ -1,5 +1,7 @@
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
@@ -18,6 +20,10 @@ const WorkersByFieldScreen = () => {
   const { field } = route.params as any;
   const [workers, setWorkers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  let [fontsLoaded] = useFonts({
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
   const fetchWorkersByField = async () => {
     try {
       const response = await fetch(`${config.backendUrl}/api/mission/filter-workers-by-field`, {
@@ -126,7 +132,9 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold'
+    
+    
   },
 
   profileContainer: {

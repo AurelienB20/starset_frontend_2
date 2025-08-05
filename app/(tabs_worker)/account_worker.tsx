@@ -1,7 +1,9 @@
 import { useUser } from '@/context/userContext';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
@@ -12,6 +14,12 @@ const AccountWorkerScreen = () => {
   const [account, setAccount] = useState<any>(null)
   const navigation = useNavigation();
   const { user } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
+
+  let [fontsLoaded] = useFonts({
+        
+        
+        LeagueSpartanBold : LeagueSpartan_700Bold
+      });
 
   const changeToUser = async () => {
     saveMode('user')
@@ -101,30 +109,24 @@ const AccountWorkerScreen = () => {
 {user && Object.keys(user).length > 0 ? (
       // 🟩 TON CONTENU ACTUEL ICI (copie ton JSX à l’intérieur de ce bloc)
       <>
-         <View style={styles.header}>
-        <Text style={styles.typeOAccount}>Worker</Text>
-    
-        <View style={styles.rightHeader}>
-              <TouchableOpacity style={styles.profileHeader} onPress={goToModifyAccount}>
-                  <View>
-                  <Image
-                    source={{ 
-                      uri: account?.profile_picture_url 
-                        ? account?.profile_picture_url
-                        : 'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png' 
-                    }} 
-                    style={styles.profilePicture}
-                  />
-                  </View>
-                  
-                  <View style={styles.profileInfo}>
-                    <Text style={styles.profileName}>{account?.firstname} {account?.lastname}</Text>
-                    <Text style={styles.profileHandle}>@{account?.pseudo}</Text>
-                  </View>
-                </TouchableOpacity>
-          
-        </View>
-      </View>
+<View style={styles.header}>
+  <View style={styles.profileInfoHeader}>
+    <Text style={styles.profileName}>{account?.firstname} {account?.lastname}</Text>
+    <Text style={styles.profileHandle}>@{account?.pseudo}</Text>
+    <Text style={styles.profileRole}>Worker</Text>
+  </View>
+
+  <TouchableOpacity onPress={goToModifyAccount}>
+    <Image
+      source={{
+        uri: account?.profile_picture_url
+          ? account?.profile_picture_url
+          : 'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png',
+      }}
+      style={styles.profilePicture}
+    />
+  </TouchableOpacity>
+</View>
 
       <TouchableOpacity style={styles.balanceContainer} onPress={goToReceivePayout}>
         <Text style={styles.balanceLabel}>Tirelire</Text>
@@ -227,20 +229,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profilePicture: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
   },
   profileInfo: {
     marginLeft: 10,
   },
   profileName: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily : 'LeagueSpartanBold',
     color: '#000',
   },
   profileHandle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#666',
   },
   balanceContainer: {
@@ -312,6 +314,7 @@ const styles = StyleSheet.create({
 
     marginRight : 30,
     marginTop : 10,
+    marginBottom : 50
   },
 
   tirelire: {
@@ -336,6 +339,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  profileInfoHeader: {
+  flexDirection: 'column',
+  justifyContent: 'center',
+  flex: 1,
+},
+
+profileRole: {
+  fontSize: 20,
+  
+  fontFamily : 'LeagueSpartanBold'
+},
+
 
 });
 

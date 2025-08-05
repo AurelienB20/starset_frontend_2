@@ -1661,11 +1661,11 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    //justifyContent: 'space-around',
+    justifyContent: 'space-around',
     marginVertical: 20,
   },
   categoryButton: {
-    padding: 15,
+    padding: 10,
     borderRadius: 30,
     margin : 5,
     backgroundColor: '#00cc66',
@@ -1675,8 +1675,9 @@ const styles = StyleSheet.create({
   },
   categoryButtonText: {
     color: '#fff',
-    fontSize: 15,
-    fontWeight: 'bold',
+    fontSize: 14,
+    
+    fontFamily : 'LeagueSpartanBold'
   },
   photoGrid: {
     flexDirection: 'row',
@@ -1889,7 +1890,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 14,
     fontFamily : 'LeagueSpartanBold'
   },
 

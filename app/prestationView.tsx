@@ -1366,6 +1366,7 @@ const styles = StyleSheet.create({
   experienceDescription: {
     fontSize: 16,
     marginBottom: 10,
+    fontFamily : 'LexendDeca'
   },
   experienceImages: {
     flexDirection: 'row',

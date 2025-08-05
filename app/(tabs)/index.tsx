@@ -1,6 +1,9 @@
+import { LeagueSpartan_400Regular, LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Keyboard, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import config from '../../config.json';
@@ -53,6 +56,14 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation()
   const route = useRoute() as any;
+
+  let [fontsLoaded] = useFonts({
+      
+      LexendDeca : LexendDeca_400Regular,
+      
+      LeagueSpartanRegular : LeagueSpartan_400Regular,
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
   
   const suggestions = [
     'Babysitter de nuit',
@@ -428,6 +439,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 10,
+    fontFamily : 'LexendDeca'
   },
   searchIcon: {
     marginLeft: 10,
@@ -437,8 +449,8 @@ const styles = StyleSheet.create({
     right: 40,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontFamily : 'LeagueSpartanBold',
     marginBottom: 10,
   },
   row: {
@@ -471,9 +483,9 @@ const styles = StyleSheet.create({
 
   },
   categoryText: {
-    fontSize: 20,
+    fontSize: 22,
     color: '#ffffff',
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold',
     marginBottom: 10,
     textAlign : 'center'
   },
@@ -647,3 +659,5 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+
+

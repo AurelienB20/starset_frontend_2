@@ -1,5 +1,7 @@
+import { LeagueSpartan_400Regular, LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import {
@@ -23,6 +25,12 @@ const ModifyAvailabilityScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
 const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null);
 const [selectedEvent, setSelectedEvent] = useState<any>(null);
+
+let [fontsLoaded] = useFonts({
+    
+    LeagueSpartanRegular : LeagueSpartan_400Regular,
+    LeagueSpartanBold : LeagueSpartan_700Bold
+  });
 
   useEffect(() => {
     (async () => {
@@ -280,10 +288,10 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  modalTitle: { fontSize: 22, fontFamily : 'LeagueSpartanBold', marginBottom: 20, textAlign: 'center' },
   input: { height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 5, marginBottom: 10, paddingHorizontal: 10 },
-  button: { backgroundColor: '#70FF70', padding: 10, borderRadius: 8, marginTop: 10 },
-  buttonText: { fontSize: 16, textAlign: 'center' },
+  button: {backgroundColor: '#00BF63', padding: 10, borderRadius: 8, marginTop: 10 },
+  buttonText: { fontSize: 18, textAlign: 'center', fontFamily : 'LeagueSpartanBold', color : 'white' },
   selectedDate: {
     fontSize: 18,
     fontWeight: '600',

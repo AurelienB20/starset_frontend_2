@@ -184,8 +184,8 @@ const CreationScreen = () => {
       </TouchableOpacity>
 
       {/* Modal WebView PDF */}
-      <Modal visible={modalVisible} animationType="slide">
-  <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <Modal visible={modalVisible} animationType="slide" transparent= {true}>
+  <View style={{ flex: 1, backgroundColor: 'white' , marginTop : 50 }}>
     <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
       <TouchableOpacity onPress={() => setModalVisible(false)}>
         <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>
@@ -279,8 +279,8 @@ const CreationScreen = () => {
   </View>
 </Modal>
 
-<Modal visible={cguModalVisible} animationType="slide">
-  <View style={{ flex: 1, backgroundColor: 'white' }}>
+<Modal visible={cguModalVisible} transparent={true}>
+  <View style={{ backgroundColor : 'white', marginTop : 50  }}>
     <View style={{ padding: 10, backgroundColor: '#eee', alignItems: 'flex-end' }}>
       <TouchableOpacity onPress={() => setCguModalVisible(false)}>
         <Text style={{ fontSize: 18, color: 'blue' }}>Fermer</Text>

@@ -1,8 +1,11 @@
 import NoteModal from '@/components/NoteModal';
 import { useUser } from '@/context/userContext';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -61,6 +64,11 @@ const AccountScreen = () => {
   const { user, setUser } = useUser()
   const [noteModalVisible, setNoteModalVisible] = useState(false);
   const [selectedPrestationForNote, setSelectedPrestationForNote] = useState(null);
+
+  let [fontsLoaded] = useFonts({
+    LeagueSpartanBold : LeagueSpartan_700Bold,
+    BebasNeue: BebasNeue_400Regular,
+  });
 
 
   const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
@@ -392,25 +400,22 @@ console.log(prestationId);
   >
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.profileHeader} onPress={goToModifyAccount}>
-          <View>
+        <View style={styles.profileInfoHeader}>
+          <Text style={styles.profileName}>{account?.firstname} {account?.lastname}</Text>
+          <Text style={styles.profileHandle}>@{account?.pseudo}</Text>
+          <Text style={styles.profileRole}>User</Text>
+        </View>
+      
+        <TouchableOpacity onPress={goToModifyAccount}>
           <Image
-            source={{ 
-              uri: account?.profile_picture_url 
+            source={{
+              uri: account?.profile_picture_url
                 ? account?.profile_picture_url
-                : 'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png'
-            }} 
+                : 'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png',
+            }}
             style={styles.profilePicture}
           />
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{account?.firstname} {account?.lastname}</Text>
-            <Text style={styles.profileHandle}>@{account?.pseudo}</Text>
-          </View>
         </TouchableOpacity>
-        <View style={styles.rightHeader}>
-          <Text style={styles.typeOAccount}>User</Text>
-        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -516,26 +521,29 @@ console.log(prestationId);
 
       {/* Modal de confirmation de déconnexion */}
       </ScrollView>
-      <Modal
-        transparent={true}
-        visible={isModalVisible}
-        animationType="fade"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalText}>Êtes-vous sûr de vouloir vous déconnecter ?</Text>
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.modalButton} onPress={confirmLogout}>
-                <Text style={styles.modalButtonText}>Oui</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
-                <Text style={styles.modalButtonText}>Annuler</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+<Modal
+  transparent
+  animationType="fade"
+  visible={isModalVisible}
+  onRequestClose={() => setIsModalVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.logoutModal}>
+      <Text style={styles.logoutTitle}>SOUHAITEZ-VOUS VRAIMENT</Text>
+      <Text style={styles.logoutTitle}>VOUS DÉCONNECTER</Text>
+
+      <View style={styles.logoutButtons}>
+        <TouchableOpacity style={styles.logoutYes} onPress={confirmLogout}>
+          <Text style={styles.logoutButtonText}>OUI</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutNo} onPress={() => setIsModalVisible(false)}>
+          <Text style={styles.logoutButtonText}>NON</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
       <Modal
         transparent={true}
         visible={historyModalVisible}
@@ -773,12 +781,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   profileName: {
-    fontSize: 18,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#000',
   },
   profileHandle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#666',
   },
   balanceContainer: {
@@ -1175,6 +1183,60 @@ dayImage: {
   height: 40,
   borderRadius: 5,
 },
+
+profileInfoHeader: {
+  flexDirection: 'column',
+  justifyContent: 'center',
+  flex: 1,
+},
+
+profileRole: {
+  fontSize: 20,
+  
+  fontFamily : 'LeagueSpartanBold'
+},
+
+logoutModal: {
+  backgroundColor: '#fff',
+  padding: 25,
+  borderRadius: 5,
+  alignItems: 'center',
+  width: '80%',
+},
+
+logoutTitle: {
+  fontSize: 28,
+  textAlign: 'center',
+  fontFamily: 'BebasNeue',
+  marginBottom: 5,
+},
+
+logoutButtons: {
+  flexDirection: 'row',
+  marginTop: 20,
+  gap: 15,
+},
+
+logoutYes: {
+  backgroundColor: '#007940',
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 10,
+},
+
+logoutNo: {
+  backgroundColor: '#E53935',
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 10,
+},
+
+logoutButtonText: {
+  fontFamily: 'BebasNeue',
+  fontSize: 36,
+  color: 'white',
+},
+
 
   
 });

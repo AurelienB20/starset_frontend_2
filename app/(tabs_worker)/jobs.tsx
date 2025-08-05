@@ -1,7 +1,11 @@
 import { useAllWorkerPrestation } from '@/context/userContext';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { LeagueSpartan_400Regular, LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { FontAwesome } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { Alert, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
@@ -55,6 +59,13 @@ const JobsScreen = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+
+  let [fontsLoaded] = useFonts({
+      BebasNeue : BebasNeue_400Regular,
+      LexendDeca : LexendDeca_400Regular,
+      LeagueSpartanRegular : LeagueSpartan_400Regular,
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
 
 
   const monthNames = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
@@ -338,7 +349,7 @@ const onRefresh = React.useCallback(() => {
         ({workerPlannedPrestations.filter(p => p.status === 'waiting' && p.prestation_id === prestation.id).length}) Demandes missions
       </Text>
       <View style={[styles.statusBadge, { backgroundColor: prestation.published ? '#00cc66' : '#cc0000' }]}>
-        <Text style={styles.statusText}>{prestation.published ? 'Publié' : 'Not Published'}</Text>
+        <Text style={styles.statusText}>{prestation.published ? 'Publié' : 'Non Publié'}</Text>
       </View>
     </View>
   </View>
@@ -424,7 +435,7 @@ const onRefresh = React.useCallback(() => {
       <Modal transparent={true} visible={isInProgressModalVisible} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>MISSIONS EN COURS</Text>
+            <Text style={styles.modalTitleLS}>MISSIONS EN COURS</Text>
             <ScrollView contentContainerStyle={styles.missionInProgressItemContainer}>
   {workerPlannedPrestations.filter(p => p.status === 'inProgress' || p.status === 'started').length > 0 ? (
     groupMissionsByMonth(workerPlannedPrestations.filter(p => p.status === 'inProgress' || p.status === 'started')).map(([key, prestations]) => {
@@ -447,7 +458,7 @@ const onRefresh = React.useCallback(() => {
                 />
                 
                 <View style={{ marginLeft: 10 }}>
-                  <Text style={styles.missionInProgressText}>{prestation.metier}</Text>
+                  <Text style={styles.missionInProgressTextLD}>{prestation.metier}</Text>
                   <Text style={styles.missionTime}>
                     {prestation.start_time} → {prestation.end_time}
                   </Text>
@@ -566,8 +577,8 @@ const onRefresh = React.useCallback(() => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Supprimer la prestation ?</Text>
-            <Text style={{ textAlign: 'center', marginBottom: 20 }}>
+            <Text style={styles.modalTitleLS}>Supprimer la prestation ?</Text>
+            <Text style={{ textAlign: 'center', marginBottom: 20, fontFamily : 'LexendDeca' }}>
               Cette action est irréversible. Voulez-vous vraiment continuer ?
             </Text>
             <View style={styles.modalButtons}>
@@ -599,7 +610,7 @@ const styles = StyleSheet.create({
     marginTop : 30
   },
   title: {
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold',
     fontSize: 40,
     textAlign: 'center',
     marginBottom: 20,
@@ -622,7 +633,7 @@ const styles = StyleSheet.create({
   },
   missionText: {
     color: 'white',
-    fontWeight: 'bold',
+    fontFamily : 'LexendDeca'
   },
   jobCard: {
     borderWidth: 1,
@@ -638,16 +649,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   jobTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontFamily : 'BebasNeue'
   },
   jobStats: {
     fontSize: 16,
     color: '#666',
+    fontFamily : 'LexendDeca'
   },
   jobRequests: {
     fontSize: 16,
     color: 'red',
+    fontFamily : 'LexendDeca'
   },
   newJobButton: {
     backgroundColor: '#00cc66',
@@ -671,6 +684,7 @@ const styles = StyleSheet.create({
     margin: 20,
     padding: 20,
     borderRadius: 10,
+    maxHeight : '80%',
   },
   modalTitle: {
     fontSize: 20,
@@ -678,6 +692,14 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
+
+  modalTitleLS: {
+    fontSize: 22,
+    marginBottom: 15,
+    textAlign: 'center',
+    fontFamily : 'LeagueSpartanBold'
+  },
+
   modalOption: {
     paddingVertical: 10,
     borderBottomWidth: 1,
@@ -794,11 +816,13 @@ const styles = StyleSheet.create({
 
   modalSubtitle: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold' ,
     marginBottom: 15,
     color: 'black',
     textAlign: 'left',
   },
+
+  
   
   missionItem: {
     width : '100%',
@@ -817,13 +841,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginVertical: 10,
     width : '100%',
+    paddingBottom : 20
     
   },
 
   missionInProgressText: {
+    marginHorizontal: 10,
+    fontSize: 13,
+    color: '#333',
+    fontFamily : 'LexendDeca',
+    marginRight : 50
+  },
+
+  missionInProgressTextLD: {
     marginLeft: 10,
     fontSize: 13,
     color: '#333',
+    fontFamily : 'LexendDeca'
   },
   inProgressCloseButton: {
     backgroundColor: '#FF3B30',
@@ -872,9 +906,11 @@ const styles = StyleSheet.create({
 
   modalButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily : 'LexendDeca'
   },
+
+  
 
   offerModalContent: {
     backgroundColor: 'white',
