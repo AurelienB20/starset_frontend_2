@@ -2,12 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import {
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+
 
 const AccessScreen = () => {
   const navigation = useNavigation();
@@ -26,26 +28,29 @@ const AccessScreen = () => {
       <Text style={styles.title}>COMMENT SOUHAITEZ-VOUS ACCÉDER À L’APPLICATION ?</Text>
 
       <TouchableOpacity style={styles.inscriptionBtn} onPress={goToInscription}>
-        <Text style={styles.btnText}>INSCRIPTION</Text>
-      </TouchableOpacity>
+  <Text style={styles.btnText}>INSCRIPTION</Text>
+  <Image source={require('@/assets/images/etoile-starset-blanc.png')} style={styles.starIconAbsolute} />
+</TouchableOpacity>
 
-      <TouchableOpacity style={styles.connexionBtn} onPress={goToConnexion}>
-        <Text style={styles.btnText}>CONNEXION</Text>
-      </TouchableOpacity>
+<TouchableOpacity style={styles.connexionBtn} onPress={goToConnexion}>
+  
+    <Text style={styles.btnText}>CONNEXION</Text>
+    <Image source={require('@/assets/images/etoile-starset-blanc.png')} style={styles.starIconAbsolute} />
+  
+</TouchableOpacity>
 
-      {/* Bouton "Accès visiteur" avec icône info */}
-      <View style={styles.visitorContainer}>
-        <TouchableOpacity style={styles.visitorBtn} onPress={goToVisitorAccess}>
-          <Text style={styles.visitorText}>ACCÈS VISITEUR</Text>
-          <Ionicons
-            name="information-circle-outline"
-            size={20}
-            color="#333"
-            style={styles.infoIcon}
-            onPress={() => setInfoVisible(true)}
-          />
-        </TouchableOpacity>
-      </View>
+<View style={styles.visitorRow}>
+  <TouchableOpacity style={styles.visitorBtn} onPress={goToVisitorAccess}>
+    <View style={styles.btnWithIcon}>
+      <Text style={[styles.btnText, { color: '#333' }]}>ACCÈS VISITEUR</Text>
+      <Ionicons name="chevron-forward" size={22} color="#333" />
+    </View>
+  </TouchableOpacity>
+
+  <TouchableOpacity onPress={() => setInfoVisible(true)} style={styles.infoOutsideBtn}>
+    <Ionicons name="information-circle-outline" size={22} color="#333" />
+  </TouchableOpacity>
+</View>
 
       {/* Modal d'information */}
       <Modal visible={infoVisible} transparent animationType="fade">
@@ -63,6 +68,9 @@ const AccessScreen = () => {
           </View>
         </View>
       </Modal>
+            <View style={styles.footer}>
+        <Text style={styles.footerText}>StarSet</Text>
+      </View>
     </View>
   );
 };
@@ -71,40 +79,46 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems : 'center',
     padding: 30,
     backgroundColor: '#fff',
   },
   title: {
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 30,
     marginBottom: 40,
     color: '#008000',
   },
   inscriptionBtn: {
     backgroundColor: '#28a745',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 3,
     marginBottom: 15,
+    width : '80%'
   },
   connexionBtn: {
     backgroundColor: '#ffc107',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 3,
     marginBottom: 15,
+     width : '80%',
   },
   visitorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+     width : '80%'
   },
   visitorBtn: {
     backgroundColor: '#d3d3d3',
     paddingVertical: 15,
     paddingHorizontal: 20,
-    borderRadius: 10,
+    borderRadius: 3,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent : 'center',
+    width : '100%'
   },
   infoIcon: {
     marginLeft: 10,
@@ -113,6 +127,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+    fontSize : 20
   },
   visitorText: {
     color: '#333',
@@ -147,6 +162,56 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+
+  footer: {
+  position: 'absolute',
+  bottom: 30,
+  width: '100%',
+  alignItems: 'center',
+},
+
+footerText: {
+  fontSize: 16,
+  color: '#666',
+  fontWeight: '600',
+},
+
+btnWithIcon: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 10,
+},
+
+starIcon: {
+  width: 40,
+  height: 40,
+  resizeMode: 'contain',
+},
+
+visitorRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '80%',
+  marginTop: 10,
+},
+
+infoOutsideBtn: {
+  marginLeft: 10,
+},
+
+starIconAbsolute: {
+  position: 'absolute',
+  right: 15,
+  top: '70%',
+  transform: [{ translateY: -10 }],
+  width: 40,
+  height: 40,
+  resizeMode: 'contain',
+},
+
+
 });
 
 export default AccessScreen;

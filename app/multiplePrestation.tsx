@@ -1,5 +1,4 @@
 import { useCurrentWorkerPrestation } from '@/context/userContext';
-import { FontAwesome } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
@@ -11,12 +10,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { Menu, Provider as PaperProvider } from 'react-native-paper';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
+
 
 const convertImagesToBase64 = async (uris: string[]) => {
   const base64Images: string[] = [];
@@ -49,6 +49,8 @@ const PrestationsScreen = () => {
   const [prestationImages, setPrestationImages] = useState<string[]>([]);
   const [menuVisibleId, setMenuVisibleId] = useState<number | null>(null);
   const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
+  const [showPriceModal, setShowPriceModal] = useState(false);
+
 
 
 
@@ -261,61 +263,66 @@ const PrestationsScreen = () => {
         renderItem={renderPrestation}
         keyExtractor={(item: any) => item.id.toString()}
       />
-      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.addButtonText}>Ajouter une prestation</Text>
-      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(!modalVisible)}>
+  <Text style={styles.addButtonText}>
+    {modalVisible ? 'Annuler' : 'Ajouter une prestation'}
+  </Text>
+</TouchableOpacity>
 
-      <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeIcon}>
-              <Icon name="close" size={24} color="#000" />
-            </TouchableOpacity>
+{modalVisible && (
+  <View style={styles.inlineForm}>
+    <Text style={styles.prestationHeader}>PRESTATION {customPrestations.length + 1}</Text>
 
-            <TextInput
-              placeholder="Titre"
-              style={styles.input}
-              value={newPrestation.title}
-              onChangeText={(text) => setNewPrestation({ ...newPrestation, title: text })}
-            />
-            <TextInput
-              placeholder="Description"
-              style={styles.input}
-              value={newPrestation.description}
-              onChangeText={(text) => setNewPrestation({ ...newPrestation, description: text })}
-            />
-            <TextInput
-              placeholder="Prix"
-              keyboardType="numeric"
-              style={styles.input}
-              value={newPrestation.price}
-              onChangeText={(text) => setNewPrestation({ ...newPrestation, price: text })}
-            />
+    <Text style={styles.label}>Titre</Text>
+    <TextInput
+      placeholder="Titre"
+      style={styles.input}
+      value={newPrestation.title}
+      onChangeText={(text) => setNewPrestation({ ...newPrestation, title: text })}
+    />
 
-            <Text style={{ marginBottom: 8 }}>Images (max 3)</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              {prestationImages.map((uri, index) => (
-                <View key={index} style={styles.imageWrapper}>
-                  <Image source={{ uri }} style={styles.imagePreview} />
-                  <TouchableOpacity style={styles.deleteIcon} onPress={() => handleDeleteImage(index)}>
-                    <Icon name="close" size={16} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-              {prestationImages.length < 3 && (
-                <TouchableOpacity style={styles.imageAddButton} onPress={handleAddImage}>
-                  <FontAwesome name="plus" size={24} color="gray" />
-                </TouchableOpacity>
-              )}
-            </View>
+    <Text style={styles.label}>Description</Text>
+    <TextInput
+      placeholder="Description"
+      style={styles.input}
+      value={newPrestation.description}
+      onChangeText={(text) => setNewPrestation({ ...newPrestation, description: text })}
+    />
 
-            <TouchableOpacity style={styles.submitButton} onPress={createOrUpdateCustomPrestation}>
-              <Text style={styles.submitButtonText}>{editingPrestation ? 'Modifier' : 'Créer'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+    <Text style={styles.label}>Ajouter le tarif</Text>
+    <TouchableOpacity style={styles.priceButton} onPress={() => setShowPriceModal(true)}>
+      <Text style={styles.euroIcon}>€</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.submitButtonGreen} onPress={createOrUpdateCustomPrestation}>
+      <Text style={styles.submitButtonText}>ENREGISTRER</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
     </View>
+    <Modal visible={showPriceModal} transparent animationType="fade">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      <Text style={styles.label}>Tarif (€)</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Entrez un tarif"
+        keyboardType="numeric"
+        value={newPrestation.price}
+        onChangeText={(text) => setNewPrestation({ ...newPrestation, price: text })}
+      />
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={() => setShowPriceModal(false)}
+      >
+        <Text style={styles.submitButtonText}>Valider</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </PaperProvider>
   );
 };
@@ -433,6 +440,52 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     resizeMode: 'cover',
   },
+
+  inlineForm: {
+  backgroundColor: '#f2f2f2',
+  padding: 20,
+  borderRadius: 12,
+  marginTop: 20,
+  marginBottom: 30,
+},
+
+label: {
+  fontWeight: 'bold',
+  marginBottom: 6,
+  marginTop: 10,
+  color: '#333',
+},
+
+priceButton: {
+  backgroundColor: '#ffc107',
+  paddingVertical: 14,
+  alignItems: 'center',
+  borderRadius: 6,
+  marginBottom: 10,
+},
+
+euroIcon: {
+  fontSize: 24,
+  fontWeight: 'bold',
+  color: '#000',
+},
+
+submitButtonGreen: {
+  backgroundColor: '#28a745',
+  paddingVertical: 14,
+  borderRadius: 6,
+  alignItems: 'center',
+  marginTop: 20,
+},
+
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: 20,
+
+},
   
   
 });

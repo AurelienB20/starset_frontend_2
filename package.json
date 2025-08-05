@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo-google-fonts/bebas-neue": "^0.3.0",
     "@expo-google-fonts/josefin-sans": "^0.3.0",
+    "@expo-google-fonts/league-spartan": "^0.4.1",
     "@expo-google-fonts/lexend": "^0.3.0",
     "@expo-google-fonts/lexend-deca": "^0.3.0",
     "@expo/vector-icons": "^14.1.0",

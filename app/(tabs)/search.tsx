@@ -1,5 +1,6 @@
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { JosefinSans_100Thin, JosefinSans_700Bold } from '@expo-google-fonts/josefin-sans';
+import { LeagueSpartan_400Regular, LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -26,6 +27,8 @@ const [isModalVisible, setIsModalVisible] = useState(false);
     LexendDeca : LexendDeca_400Regular,
     JosefinRegular : JosefinSans_700Bold,
     JosefinBold : JosefinSans_100Thin,
+    LeagueSpartanRegular : LeagueSpartan_400Regular,
+    LeagueSpartanBold : LeagueSpartan_700Bold
   });
 
   const handleEndReached = () => {
@@ -692,9 +695,10 @@ modalContent: {
 
 jobTitle: {
   fontSize: 24,
-  fontFamily: 'BebasNeue',
+  fontFamily: 'LeagueSpartanBold',
   textAlign: 'center',
   marginBottom: 10,
+  
 },
 
 jobDescription: {
@@ -702,6 +706,7 @@ jobDescription: {
   color: '#333',
   textAlign: 'center',
   marginBottom: 20,
+  fontFamily : 'LexendDeca'
 },
 
 sectionTitle: {
@@ -717,7 +722,7 @@ missionItem: {
 },
 
 addButton: {
-  backgroundColor: '#00cc66',
+  backgroundColor: '#cc0000ff',
   padding: 15,
   borderRadius: 10,
   alignItems: 'center',
@@ -726,8 +731,9 @@ addButton: {
 
 addButtonText: {
   color: 'white',
-  fontSize: 18,
-  fontWeight: 'bold',
+  fontSize: 22,
+  
+  fontFamily : 'LeagueSpartanBold'
 },
 
 markerContainer: {

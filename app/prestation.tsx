@@ -1,6 +1,7 @@
 import CertificationFormModal from '@/components/CertificationModal';
 import ExperienceModal from '@/components/ExperienceModal';
 import { useAllWorkerPrestation, useCurrentWorkerPrestation } from '@/context/userContext';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -14,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
 
 
+import { useFonts } from 'expo-font';
 import {
   getAllExperience,
   getPrestation
@@ -85,6 +87,11 @@ const PrestationScreen = () => {
   const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
 const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
 const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
+
+ let [fontsLoaded] = useFonts({
+    
+    LeagueSpartanBold : LeagueSpartan_700Bold
+  });
 
 
  
@@ -1232,7 +1239,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
               <MaterialIcons name="close" size={24} color="black" />
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>TARIF PAR HEURE</Text>
+            <Text style={styles.modalTitleLS}>TARIF PAR HEURE</Text>
             
             <View style={styles.inputWithCurrency}>
               <TextInput
@@ -1834,6 +1841,14 @@ const styles = StyleSheet.create({
     color: '#006400',
     marginBottom: 20,
   },
+
+   modalTitleLS: {
+    fontSize: 18,
+    
+    color: '#006400',
+    marginBottom: 20,
+    fontFamily : 'LeagueSpartanBold'
+  },
   inputWithCurrency: {
     position: 'relative',
     backgroundColor: '#ccc',
@@ -1844,18 +1859,20 @@ const styles = StyleSheet.create({
   
   inputModal: {
     fontSize: 30,
-    fontWeight: 'bold',
+    
     color: '#000',
     textAlign: 'center',     
     paddingVertical: 10,
     paddingRight: 50,         
     paddingLeft: 15,
+    marginLeft : 30,
+    fontFamily : 'LeagueSpartanBold'
   },
   
   currency: {
     position: 'absolute',         
     right: 15,
-    top: '50%',
+    top: '45%',
     transform: [{ translateY: -15 }],
     fontSize: 30,
     fontWeight: 'bold',
@@ -1873,7 +1890,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     color: '#fff',
     fontSize: 10,
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold'
   },
 
   certificationCard: {

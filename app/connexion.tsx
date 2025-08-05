@@ -1,10 +1,13 @@
 
 import { useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
+import { LeagueSpartan_400Regular, LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
 
@@ -15,6 +18,14 @@ const ConnexionScreen = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation();
   const { setUser } = useUser()
+
+  let [fontsLoaded] = useFonts({
+      
+      LexendDeca : LexendDeca_400Regular,
+      
+      LeagueSpartanRegular : LeagueSpartan_400Regular,
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
   
 const { setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation();
 const { setAllWorkerPrestation } = useAllWorkerPrestation();
@@ -133,7 +144,9 @@ const getProfile = async (accountId: string) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.logoContainer}></View>
+      <View style={styles.logoContainer}>
+        <Image source={require('@/assets/images/etoile-starset-noir.png')} style={styles.starIcon} />
+      </View>
       <Text style={styles.enter}>Connectez-vous !</Text>
       <Text style={styles.description}>
         Laissez-nous identifier votre profil, Star Set n'attend plus que vous !
@@ -178,7 +191,7 @@ const getProfile = async (accountId: string) => {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={goToCreate}>
-        <Text>
+        <Text style={{fontFamily : 'LexendDeca'}}>
           Vous n'avez pas encore de compte ?{' '}
           <Text style={styles.createAccount}>inscrivez-vous !</Text>
         </Text>
@@ -202,10 +215,12 @@ const styles = StyleSheet.create({
   logoContainer: {
     width: 100,
     height: 100,
-    backgroundColor: '#A0A0FF',
+   
     borderRadius: 50,
     marginBottom: 100,
     top: 80,
+    justifyContent : 'center', 
+    alignItems : 'center'
   },
   separator: {
     width: '50%',
@@ -215,7 +230,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   enter: {
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold',
     textAlign: 'center',
     fontSize: 34,
     marginTop: 0,
@@ -266,6 +281,7 @@ description: {
   textAlign: "center",
   color : 'black',
   marginHorizontal : 10,
+  fontFamily : 'LexendDeca'
 },
 description2: {
   fontWeight: 'bold',
@@ -320,7 +336,8 @@ forgotPassword: {
 forgotPasswordText: {
   
   fontSize: 12,
-  textAlign : 'right'
+  textAlign : 'right',
+  marginRight : 40
 },
 
 footer: {
@@ -335,6 +352,12 @@ footerText: {
   color: '#666',
   fontWeight: '600',
 },
+
+starIcon : {
+  width : 130,
+  height : 130,
+  marginRight : 20
+}
 
 
 });

@@ -50,6 +50,7 @@ function RootLayoutNav() {
                     <Stack.Screen name="testImage"  options={{ headerShown : false }} />
                     <Stack.Screen name="metierList"  options={{ headerShown : false }} />
                     <Stack.Screen name="workerByField"  options={{ headerShown : false }} />
+                    <Stack.Screen name="isVisitor"  options={{ headerShown : false }} />
                     <Stack.Screen name="nearby" />
                     
                   </Stack>
