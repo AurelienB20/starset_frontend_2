@@ -3,7 +3,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import React from 'react';
-import { Alert, Image, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type Props = {
@@ -63,13 +63,8 @@ const ExperienceModal = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         <View style={[styles.modalContent, { width: '90%' }]}>
-          <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-            <Icon name="close" size={24} color="#000" />
-          </TouchableOpacity>
-
           <Text style={styles.modalTitle}>
             {isEditMode ? 'Modifier une expérience' : 'Nouvelle expérience'}
           </Text>
@@ -145,7 +140,6 @@ const ExperienceModal = ({
           </TouchableOpacity>
         </View>
       </View>
-    </Modal>
   );
 };
 
@@ -153,13 +147,12 @@ export default ExperienceModal;
 
 // Styles identiques
 const styles = StyleSheet.create({
-  modalContainer: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 20 },
-  closeIcon: { position: 'absolute', top: 10, right: 10 },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  modalContent: { backgroundColor: 'rgba(0, 0, 0, 0.1)', borderRadius: 5, padding: 20 },
   modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 20 },
   inputLabel: { fontWeight: 'bold', marginBottom: 5 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 10, marginBottom: 10 },
-  descriptionInput: { height: 100, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 10, marginBottom: 10 },
+  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 10, marginBottom: 10 },
+  descriptionInput: { backgroundColor: '#fff', height: 100, borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 10, marginBottom: 10 },
   imagePreview: { width: 80, height: 80, borderRadius: 6, marginRight: 10 },
   imageAddButton: { width: 80, height: 80, borderRadius: 6, backgroundColor: '#f5f5f5', justifyContent: 'center', alignItems: 'center' },
   submitButton: { backgroundColor: '#00cc66', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 20 },

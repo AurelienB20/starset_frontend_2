@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   Image,
-  Modal,
   Platform,
   StyleSheet,
   Text,
@@ -16,7 +15,6 @@ import {
 } from 'react-native';
 
 interface CertificationFormModalProps {
-  visible: boolean;
   onClose: () => void;
   isEditMode: boolean;
   item: any;
@@ -29,8 +27,6 @@ interface CertificationFormModalProps {
 }
 
 const CertificationFormModal: React.FC<CertificationFormModalProps> = ({
-  
-  visible,
   onClose,
   isEditMode,
   item,
@@ -76,13 +72,7 @@ const CertificationFormModal: React.FC<CertificationFormModalProps> = ({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent style={styles.modal}>
-      <View style={styles.overlay}>
         <View style={styles.container}>
-          <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-            <MaterialIcons name="close" size={24} />
-          </TouchableOpacity>
-
           <Text style={styles.title}>
             {isEditMode ? 'Modifier Certification' : 'Ajouter Certification'}
           </Text>
@@ -161,31 +151,19 @@ const CertificationFormModal: React.FC<CertificationFormModalProps> = ({
               {isEditMode ? 'Mettre à jour' : 'Valider'}
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+            <Text style={styles.cancelButtonText}>Annuler</Text>
+          </TouchableOpacity>
         </View>
-      </View>
-    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // fond semi-transparent
-    justifyContent: 'center',
-    alignItems: 'center',
-    height : "100%"
-  },
-
-  modal: {
-    backgroundColor: '#fff',
-    height : "100%"
-    
-  },
   container: {
-    backgroundColor: '#fff',
+  backgroundColor: 'rgba(0, 0, 0, 0.1)', 
     borderRadius: 10,
     padding: 20,
-    width: '90%',
+    width: '95%',
     maxHeight: '90%',
     alignSelf : "center",
     marginTop : 60
@@ -209,6 +187,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   input: {
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
@@ -216,6 +195,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   textArea: {
+    backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 10,
@@ -269,6 +249,17 @@ const styles = StyleSheet.create({
   },
   calendar: {
     marginTop: 20,
+  },
+  cancelButton: {
+     backgroundColor: '#999',
+     borderRadius: 8,
+     padding: 12,
+     alignItems: 'center',
+     marginTop: 10
+  },
+  cancelButtonText: { 
+    color: '#fff',
+    fontWeight: 'bold'
   },
 });
 
