@@ -223,22 +223,25 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   passwordWrapper: {
-    width: '80%',
-    height: 46,
-    marginTop: 20,
-    borderWidth: 2,
-    borderRadius: 23,
-    borderColor: 'black',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 15,
-    backgroundColor: 'white',
-  },
+  width: '80%',
+  height: 46,
+  marginTop: 20,
+  borderWidth: 2,
+  borderRadius: 23,
+  borderColor: 'black',
+  backgroundColor: 'white',
+  flexDirection: 'row',       // ← pour disposer le champ et l’icône horizontalement
+  alignItems: 'center',
+  paddingHorizontal: 15,      // ← un peu de padding intérieur
+  position: 'relative',
+},
   passwordInput: {
     flex: 1,
     fontSize: 15,
     fontFamily: 'Outfit',
     color: 'black',
+    textAlign: 'center', // ← centre le texte
+    paddingHorizontal: 15,    // ← espace pour ne pas que l'œil le recouvre
   },
   eyeIcon: {
     paddingHorizontal: 8,

@@ -151,6 +151,7 @@ const CreationScreen = () => {
        <Checkbox
   value={acceptedPrivacy}
   onValueChange={setAcceptedPrivacy}
+  style={{ transform: [{ scale: 0.8 }] }}
 />
         <Pressable onPress={() => setModalVisible(true)}>
           <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
@@ -162,6 +163,7 @@ const CreationScreen = () => {
         <Checkbox
           value={acceptedCGU}
           onValueChange={setAcceptedCGU}
+          style={{ transform: [{ scale: 0.8 }] }}
         />
         <Pressable onPress={() => setCguModalVisible(true)}>
           <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
