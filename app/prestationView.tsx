@@ -1110,8 +1110,8 @@ const unlikeImage = async (imageId: string) => {
       <Text style={styles.popupText}><Text style={styles.bold}>Prénom :</Text> {account?.firstname}</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo || 'mariemmm'}</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> {account?.Statut}</Text>
-      <Text></Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de métiers effectués :</Text>{account?.completed_prestation}</Text>
+      <Text>    </Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de prestations effectués :</Text>{account?.completed_prestation}</Text>
       <Text style={styles.popupText}>
         <Text style={styles.bold}>Prestation favori :</Text>  <Text style={styles.underline}>Petsitting</Text>
       </Text>
@@ -2081,7 +2081,7 @@ certificationInstitution: {
   },
   
   underline: {
-    textDecorationLine: 'underline',
+    backgroundColor: 'yellow'
   },
 
   calendarButton: {

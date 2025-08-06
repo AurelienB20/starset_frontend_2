@@ -1,5 +1,8 @@
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -61,6 +64,12 @@ const ConversationScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
+  let [fontsLoaded] = useFonts({
+      
+      LexendDeca : LexendDeca_400Regular,
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
+
   const getAccountId = async () => {
     try {
       const account_id = await AsyncStorage.getItem('account_id');
@@ -71,17 +80,28 @@ const ConversationScreen = () => {
   };
 
   const getFormattedTime = (timestamp: string) => {
-    if (!timestamp) return '';
     const date = new Date(timestamp);
-    return date.toLocaleString('fr-FR', {
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      hour: '2-digit',
-      minute: '2-digit',
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+    const now = new Date();
+  
+    const isToday =
+      date.getDate() === now.getDate() &&
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear();
+  
+    if (isToday) {
+      return date.toLocaleTimeString('fr-FR', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } else {
+      return date.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    }
   };
+  
 
   const gotoChat = async (conversationId: string, contactProfilePictureUrl: string, contactFirstname: string) => {
     const sender_id = await getAccountId();
@@ -243,11 +263,12 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold'
   },
   message: {
     fontSize: 14,
     color: '#666',
+    fontFamily : 'LexendDeca'
   },
   time: {
     fontSize: 12,

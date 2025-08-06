@@ -264,6 +264,11 @@ const getMarkedDates = () => {
                 markingType="custom"
                 markedDates={getMarkedDates()}
                 style={styles.calendar}
+                theme={{
+                  textDayFontFamily: 'LexendDeca_400Regular',
+                  textMonthFontFamily: 'LexendDeca_400Regular',
+                  
+                }}
               />
               
               {selectedDates.length > 0 && (
@@ -432,7 +437,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: '85%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center',
   },
-  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold' },
+  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold', marginTop : 20 },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   input: { width: 60, height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, textAlign: 'center', fontSize: 24 },
   timeSeparator: { fontSize: 40, marginHorizontal: 10 },

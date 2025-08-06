@@ -1,7 +1,10 @@
 import { useUser } from '@/context/userContext';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -61,6 +64,12 @@ const ModifyAccountScreen = () => {
     }
   };
 
+  let [fontsLoaded] = useFonts({
+        
+        LexendDeca : LexendDeca_400Regular,
+        LeagueSpartanBold : LeagueSpartan_700Bold
+      });
+
   const deleteAccount = async () => {
     Alert.alert(
       'Suppression du compte',
@@ -86,7 +95,7 @@ const ModifyAccountScreen = () => {
                 await AsyncStorage.clear();
                 Alert.alert('Compte supprimé', 'Votre compte a bien été supprimé.');
                 setUser({})
-                navigation.reset({ index: 0, routes: [{ name: 'LoginScreen' as never }] });
+                navigation.reset({ index: 0, routes: [{ name: 'isVisitor' as never }] });
               } else {
                 Alert.alert('Erreur', 'La suppression a échoué.');
               }
@@ -143,8 +152,6 @@ const ModifyAccountScreen = () => {
         )}
       </TouchableOpacity>
 
-      
-      
       <Modal visible={isDescriptionModalVisible} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -186,8 +193,8 @@ const styles = StyleSheet.create({
   profilePictureContainer: { alignItems: 'center', marginBottom: 20 },
   profilePicture: { width: 100, height: 100, borderRadius: 50, borderWidth: 2 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
-  infoLabel: { fontWeight: 'bold', fontSize: 16 },
-  infoValue: { fontSize: 16, color: '#000' },
+  infoLabel: { fontFamily : 'LeagueSpartanBold' , fontSize: 16 },
+  infoValue: { fontSize: 16, color: '#000', fontFamily : 'LexendDeca' },
   addButton: { marginTop: 10, backgroundColor: '#00cc66', padding: 10, borderRadius: 10 },
   addButtonText: { color: '#FFF', fontWeight: 'bold' },
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.8)' },
