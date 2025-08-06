@@ -89,6 +89,12 @@ const dateTimeStr = `${endDateStr}T${endTimeStr}`;
     console.log('🕒 Temps restant :', diffSec, 'secondes');
 
     setRemainingTime(diffSec);
+
+    // ✅ Arrêter le timer si le temps est écoulé
+    if (diffSec <= 0) {
+      console.log('⛔ Timer terminé, arrêt de l\'intervalle');
+      clearInterval(interval); // on stoppe ici
+    }
   };
 
   updateRemainingTime(); // initial

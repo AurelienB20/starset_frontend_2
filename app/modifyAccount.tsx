@@ -90,7 +90,6 @@ const ModifyAccountScreen = () => {
               });
   
               const result = await response.json();
-  
               if (result.success) {
                 await AsyncStorage.clear();
                 Alert.alert('Compte supprimé', 'Votre compte a bien été supprimé.');

@@ -35,6 +35,24 @@ export default function TabLayout() {
 
 
   const intervalRef : any = useRef<NodeJS.Timeout | null>(null);
+
+  const isPrestationExpired = (p: any): boolean => {
+    const now = new Date();
+    const endDateStr = p.end_date || p.start_date;
+    const endTimeStr = p.end_time || '23:59:00';
+  
+    const endDate = new Date(endDateStr);
+    const [h, m, s] = endTimeStr.split(':').map(Number);
+    endDate.setHours(h || 0, m || 0, s || 0, 0);
+  
+    // Si pas de end_date, on considère que ça se finit le lendemain à 23:59:00
+    if (!p.end_date) {
+      endDate.setDate(endDate.getDate() + 1);
+    }
+  
+    return now > endDate;
+  };
+  
      
       const loadPlannedPrestations = async () => {
   const workerId = user?.worker;
@@ -76,57 +94,39 @@ const combineDateTime = (dateStr: string, timeStr?: string) => {
 const checkIfPrestationIsDue = () => {
   const now = new Date();
   console.log('⏰ Vérification des prestations à', now.toISOString());
-  debugLog(allWorkerPlannedPrestation)
+  debugLog(allWorkerPlannedPrestation);
 
   if (!allWorkerPlannedPrestation || allWorkerPlannedPrestation.length === 0) {
     console.log('Aucune prestation planifiée détectée.');
-    debugLog('Aucune prestation planifiée détectée.')
     return;
   }
 
   for (let p of allWorkerPlannedPrestation) {
+    if (isPrestationExpired(p)) {
+      console.log(`⛔ Prestation ${p.id} expirée, on passe à la suivante`);
+      continue;
+    }
+
     const start = combineDateTime(p.start_date, p.start_time);
     const end = combineDateTime(p.end_date || p.start_date, p.end_time || '23:59:00');
+    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 5 * 60 * 1000;
 
     console.log(`➡️ Prestation ${p.id}`);
     console.log(`   - Statut       : ${p.status}`);
     console.log(`   - Début réel   : ${start.toISOString()}`);
     console.log(`   - Fin réelle   : ${end.toISOString()}`);
-    console.log(`   - Déjà montré ? : ${p.shown}`);
-
-    debugLog([
-      `➡️ Prestation ${p.id}`,
-      `   - Statut       : ${p.status}`,
-      `   - Début réel   : ${start.toISOString()}`,
-      `   - Fin réelle   : ${end.toISOString()}`,
-      `   - Déjà montré ? : ${p.shown}`
-    ].join('\n'));
-
-    const startsSoon = now < start && (start.getTime() - now.getTime()) <= 5 * 60 * 1000; // dans moins de 5 minutes
 
     if (
-      p.status === 'inProgress' || p.status === 'started' &&
-      
-      (
-        (now >= start && now < end) || startsSoon
-      )
+      (p.status === 'inProgress' || p.status === 'started') &&
+      ((now >= start && now < end) || startsSoon)
     ) {
-      console.log(` Affichage du popup pour la prestation ${p.id}`);
-      
+      console.log(`📣 Affichage du popup pour la prestation ${p.id}`);
       setPrestation(p);
       setPrestationModal(true);
-
-      // Marquer cette prestation comme affichée (dans le contexte, si possible)
-      // Sinon tu peux stocker localement les ID affichés pour éviter la répétition
       break;
     }
   }
 };
-
-
-
-
-
 
 
 useEffect(() => {

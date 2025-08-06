@@ -498,7 +498,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
     if (!result.canceled && result.assets && experienceImages.length < 3) {
       setExperienceImages(prev => [...prev, result.assets[0].uri]);
     } else if (experienceImages.length >= 3) {
-      Alert.alert("Limite atteinte", "Vous ne pouvez ajouter que 3 images.");
+      Alert.alert("Limite atteinte", "Vous ne pouvez ajouter que 3 image.");
     }
   };
 
@@ -1382,7 +1382,7 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       item = {selectedItem}
       showCalendar={showExperienceCalendar}
       onChange={(updatedItem) => {setSelectedItem(updatedItem), console.log(updatedItem)}}
-      onAddImage={editType === 'experience' ? pickEditImage : pickExperienceImage}
+      onAddImage={editType === 'experience' ? pickExperienceImage : pickCertificationImage}
       onSubmit={editType === 'experience' ? updateExperience : createExperience}
       onToggleCalendar={() => setShowExperienceCalendar(!showExperienceCalendar)}
     />)}
