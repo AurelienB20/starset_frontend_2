@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 
@@ -23,11 +23,18 @@ const CreationScreen = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [acceptedCGU, setAcceptedCGU] = useState(false);
   const [cguModalVisible, setCguModalVisible] = useState(false);
-  
+  const rules = [
+    '8 caractères minimum',
+    'au moins une lettre majuscule',
+    'une lettre minuscule',
+    'Au moins un chiffre',
+    'Au moins un caractère spécial (exemple : St@rSet7LovesU)',
+  ];
 
   const navigation = useNavigation();
 
@@ -37,7 +44,11 @@ const CreationScreen = () => {
     setIsEmailValid(emailRegex.test(text));
   };
 
-  const handlePasswordChange = (text: string) => setPassword(text);
+  const handlePasswordChange = (text: string) => {
+    setPassword(text)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    setIsPasswordValid(passwordRegex.test(text));
+  };
   const handleConfirmPasswordChange = (text: string) => setConfirmPassword(text);
 
   const handleSubmit = async () => {
@@ -117,7 +128,7 @@ const CreationScreen = () => {
       {!isEmailValid && <Text style={styles.errorText}>Email invalide</Text>}
 
       {/* Mot de passe */}
-      <View style={styles.passwordWrapper}>
+      <View style={[styles.passwordWrapper, { borderColor: isPasswordValid ? 'black' : 'red' }]}>
         <TextInput
           style={styles.passwordInput}
           onChangeText={handlePasswordChange}
@@ -130,9 +141,8 @@ const CreationScreen = () => {
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
-
       {/* Confirmation mot de passe */}
-      <View style={styles.passwordWrapper}>
+      <View style={[styles.passwordWrapper, { borderColor: isPasswordValid ? 'black' : 'red' }]}>
         <TextInput
           style={styles.passwordInput}
           onChangeText={handleConfirmPasswordChange}
@@ -145,6 +155,16 @@ const CreationScreen = () => {
           <Ionicons name={showConfirmPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
+
+      {!isPasswordValid &&  <View style={styles.containerRules}>
+        {rules.map((rule, index) => (
+          <View key={index} style={styles.ruleContainer}>
+            <MaterialIcons name="circle" size={6} color="#555" style={styles.bullet} />
+            <Text style={styles.ruleText}>{rule}</Text>
+          </View>
+        ))}
+      </View>
+      }
 
       {/* Case à cocher + lien */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
@@ -435,7 +455,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 15,
     borderWidth: 2,
-    borderColor: 'black',
     backgroundColor: 'white',
     marginTop: 10,
     paddingHorizontal: 15,
@@ -472,6 +491,28 @@ policyText: {
   lineHeight: 20,
   marginTop: 5,
 },
+containerRules: {
+  alignItems: 'center',
+  marginTop: 10,
+  marginBottom: 20,
+  marginLeft: 20,
+  width: '100%',
+},
+ruleContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+    marginLeft: 30,
+  },
+  bullet: {
+    marginTop: 6,
+    marginRight: 8,
+  },
+  ruleText: {
+    fontSize: 12,
+    color: '#444',
+    flex: 1,
+  },
 });
 
 export default CreationScreen;
