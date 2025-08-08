@@ -10,9 +10,10 @@ interface Props {
   firstName: string;
   lastName: string;
   missionTitle: string;
+  reporterMail: string;
 }
 
-const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionTitle }: Props) => {
+const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionTitle, reporterMail }: Props) => {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   //const [selectedItem, setSelectedItem] = useState<any>(null);
   const [form, setForm] = useState({
@@ -21,8 +22,6 @@ const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionT
     workerId: workerId,
     //images: [],
   });
-
-  console.log('missionTitle state:', missionTitle);
 
 /*const handleDeleteImage = (index: number) => {
     Alert.alert(
@@ -87,13 +86,13 @@ const sendReport = async (form: any, checkedItems: any) => {
           title:form.title,
           type: Object.keys(checkedItems).filter(key => checkedItems[key]),
           description: form.description,
+          reporter_mail: reporterMail
         }),
       });
-      
-      const data = await response.json();
-      console.log(data);
-      if (data.success) {
-        Alert.alert('Merci', 'Le signalement a bien été envoyé.');
+
+      if (response.ok) {
+        const data = await response.json();
+        Alert.alert('Merci', data.message);
       } else {
         Alert.alert('Erreur', 'Le signalement n’a pas pu être envoyé.');
       }

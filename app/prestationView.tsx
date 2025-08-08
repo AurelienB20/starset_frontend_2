@@ -1090,6 +1090,7 @@ const unlikeImage = async (imageId: string) => {
     firstName={account?.firstname}
     lastName={account?.lastname}
     missionTitle={prestation.metier}
+    reporterMail={user?.email}
     onClose={() => {
       setIsReportModalVisible(false);
     }}
