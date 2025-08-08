@@ -90,10 +90,10 @@ const AccountScreen = () => {
     navigation.navigate('modifyAccount' as never);
   };
 
-  const resetAccountIds = async () => {
+  const generateMetierVector = async () => {
    try {
-    const account_id =user?.id
-              const response = await fetch(`${config.backendUrl}/api/stripe/reset-stripe-account-ids`, {
+    
+              const response = await fetch(`${config.backendUrl}/api/suggestion/generate-metier-vector`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -502,6 +502,13 @@ console.log(prestationId);
   <View style={styles.iconWithText}>
     <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Politique de confidentialite</Text>
+  </View>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={generateMetierVector}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>GenerateMetierVector</Text>
   </View>
 </TouchableOpacity>
 

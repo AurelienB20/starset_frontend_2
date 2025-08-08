@@ -1078,7 +1078,8 @@ const unlikeImage = async (imageId: string) => {
       <Text>    </Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Nombre de prestations effectués :</Text>{account?.completed_prestation}</Text>
       <Text style={styles.popupText}>
-        <Text style={styles.bold}>Prestation favori :</Text>  <Text style={styles.underline}>Petsitting</Text>
+        <Text style={styles.bold}>Prestation favori :</Text> 
+        <Text style={styles.underline}>{metiers?.[0]?.metier || 'Non défini'}</Text>
       </Text>
     </View>
   </TouchableOpacity>

@@ -296,7 +296,7 @@ const getMarkedDates = () => {
                 onPress={() => {
                   if (!arrivalHour) onArrivalHourChange('00');
                   if (!arrivalMinute) onArrivalMinuteChange('00');
-                  setModalType('departure');
+                  setModalType('arrival');
                 }}
               >
                 <Text style={styles.horairesButtonText}>Suivant</Text>
