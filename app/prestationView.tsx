@@ -1,4 +1,5 @@
 import DateTimeSelectionModal from '@/components/DateTimeSelectionModal'; // ajuste le chemin si besoin
+import ReportModal from '@/components/ReportModal';
 import SignupPromptModal from '@/components/SignupPromptModal';
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
@@ -46,7 +47,8 @@ const PrestationViewScreen = () => {
   const [selectedTag, setSelectedTag] = useState<number | null>(null);
   const [isConfirmModalVisible, setConfirmModalVisible] = useState(false); // Pour le pop-up
   const [likedImages, setLikedImages] = useState<string[]>([]);
-  
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
+
   const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')); // Array from "00" to "23"
   const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')); // Array from "00" to "59"
 
@@ -121,47 +123,11 @@ const PrestationViewScreen = () => {
       "Êtes-vous sûr de vouloir signaler cette personne ?",
       [
         { text: "Annuler", style: "cancel" },
-        { text: "Oui", onPress: () => sendReport() }
+        { text: "Oui", onPress: () =>  {setIsReportModalVisible(true); console.log(account);}}
       ],
       { cancelable: false }
     );
     setMenuVisible(false);
-  };
-
-  const sendReport = async () => {
-    try {
-      const reporter_id = await getAccountId(); // L'utilisateur qui signale
-      const reported_id = prestation.worker_id;
-      const reported_name = account?.firstname + ' ' + account?.lastname;
-      const prestation_title = prestation?.title || prestation?.metier;
-      const prestation_description = prestation?.description || '';
-
-      const response = await fetch(`${config.backendUrl}/api/auth/submit-report`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reporter_id,
-          reported_id,
-          reported_name,
-          prestation_id,
-          prestation_title,
-          prestation_description,
-          type: 'worker',
-          reason: 'Comportement inapproprié', // Tu peux remplacer ou laisser l'utilisateur choisir
-        }),
-      });
-  
-      const data = await response.json();
-  
-      if (data.success) {
-        Alert.alert('Merci', 'Le signalement a bien été envoyé.');
-      } else {
-        Alert.alert('Erreur', 'Le signalement n’a pas pu être envoyé.');
-      }
-    } catch (error) {
-      console.error('Erreur lors de l’envoi du signalement:', error);
-      Alert.alert('Erreur', 'Une erreur est survenue.');
-    }
   };
 
   const toggleDatePicker = () => {
@@ -267,7 +233,6 @@ const PrestationViewScreen = () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
       const data = await response.json();
       if(data)
       {
@@ -1108,7 +1073,7 @@ const unlikeImage = async (imageId: string) => {
     <View style={styles.popupContainer}>
       <Text style={styles.popupTitle}>Informations</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Prénom :</Text> {account?.firstname}</Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo || 'mariemmm'}</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo}</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> {account?.Statut}</Text>
       <Text>    </Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Nombre de prestations effectués :</Text>{account?.completed_prestation}</Text>
@@ -1119,6 +1084,18 @@ const unlikeImage = async (imageId: string) => {
     </View>
   </TouchableOpacity>
 </Modal>
+
+ <ReportModal
+    visible={isReportModalVisible}
+    workerId={prestation.worker_id}
+    firstName={account?.firstname}
+    lastName={account?.lastname}
+    missionTitle={prestation.metier}
+    reporterMail={user?.email}
+    onClose={() => {
+      setIsReportModalVisible(false);
+    }}
+  />
 
  <View style={{height : 120 }}></View>    
       
@@ -1188,8 +1165,8 @@ const unlikeImage = async (imageId: string) => {
     <Text style={styles.addButtonText}>AJOUTER</Text>
     <Icon name="shopping-cart" size={24} color="white" style={{ marginLeft: 8 }} />
   </View>
-</TouchableOpacity>
-
+  </TouchableOpacity>
+ 
       </View>
     </View>
   );

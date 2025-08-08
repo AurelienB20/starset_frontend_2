@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
 
@@ -23,10 +23,20 @@ const CreationScreen = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [acceptedCGU, setAcceptedCGU] = useState(false);
   const [cguModalVisible, setCguModalVisible] = useState(false);
+
+  const rules = [
+    '8 caractères minimum',
+    'au moins une lettre majuscule',
+    'une lettre minuscule',
+    'Au moins un chiffre',
+    'Au moins un caractère spécial (exemple : St@rSet7LovesU)',
+  ];
+
   const [passwordValidity, setPasswordValidity] = useState({
   minLength: false,
   hasUppercase: false,
@@ -37,6 +47,7 @@ const CreationScreen = () => {
 const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   
 
+
   const navigation = useNavigation();
 
   const handleEmailChange = (text: string) => {
@@ -46,6 +57,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   };
 
   const handlePasswordChange = (text: string) => {
+
   setPassword(text);
 
   setPasswordValidity({
@@ -60,6 +72,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   setConfirmPassword(text);
   setIsConfirmPasswordValid(text === password);
 };
+
 
   const handleSubmit = async () => {
     if (!isEmailValid) {
@@ -142,7 +155,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       {!isEmailValid && <Text style={styles.errorText}>Email invalide</Text>}
 
       {/* Mot de passe */}
-      <View style={styles.passwordWrapper}>
+      <View style={[styles.passwordWrapper, { borderColor: isPasswordValid ? 'black' : 'red' }]}>
         <TextInput
           style={styles.passwordInput}
           onChangeText={handlePasswordChange}
@@ -155,9 +168,8 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
-
       {/* Confirmation mot de passe */}
-      <View style={styles.passwordWrapper}>
+      <View style={[styles.passwordWrapper, { borderColor: isPasswordValid ? 'black' : 'red' }]}>
         <TextInput
           style={styles.passwordInput}
           onChangeText={handleConfirmPasswordChange}
@@ -170,6 +182,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
           <Ionicons name={showConfirmPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
+
 
       {!isConfirmPasswordValid && (
   <Text style={styles.errorText}>Les mots de passe ne correspondent pas.</Text>
@@ -193,6 +206,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
           • Au moins un caractère spécial (exemple : St@rSet7LovesU)
         </Text>
       </View>
+
 
       {/* Case à cocher + lien */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
@@ -483,7 +497,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 15,
     borderWidth: 2,
-    borderColor: 'black',
     backgroundColor: 'white',
     marginTop: 10,
     paddingHorizontal: 15,
@@ -520,6 +533,28 @@ policyText: {
   lineHeight: 20,
   marginTop: 5,
 },
+containerRules: {
+  alignItems: 'center',
+  marginTop: 10,
+  marginBottom: 20,
+  marginLeft: 20,
+  width: '100%',
+},
+ruleContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+    marginLeft: 30,
+  },
+  bullet: {
+    marginTop: 6,
+    marginRight: 8,
+  },
+  ruleText: {
+    fontSize: 12,
+    color: '#444',
+    flex: 1,
+  },
 });
 
 export default CreationScreen;
