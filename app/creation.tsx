@@ -27,6 +27,14 @@ const CreationScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [acceptedCGU, setAcceptedCGU] = useState(false);
   const [cguModalVisible, setCguModalVisible] = useState(false);
+  const [passwordValidity, setPasswordValidity] = useState({
+  minLength: false,
+  hasUppercase: false,
+  hasLowercase: false,
+  hasDigit: false,
+  hasSpecialChar: false,
+});
+const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   
 
   const navigation = useNavigation();
@@ -37,8 +45,21 @@ const CreationScreen = () => {
     setIsEmailValid(emailRegex.test(text));
   };
 
-  const handlePasswordChange = (text: string) => setPassword(text);
-  const handleConfirmPasswordChange = (text: string) => setConfirmPassword(text);
+  const handlePasswordChange = (text: string) => {
+  setPassword(text);
+
+  setPasswordValidity({
+    minLength: text.length >= 8,
+    hasUppercase: /[A-Z]/.test(text),
+    hasLowercase: /[a-z]/.test(text),
+    hasDigit: /[0-9]/.test(text),
+    hasSpecialChar: /[^A-Za-z0-9]/.test(text),
+  });
+};
+  const handleConfirmPasswordChange = (text: string) => {
+  setConfirmPassword(text);
+  setIsConfirmPasswordValid(text === password);
+};
 
   const handleSubmit = async () => {
     if (!isEmailValid) {
@@ -96,6 +117,10 @@ const CreationScreen = () => {
       setErrorMessage("Erreur lors de l'enregistrement. Veuillez réessayer.");
     }
   };
+
+  const isPasswordValid = Object.values(passwordValidity).every(Boolean);
+  const isFormValid = isEmailValid && acceptedPrivacy && acceptedCGU && isPasswordValid && confirmPassword === password;
+
   
 
   return (
@@ -146,6 +171,29 @@ const CreationScreen = () => {
         </TouchableOpacity>
       </View>
 
+      {!isConfirmPasswordValid && (
+  <Text style={styles.errorText}>Les mots de passe ne correspondent pas.</Text>
+)}
+
+
+      <View style={{ marginTop: 10, alignSelf: 'flex-start', marginLeft: '15%' }}>
+        <Text style={{ color: passwordValidity.minLength ? 'green' : 'black' }}>
+          • 8 caractères minimum
+        </Text>
+        <Text style={{ color: passwordValidity.hasUppercase ? 'green' : 'black' }}>
+          • au moins une lettre majuscule
+        </Text>
+        <Text style={{ color: passwordValidity.hasLowercase ? 'green' : 'black' }}>
+          • une lettre minuscule
+        </Text>
+        <Text style={{ color: passwordValidity.hasDigit ? 'green' : 'black' }}>
+          • Au moins un chiffre
+        </Text>
+        <Text style={{ color: passwordValidity.hasSpecialChar ? 'green' : 'black' }}>
+          • Au moins un caractère spécial (exemple : St@rSet7LovesU)
+        </Text>
+      </View>
+
       {/* Case à cocher + lien */}
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 20 }}>
        <Checkbox
@@ -178,7 +226,7 @@ const CreationScreen = () => {
       <TouchableOpacity
         onPress={handleSubmit}
         style={styles.submitbutton}
-        disabled={!isEmailValid || !acceptedPrivacy || !acceptedCGU}
+        disabled={!isFormValid}
       >
         <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'white' }}>Suivant</Text>
       </TouchableOpacity>

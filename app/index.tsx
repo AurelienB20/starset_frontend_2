@@ -1,9 +1,9 @@
 import { useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import config from '../config.json';
 
 const StarsetScreen = () => {
@@ -171,12 +171,20 @@ const StarsetScreen = () => {
   return (
     <View style={styles.container}>
       
-      <Image
-        source={require('../assets/images/logo_gif_hd.gif')}
-        style={{ width: '80%', height: 200 }}
-        resizeMode="contain"
-        
-      />
+      
+      <WebView
+  originWhitelist={['*']}
+  source={{ html: `
+    <html>
+      <body style="margin:0;display:flex;justify-content:center;align-items:center;height:100%;">
+        <img src="https://api.starsetfrance.com/media/assets/logo_gif_hd.gif" style="width:100%;height:auto;" />
+      </body>
+    </html>
+  ` }}
+  style={{ width: 300, height: 200 }}
+/>
+      
+
 
       
       {/* Remplacer par un objet de style et non un tableau 
