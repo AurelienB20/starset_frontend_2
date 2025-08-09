@@ -1815,7 +1815,7 @@ const styles = StyleSheet.create({
 
   reviewsList: {
     paddingHorizontal: 10,
-    backgroundColor : 'blue'
+    
   },
   
   reviewCard: {

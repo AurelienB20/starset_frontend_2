@@ -1517,7 +1517,7 @@ const [docsMissing, setDocsMissing] = useState<string[]>([]);
   onClose={() => setIsDocumentPopUpVisible(false)}
 />
 <TouchableOpacity
-      style={styles.addButton}
+      style={styles.mandatoryDocumentButton}
       onPress={() => setIsDocumentPopUpVisible(true)}
     >
       <Text style={styles.addButtonText}>
@@ -1607,7 +1607,7 @@ const [docsMissing, setDocsMissing] = useState<string[]>([]);
 
       ))
     ) : (
-      <Text style={{ textAlign: 'center' }}>Aucune certification disponible</Text>
+      <Text style={{ textAlign: 'center', marginVertical : 20 }}>Aucune certification disponible</Text>
     )}
 
 {isCertificationFormVisible && (
@@ -1913,6 +1913,15 @@ const styles = StyleSheet.create({
   addButton: {
     alignSelf: 'stretch',
     backgroundColor: '#7ED957',
+    paddingVertical: 15,
+    marginHorizontal : 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+   mandatoryDocumentButton: {
+    alignSelf: 'stretch',
+    backgroundColor: 'red',
     paddingVertical: 15,
     marginHorizontal : 15,
     borderRadius: 10,
