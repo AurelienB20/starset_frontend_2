@@ -68,6 +68,7 @@ const PrestationViewScreen = () => {
   const [availabilityByDate, setAvailabilityByDate] = useState<any>({});
   const [selectedDates, setSelectedDates] = useState<any>({});
   const [signupPromptModalVisible, setSignupPromptModalVisible] = useState(false);
+  const [ finishedPrestationCount, setFinishedPrestationCount] = useState(0);
 
 
     const profileImageSize = scrollY.interpolate({
@@ -244,7 +245,8 @@ const PrestationViewScreen = () => {
         setAccount(data.account);
         setPrestationImages(data.images);
         setComments(data.comments);
-        fetchAvailability(data.account.worker)
+        fetchAvailability(data.account.worker);
+        setFinishedPrestationCount(data.finished_count)
       }
     } catch (error) {
       console.error('Une erreur est survenue lors de la récupération des prestations:', error);
@@ -1074,9 +1076,12 @@ const unlikeImage = async (imageId: string) => {
       <Text style={styles.popupTitle}>Informations</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Prénom :</Text> {account?.firstname}</Text>
       <Text style={styles.popupText}><Text style={styles.bold}>Pseudo :</Text> @{account?.pseudo}</Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Statut :</Text> {account?.Statut}</Text>
+      <Text style={styles.popupText}>
+        <Text style={styles.bold}>Statut :</Text> {account?.is_company ? 'Entreprise' : 'Particulier'}
+      </Text>
+
       <Text>    </Text>
-      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de prestations effectués :</Text>{account?.completed_prestation}</Text>
+      <Text style={styles.popupText}><Text style={styles.bold}>Nombre de prestations effectués :</Text>{finishedPrestationCount}</Text>
       <Text style={styles.popupText}>
         <Text style={styles.bold}>Prestation favori :</Text> 
         <Text style={styles.underline}>{metiers?.[0]?.metier || 'Non défini'}</Text>

@@ -2,7 +2,7 @@ import { HapticTab } from '@/components/HapticTab';
 import PrestationConfirmation from '@/components/PrestationConfirmationModal';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
-import { useAllWorkerPlannedPrestation, useUser } from '@/context/userContext';
+import { useAllUserPlannedPrestation, useAllWorkerPlannedPrestation, useUser } from '@/context/userContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import config from '../../config.json';
 
+import NoteModal from '@/components/NoteModal';
 import {
   debugLog
 } from '../../api/prestationApi';
@@ -21,6 +22,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
   const { allWorkerPlannedPrestation, setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
+  const { allUserPlannedPrestation, setAllUserPlannedPrestation } = useAllUserPlannedPrestation()
   const navigation = useNavigation();
   let [fontsLoaded] = useFonts({
       BebasNeue: BebasNeue_400Regular,
@@ -32,6 +34,8 @@ export default function TabLayout() {
       const [isTime, setIsTime] = useState(false);
       const { user } = useUser();
        const [errorMessage, setErrorMessage] = useState('');
+
+  const [noteModalVisible, setNoteModalVisible] = useState(false);
 
 
   const intervalRef : any = useRef<NodeJS.Timeout | null>(null);
@@ -152,6 +156,26 @@ useEffect(() => {
     }
   };
 }, [user?.worker]);
+
+useEffect(() => {
+  console.log('allUserPlannedPrestation')
+  console.log(allUserPlannedPrestation)
+  
+  if (!allUserPlannedPrestation || allUserPlannedPrestation.length === 0) return;
+
+  // Trouver une prestation qui correspond aux critères
+  const targetPrestation = allUserPlannedPrestation.find(
+    (p) =>
+      p.has_seen_rating_popup === false &&
+      (p.status === "finished" || p.status === "completed")
+  );
+
+  if (targetPrestation) {
+    setPrestation(targetPrestation); // On la met dans le state actuel
+    setNoteModalVisible(true); // On affiche le NoteModal
+  }
+}, [allUserPlannedPrestation, user]);
+
   
   const goToUserTabs = () => {
     navigation.dispatch(
@@ -174,8 +198,34 @@ useEffect(() => {
   function TabBarIcon(props: { name: React.ComponentProps<typeof FontAwesome>['name']; color: string; }) {
     return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
   }
+
+  const markRatingPopupSeen = async () => {
+  try {
+    await fetch(`${config.backendUrl}/api/planned-prestation/mark-rating-popup-seen`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: user?.id, planned_prestation_id : prestation.id}), // ou worker_id selon la logique
+    });
+    console.log('✅ Popup marqué comme vu');
+  } catch (error) {
+    console.error('Erreur lors du markRatingPopupSeen:', error);
+  }
+};
+
+// Fermer le popup et marquer comme vu
+const closePopup = () => {
+  setNoteModalVisible(false);
+  markRatingPopupSeen();
+};
+  
+
   return (
     <>
+    <NoteModal
+        visible={noteModalVisible}
+        onClose={closePopup}
+        planned_prestation={prestation}
+      />
     <PrestationConfirmation
       visible={prestationModal}
       onClose={() => {
