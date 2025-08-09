@@ -96,12 +96,21 @@ const CreationScreen = () => {
       if (data.success === true) {
         setErrorMessage('e-mail existe déjà');
       } else {
-        navigation.navigate({
-          name: 'mailVerificationCode',
-          params: { email, password },
-        } as never);
+      fetch(`${config.TicketUrl}/users`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${config.tokenTicket}` },
+      body: JSON.stringify({ email: email })
+     }).then((response) => {
+       if (response.status === 200) {
+         navigation.navigate({
+           name: 'mailVerificationCode',
+           params: { email, password },
+         } as never);
+       } else {
+         setErrorMessage("Erreur lors de la création de l'utilisateur.");
+       }
+      });
       }
-  
     } catch (error) {
       console.error(error);
       setErrorMessage("Erreur lors de l'enregistrement. Veuillez réessayer.");
