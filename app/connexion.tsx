@@ -147,7 +147,7 @@ const getProfile = async (accountId: string) => {
       <View style={styles.logoContainer}>
         <Image source={require('@/assets/images/etoile-starset-noir.png')} style={styles.starIcon} />
       </View>
-      <Text style={styles.enter}>Connectez-vous !</Text>
+      <Text style={styles.enter}>CONNECTEZ-VOUS !</Text>
       <Text style={styles.description}>
         Laissez-nous identifier votre profil, Star Set n'attend plus que vous !
       </Text>

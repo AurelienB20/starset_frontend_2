@@ -1,4 +1,4 @@
-import { AllWorkerPlannedPrestationProvider, AllWorkerPrestationProvider, CartProvider, CurrentWorkerPrestationProvider, UserConversationProvider, UserProvider, WorkerConversationProvider } from '@/context/userContext';
+import { AllUserPlannedPrestationProvider, AllWorkerPlannedPrestationProvider, AllWorkerPrestationProvider, CartProvider, CurrentWorkerPrestationProvider, UserConversationProvider, UserProvider, WorkerConversationProvider } from '@/context/userContext';
 import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { Stack } from 'expo-router';
@@ -19,6 +19,7 @@ function RootLayoutNav() {
 
   return (
     <PaperProvider>
+    <AllUserPlannedPrestationProvider>
     <AllWorkerPlannedPrestationProvider>
     <CartProvider>
     <StripeProvider
@@ -63,6 +64,7 @@ function RootLayoutNav() {
     </StripeProvider>
     </CartProvider>
     </AllWorkerPlannedPrestationProvider>
+    </AllUserPlannedPrestationProvider>
     </PaperProvider>
   );
 }

@@ -80,6 +80,7 @@ const NoteScreen = () => {
           user_id: user?.id,
           worker_id: prestation.worker_id,
           prestation_id: prestation.id,
+          planned_prestation_id : planned_prestation.id,
           rating,
           comment,
           firstname: account.firstname,

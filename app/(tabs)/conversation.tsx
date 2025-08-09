@@ -81,6 +81,8 @@ const ConversationScreen = () => {
 
   const getFormattedTime = (timestamp: string) => {
     const date = new Date(timestamp);
+
+    date.setHours(date.getHours() + 6);
     const now = new Date();
   
     const isToday =

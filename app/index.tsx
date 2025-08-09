@@ -1,9 +1,9 @@
-import { useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
+import { useAllUserPlannedPrestation, useAllWorkerPlannedPrestation, useAllWorkerPrestation, useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { WebView } from 'react-native-webview';
 import config from '../config.json';
 
 const StarsetScreen = () => {
@@ -12,6 +12,7 @@ const StarsetScreen = () => {
   const { user, setUser } = useUser()
   const { setAllWorkerPrestation } = useAllWorkerPrestation()
   const { allWorkerPlannedPrestation, setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
+  const { allUserPlannedPrestation, setAllUserPlannedPrestation } = useAllUserPlannedPrestation()
   const navigation = useNavigation();
 
   const getAccountId = async () => {
@@ -36,7 +37,7 @@ const StarsetScreen = () => {
     }
   };
 
-  const getPrestation = async () =>{
+  const getAllWorkerPlannedPrestation = async () =>{
         const workerId = await getWorkerId()
         try {
           const response = await fetch(`${config.backendUrl}/api/mission/get-worker-planned-prestation`, {
@@ -51,6 +52,28 @@ const StarsetScreen = () => {
       console.log("ici dans la page index")
       console.log(data.plannedPrestations)
       setAllWorkerPlannedPrestation(data.plannedPrestations)
+        
+      }
+      catch (error) {
+        
+      }
+    }
+
+    const getAllUserPlannedPrestation = async () =>{
+        const user_id = await getAccountId()
+        try {
+          const response = await fetch(`${config.backendUrl}/api/mission/get-user-planned-prestation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id:user_id }),
+        });
+      const data = await response.json();
+      console.log("ici dans la page index")
+      console.log("ici dans la page index")
+      console.log(data.plannedPrestations)
+      setAllUserPlannedPrestation(data.plannedPrestations)
         
       }
       catch (error) {
@@ -150,7 +173,8 @@ const StarsetScreen = () => {
           hasLoaded = true; // ✅ stop les appels multiples
           getProfile();
           getAllWorkerPrestation();
-          getPrestation()
+          getAllWorkerPlannedPrestation()
+          getAllUserPlannedPrestation()
         }
 
         return prev;
@@ -171,12 +195,20 @@ const StarsetScreen = () => {
   return (
     <View style={styles.container}>
       
-      <Image
-        source={require('../assets/images/logo_gif_hd.gif')}
-        style={{ width: '80%', height: 200 }}
-        resizeMode="contain"
-        
-      />
+      
+      <WebView
+  originWhitelist={['*']}
+  source={{ html: `
+    <html>
+      <body style="margin:0;display:flex;justify-content:center;align-items:center;height:100%;">
+        <img src="https://api.starsetfrance.com/media/assets/logo_gif_hd.gif" style="width:100%;height:auto;" />
+      </body>
+    </html>
+  ` }}
+  style={{ width: 300, height: 200 }}
+/>
+      
+
 
       
       {/* Remplacer par un objet de style et non un tableau 

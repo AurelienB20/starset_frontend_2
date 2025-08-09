@@ -17,14 +17,17 @@ const PaymentScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [savedCards, setSavedCards] = useState<any[]>([]);
   const { confirmSetupIntent } = useStripe();
-  const totalRemuneration = route.params?.total_remuneration || 0
+  const totalRemuneration2 = route.params?.totalRemuneration || 0
+  
+  
   const instruction = route.params?.instruction || ""
 
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
-const serviceFee = totalRemuneration * 0.10;
-const transactionFee = totalRemuneration * 0.015 + 0.25;
-const finalTotal = totalRemuneration + serviceFee + transactionFee;
+const serviceFee = totalRemuneration2 * 0.10;
+const transactionFee = totalRemuneration2 * 0.015 + 0.25;
+const finalTotal = totalRemuneration2 + serviceFee + transactionFee;
+console.log(finalTotal)
 const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
 const [cardDetails, setCardDetails] = useState<any>(null);
 const [showCardField, setShowCardField] = useState(false);
