@@ -11,6 +11,8 @@ const CroissanceScreen = () => {
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const { user } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
   const [otherJobs, setOtherJobs] = useState<any[]>([]);
+  const [workers, setWorkers] = useState<any[]>([]);
+const [loadingWorkers, setLoadingWorkers] = useState(false);
 
 
   const news = {
@@ -23,7 +25,26 @@ const CroissanceScreen = () => {
   useEffect(() => {
   fetchJobsOfTheDay();
   fetchJobsThatNeedHelp();
+   fetchWorkers();
 }, []);
+
+const fetchWorkers = async () => {
+  try {
+    setLoadingWorkers(true);
+    const res = await fetch(`${config.backendUrl}/api/mission/get-workers-with-metiers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json();
+    if (data?.workers) setWorkers(data.workers);
+  } catch (e) {
+    console.error('Erreur lors de la récupération des workers :', e);
+  } finally {
+    setLoadingWorkers(false);
+  }
+};
+
 
 const fetchJobsOfTheDay = async () => {
   try {
@@ -106,21 +127,47 @@ const fetchJobsThatNeedHelp = async () => {
       </View>
 
       <Text style={[styles.sectionHeader, { marginTop: 40 }]}>WORKERS OF THE DAY</Text>
-      <FlatList
-        horizontal
-        data={[...workersMock, ...workersMock]}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.workerWrapper}>
-            <Image source={{ uri: item }} style={styles.workerImage} />
-            <View style={styles.badge}>
-              <FontAwesome name="check" size={12} color="#fff" />
-            </View>
-          </View>
-        )}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 20 }}
-      />
+      {loadingWorkers ? (
+        <View style={{ paddingVertical: 12 }}>
+          <Text style={{ textAlign: 'center' }}>Chargement...</Text>
+        </View>
+      ) : (
+        <FlatList
+          horizontal
+          data={workers}
+          keyExtractor={(item, index) => (item.worker_id?.toString?.() ?? String(index))}
+          renderItem={({ item }) => {
+            // récupère la photo
+            const photo =
+              item.profile_picture_url ||
+              'https://static.vecteezy.com/ti/vecteur-libre/p1/7033146-icone-de-profil-login-head-icon-vectoriel.jpg';
+
+            // récupère un id de prestation/métier si dispo (comme SearchScreen)
+            const firstMetierId = item?.metiers?.[0]?.id;
+
+            return (
+              <TouchableOpacity
+                style={styles.workerWrapper}
+                onPress={() => {
+                  if (firstMetierId) {
+                    // ouvre la page prestation si dispo
+                    // (enlève si tu ne veux pas de navigation ici)
+                    // @ts-ignore
+                    goToPrestationViewWithId(firstMetierId);
+                  }
+                }}
+              >
+                <Image source={{ uri: photo }} style={styles.workerImage} />
+                <View style={styles.badge}>
+                  <FontAwesome name="check" size={12} color="#fff" />
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: 20 }}
+        />
+      )}
 
       <Text style={[styles.sectionHeader, { marginTop: 30 }]}>JOBS OF THE DAY</Text>
       <FlatList
