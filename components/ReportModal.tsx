@@ -78,11 +78,11 @@ const sendReport = async (form: any, checkedItems: any, workerId: string) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
         body: JSON.stringify({
-          reported_id:workerId,
-          nom:lastName,
-          prenom:firstName,
-          intitule_mission:missionTitle,
-          title:form.title,
+          id_worker: workerId,
+          nom: lastName,
+          prenom: firstName,
+          intitule_mission: missionTitle,
+          title: form.title,
           type_signalement: Object.keys(checkedItems).filter(key => checkedItems[key]),
           description: form.description,
           customer: reporterMail,
@@ -94,6 +94,7 @@ const sendReport = async (form: any, checkedItems: any, workerId: string) => {
       if (response.ok) {
         const data = await response.json();
         Alert.alert('Merci', 'Votre signalement a été envoyé avec succès.');
+        onClose();
       } else {
         Alert.alert('Erreur', 'Le signalement n’a pas pu être envoyé.');
       }
