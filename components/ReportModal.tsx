@@ -19,7 +19,6 @@ const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionT
   const [form, setForm] = useState({
     title: '',
     description: '',
-    workerId: workerId,
     //images: [],
   });
 
@@ -73,26 +72,28 @@ const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionT
     }));
   };
 
-const sendReport = async (form: any, checkedItems: any) => {
+const sendReport = async (form: any, checkedItems: any, workerId: string) => {
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/submit-report`, {
+      const response = await fetch(`${config.TicketUrl}/tickets`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
         body: JSON.stringify({
-          reported_id:form.workerId,
-          name:lastName,
-          firstname:firstName,
-          prestation_title:missionTitle,
+          reported_id:workerId,
+          nom:lastName,
+          prenom:firstName,
+          intitule_mission:missionTitle,
           title:form.title,
-          type: Object.keys(checkedItems).filter(key => checkedItems[key]),
+          type_signalement: Object.keys(checkedItems).filter(key => checkedItems[key]),
           description: form.description,
-          reporter_mail: reporterMail
+          customer: reporterMail,
+          group_id: 1,
+          type: 'email',
         }),
       });
-
+      console.log('Response status:', response.status);
       if (response.ok) {
         const data = await response.json();
-        Alert.alert('Merci', data.message);
+        Alert.alert('Merci', 'Votre signalement a été envoyé avec succès.');
       } else {
         Alert.alert('Erreur', 'Le signalement n’a pas pu être envoyé.');
       }
@@ -167,7 +168,7 @@ const sendReport = async (form: any, checkedItems: any) => {
 */}
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={() => sendReport(form, checkedItems)}
+              onPress={() => sendReport(form, checkedItems, workerId)}
             >
               <Text style={styles.submitText}>ENVOYER</Text>
             </TouchableOpacity>
