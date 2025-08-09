@@ -23,6 +23,7 @@ const CreationScreen = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
+
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [acceptedCGU, setAcceptedCGU] = useState(false);

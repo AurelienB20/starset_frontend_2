@@ -1,4 +1,5 @@
 import { useUser } from '@/context/userContext';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,10 +15,12 @@ const AccountWorkerScreen = () => {
   const [account, setAccount] = useState<any>(null)
   const navigation = useNavigation();
   const { user } = useUser(); // Utilisation du contexte pour récupérer les infos utilisateur
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
 
   let [fontsLoaded] = useFonts({
         
-        
+        BebasNeue: BebasNeue_400Regular,
         LeagueSpartanBold : LeagueSpartan_700Bold
       });
 
@@ -208,6 +211,8 @@ const AccountWorkerScreen = () => {
         </TouchableOpacity>
       </View>
     )}
+
+    
      
 
 

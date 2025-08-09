@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
 
 
+import PrestationDocumentModal from '@/components/documentPopup';
 import { useFonts } from 'expo-font';
 import {
   getAllExperience,
@@ -87,6 +88,10 @@ const PrestationScreen = () => {
   const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
 const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
 const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
+const [isDoucmentPopUpVisible, setIsDocumentPopUpVisible] = useState(false);
+const [docLoading, setDocLoading] = useState(false);
+const [docsComplete, setDocsComplete] = useState(true);
+const [docsMissing, setDocsMissing] = useState<string[]>([]);
 
  let [fontsLoaded] = useFonts({
     
@@ -182,6 +187,36 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
     setSelectedItem({ ...emptyCertification });
     setCertificationFormVisible(true);
   };
+
+  const refreshMandatoryDocsStatus = async () => {
+  if (!prestation_id) return;
+  try {
+    setDocLoading(true);
+    const res = await fetch(`${config.backendUrl}/api/document/check-prestation-mandatory-documents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prestation_id }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data?.success) {
+      // si l’API renvoie une erreur, on choisit de bloquer la publication par défaut
+      setDocsComplete(false);
+      setDocsMissing([]);
+      return;
+    }
+
+    setDocsComplete(!!data.is_complete);
+    setDocsMissing(Array.isArray(data.missing) ? data.missing : []);
+  } catch (e) {
+    // en cas d’erreur réseau, mieux vaut prévenir que guérir → on bloque
+    setDocsComplete(false);
+    setDocsMissing([]);
+  } finally {
+    setDocLoading(false);
+  }
+};
+
 
   // Pour ajouter une expérience
   const handleAddExperienceClick = () => {
@@ -914,22 +949,44 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
   };
 
 
-  const confirmTogglePrestationPublished = () => {
-    const action = prestation?.published ? "dépublier" : "publier";
-  
+  const confirmTogglePrestationPublished = async () => {
+  // Toujours rafraîchir juste avant, pour être sûr
+  await refreshMandatoryDocsStatus();
+
+  if (!docsComplete) {
+    const list = docsMissing.length
+      ? '\n\n• ' + docsMissing.join('\n• ')
+      : '';
+
     Alert.alert(
-      ``,
-      `Voulez-vous vraiment ${action} cette prestation ?`,
+      'Documents obligatoires manquants',
+      `Vous devez téléverser tous les documents obligatoires avant de pouvoir publier votre prestation.${list}`,
       [
-        { text: "Annuler", style: "cancel" },
+        { text: 'Annuler', style: 'cancel' },
         {
-          text: prestation?.published ? "Dépublier" : "Publier",
-          style: "destructive",
-          onPress: togglePrestationPublished, // Appelle la fonction qui gère la publication
+          text: 'Ajouter mes documents',
+          onPress: () => setIsDocumentPopUpVisible(true),
         },
       ]
     );
-  };
+    return;
+  }
+
+  const action = prestation?.published ? "dépublier" : "publier";
+  Alert.alert(
+    '',
+    `Voulez-vous vraiment ${action} cette prestation ?`,
+    [
+      { text: "Annuler", style: "cancel" },
+      {
+        text: prestation?.published ? "Dépublier" : "Publier",
+        style: "destructive",
+        onPress: togglePrestationPublished,
+      },
+    ]
+  );
+};
+
 
   const togglePrestationPublished = async () => {
     try {
@@ -971,6 +1028,17 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
   const handleEditDescription = () => {
     setIsEditing(true); // Active le mode édition local
   };
+
+  useEffect(() => {
+    refreshMandatoryDocsStatus();
+  }, [prestation_id]);
+
+  // Quand le popup des documents se ferme (l’utilisateur a peut-être uploadé)
+  useEffect(() => {
+    if (!isDoucmentPopUpVisible) {
+      refreshMandatoryDocsStatus();
+    }
+  }, [isDoucmentPopUpVisible]);
   
 
   useEffect(() => {
@@ -1047,6 +1115,24 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
       </View>
       <Text style={styles.title}>{prestation?.metier}</Text>
       <View style={styles.widthMax}>
+        {!docsComplete && (
+  <View style={styles.mandatoryBanner}>
+    <Text style={styles.mandatoryBannerText}>
+      Des documents obligatoires sont manquants.
+    </Text>
+    {!!docsMissing.length && (
+      <Text style={styles.mandatoryBannerSub}>
+        Manquants : {docsMissing.join(', ')}
+      </Text>
+    )}
+    <TouchableOpacity
+      style={styles.mandatoryBannerBtn}
+      onPress={() => setIsDocumentPopUpVisible(true)}
+    >
+      <Text style={styles.mandatoryBannerBtnText}>Ajouter maintenant</Text>
+    </TouchableOpacity>
+  </View>
+)}
       <View style={styles.descriptionRow}>
         <View style={{ flex: 1, width : '100%' }}>
           <Text style={styles.infoLabel}>Description</Text>
@@ -1422,7 +1508,22 @@ const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 
       {/* Placeholder for the "Certifications" tab */}
       {selectedTab === 'certifications' && (
+        
   <View>
+    <PrestationDocumentModal
+  visible={isDoucmentPopUpVisible}
+  prestationId={prestation_id}
+  workerId={prestation?.worker_id}
+  onClose={() => setIsDocumentPopUpVisible(false)}
+/>
+<TouchableOpacity
+      style={styles.addButton}
+      onPress={() => setIsDocumentPopUpVisible(true)}
+    >
+      <Text style={styles.addButtonText}>
+        document obligatoire
+      </Text>
+    </TouchableOpacity>
     {certifications.length > 0 ? (
       certifications.map((certification: any, index: number) => (
         <View key={index} style={styles.certificationCardUpdated}>
@@ -2384,6 +2485,37 @@ documentItem: {
   color: '#d63031',
   marginVertical: 2,
 },
+
+mandatoryBanner: {
+  backgroundColor: '#fff3cd',
+  borderColor: '#ffeeba',
+  borderWidth: 1,
+  padding: 12,
+  borderRadius: 8,
+  marginHorizontal: 16,
+  marginTop: 12,
+},
+mandatoryBannerText: {
+  color: '#856404',
+  fontWeight: '600',
+  marginBottom: 4,
+},
+mandatoryBannerSub: {
+  color: '#856404',
+  marginBottom: 8,
+},
+mandatoryBannerBtn: {
+  alignSelf: 'flex-start',
+  backgroundColor: '#856404',
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  borderRadius: 6,
+},
+mandatoryBannerBtnText: {
+  color: '#fff',
+  fontWeight: '600',
+},
+
 
 
 });

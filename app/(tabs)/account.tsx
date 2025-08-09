@@ -505,13 +505,6 @@ console.log(prestationId);
   </View>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem} onPress={generateMetierVector}>
-  <View style={styles.iconWithText}>
-    <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
-    <Text style={styles.menuItemText}>GenerateMetierVector</Text>
-  </View>
-</TouchableOpacity>
-
 <TouchableOpacity style={styles.menuItem} onPress={changeToWorker}>
   <View style={styles.iconWithText}>
     <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />

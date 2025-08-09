@@ -1,3 +1,4 @@
+import { useUser } from '@/context/userContext';
 import { MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -9,6 +10,7 @@ import config from '../config.json';
 const PaymentScreen = () => {
   const route = useRoute() as any;
   const [ready, setReady] = useState(false);
+  const {user } = useUser()
   const navigation = useNavigation();
   const {initPaymentSheet, presentPaymentSheet} = usePaymentSheet();
   // On récupère cart, instruction, totalRemuneration depuis params
@@ -22,11 +24,21 @@ const PaymentScreen = () => {
   
   const instruction = route.params?.instruction || ""
 
+  const itemCount = Array.isArray(cart) ? cart.length : 0;
+
+const PERCENT_FEE = 0.015;     // 1,5%
+const PER_ITEM_FIXED_FEE = 0.25; // 0,25 € par item
+
+const serviceFee = totalRemuneration2 * 0.10;
+const percentFeeAmount = totalRemuneration2 * PERCENT_FEE;
+const fixedFeeAmount = itemCount * PER_ITEM_FIXED_FEE;
+
+const transactionFee = percentFeeAmount + fixedFeeAmount;
+const finalTotal = totalRemuneration2 + serviceFee + transactionFee;
+
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
-const serviceFee = totalRemuneration2 * 0.10;
-const transactionFee = totalRemuneration2 * 0.015 + 0.25;
-const finalTotal = totalRemuneration2 + serviceFee + transactionFee;
+
 console.log(finalTotal)
 const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
 const [cardDetails, setCardDetails] = useState<any>(null);
@@ -179,6 +191,8 @@ const [showCardField, setShowCardField] = useState(false);
         profilePictureUrl,
       } = item;
 
+      const totalRemunerationItem = (itemRemuneration * 1.115) + 0.25;
+
       const response = await fetch(`${config.backendUrl}/api/planned-prestation/create-planned-prestation`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -190,6 +204,7 @@ const [showCardField, setShowCardField] = useState(false);
           end_date: endDate,
           type_of_remuneration,
           remuneration: itemRemuneration,
+          total_remuneration : totalRemunerationItem,
           start_time: arrivalTime,
           end_time: departureTime,
           instruction,
@@ -197,6 +212,8 @@ const [showCardField, setShowCardField] = useState(false);
           profile_picture_url: profilePictureUrl,
           payment_method_id: selectedPaymentMethodId, 
           stripe_customer_id: stripeCustomerId, 
+          location : user?.location,
+          address : user?.address
         }),
       });
 
@@ -252,8 +269,12 @@ const [showCardField, setShowCardField] = useState(false);
       })}
 
       <View style={{ width: '100%', marginTop: 10 }}>
-        <Text style={{ fontSize: 16 }}>Frais de service (10%) : {serviceFee.toFixed(2)} €</Text>
-        <Text style={{ fontSize: 16 }}>Frais de transaction (1,5% + 0,25€) : {transactionFee.toFixed(2)} €</Text>
+        <Text style={{ fontSize: 16 }}>
+          Frais de service (10%) : {serviceFee.toFixed(2)} €
+        </Text>
+        <Text style={{ fontSize: 16 }}>
+          Frais de transaction (1,5% + 0,25€ × {itemCount}) : {transactionFee.toFixed(2)} €
+        </Text>
       </View>
 
       <View style={styles.separator} />
