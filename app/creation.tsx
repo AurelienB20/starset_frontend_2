@@ -123,7 +123,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       headers: { 'Authorization': `Bearer ${config.tokenTicket}` },
       body: JSON.stringify({ email: email })
      }).then((response) => {
-       if (response.status === 200) {
+       if (response.status === 201) {
          navigation.navigate({
            name: 'mailVerificationCode',
            params: { email, password },
