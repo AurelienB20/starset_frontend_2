@@ -1,6 +1,6 @@
 import CertificationFormModal from '@/components/CertificationModal';
 import ExperienceModal from '@/components/ExperienceModal';
-import { useAllWorkerPrestation, useCurrentWorkerPrestation } from '@/context/userContext';
+import { useAllWorkerPrestation, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -92,6 +92,7 @@ const [isDoucmentPopUpVisible, setIsDocumentPopUpVisible] = useState(false);
 const [docLoading, setDocLoading] = useState(false);
 const [docsComplete, setDocsComplete] = useState(true);
 const [docsMissing, setDocsMissing] = useState<string[]>([]);
+const { user, setUser } = useUser()
 
  let [fontsLoaded] = useFonts({
     
@@ -950,7 +951,7 @@ const [docsMissing, setDocsMissing] = useState<string[]>([]);
 
 
   const confirmTogglePrestationPublished = async () => {
-  // Toujours rafraîchir juste avant, pour être sûr
+  // Toujours rafraîchir juste avant, pour être sû
   await refreshMandatoryDocsStatus();
 
   if (!docsComplete) {
@@ -971,6 +972,36 @@ const [docsMissing, setDocsMissing] = useState<string[]>([]);
     );
     return;
   }
+
+  try {
+  const response = await fetch(`${config.backendUrl}/api/auth/check-stripe-account`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: user?.id }),
+  });
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    Alert.alert(
+      'Autorisation de paiement requise',
+      data.message || `Vous devez configurer votre compte de paiement avant de pouvoir publier une prestation.`,
+      [{ text: 'OK', style: 'default' }]
+    );
+    return;
+  }
+} catch (error) {
+  console.error('Erreur lors de la vérification du compte Stripe:', error);
+  Alert.alert(
+    'Erreur',
+    'Impossible de vérifier le compte Stripe. Veuillez réessayer plus tard.',
+    [{ text: 'OK', style: 'default' }]
+  );
+  return;
+}
+
 
   const action = prestation?.published ? "dépublier" : "publier";
   Alert.alert(

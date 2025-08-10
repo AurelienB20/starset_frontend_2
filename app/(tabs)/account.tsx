@@ -641,12 +641,16 @@ console.log(prestationId);
             <ScrollView style={{ width: '100%' }}>
             {(() => {
   // 1. Filtrer les prestations par statut
-  const filtered = plannedPrestations.filter(p => {
-    if (statusFilter === 'inProgress') {
-      return p.status === 'inProgress' || p.status === 'started';
-    }
-    return p.status === statusFilter;
-  });
+  const filtered = plannedPrestations.filter((p) => {
+  if (statusFilter === 'inProgress') {
+    return p.status === 'inProgress' || p.status === 'started';
+  }
+  if (statusFilter === 'finished') {
+    // Accepte "finished" ET "completed"
+    return p.status === 'finished' || p.status === 'completed';
+  }
+  return p.status === statusFilter;
+});
 
   // 2. Trier par date de début
   const sorted = filtered.sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());

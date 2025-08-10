@@ -121,9 +121,11 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       } else {
       fetch(`${config.TicketUrl}/api/v1/users`, {
       method: 'POST',
+
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
       body: JSON.stringify({ email: email, organization: "starset"})
      }).then(() => {
+
          navigation.navigate({
            name: 'mailVerificationCode',
            params: { email, password },
