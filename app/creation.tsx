@@ -99,7 +99,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       });
         
       const checkData = await checkResponse.json();
-      console.log('Check email response:', checkData);
+     
       if (!checkData.available) {
         setErrorMessage("Cette adresse e-mail est déjà utilisée.");
         return;
@@ -123,16 +123,12 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
       body: JSON.stringify({ email: email, organization: "starset"})
-     }).then((response) => {
-       if (response.ok) {
+     }).then(() => {
          navigation.navigate({
            name: 'mailVerificationCode',
            params: { email, password },
          } as never);
-       } else {
-         setErrorMessage("Erreur lors de la création de l'utilisateur.");
-       }
-      });
+       });
       }
     } catch (error) {
       console.error(error);
