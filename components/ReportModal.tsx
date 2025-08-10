@@ -74,7 +74,7 @@ const ReportModal = ({ visible, onClose, workerId, firstName, lastName, missionT
 
 const sendReport = async (form: any, checkedItems: any, workerId: string) => {
     try {
-      const response = await fetch(`${config.TicketUrl}/tickets`, {
+      const response = await fetch(`${config.TicketUrl}/api/v1/tickets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
         body: JSON.stringify({
@@ -86,6 +86,7 @@ const sendReport = async (form: any, checkedItems: any, workerId: string) => {
           type_signalement: Object.keys(checkedItems).filter(key => checkedItems[key]),
           description: form.description,
           customer: reporterMail,
+          email_user: reporterMail,
           group_id: 1,
           type: 'email',
         }),
