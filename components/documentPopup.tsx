@@ -1,4 +1,7 @@
 // components/PrestationDocumentModal.tsx
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
+import { useFonts } from 'expo-font';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -41,6 +44,12 @@ const PrestationDocumentModal: React.FC<Props> = ({
   const [metier, setMetier] = useState('');
   const [documents, setDocuments] = useState<DocItem[]>([]);
   const [mandatorySummary, setMandatorySummary] = useState({ required: 0, uploaded: 0 });
+
+  let [fontsLoaded] = useFonts({
+        
+    LexendDeca : LexendDeca_400Regular,    
+    LeagueSpartanBold : LeagueSpartan_700Bold
+  });
 
   const mandatoryDocs = useMemo(
     () => documents.filter(d => d.type === 'mandatory'),
@@ -184,22 +193,27 @@ const PrestationDocumentModal: React.FC<Props> = ({
         )}
       </View>
       {doc.uploaded ? (
-        <TouchableOpacity
-          style={[styles.actionBtn, styles.deleteBtn]}
-          onPress={() => deleteDocument(doc)}
-          disabled={uploading || loading}
-        >
-          <Text style={styles.actionText}>Supprimer</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={[styles.actionBtn, styles.addBtn]}
-          onPress={() => pickAndUpload(doc)}
-          disabled={uploading || loading}
-        >
-          <Text style={styles.actionText}>Ajouter</Text>
-        </TouchableOpacity>
-      )}
+  <TouchableOpacity
+    style={[styles.actionBtn, styles.deleteBtn]}
+    onPress={() => deleteDocument(doc)}
+    disabled={uploading || loading}
+  >
+    <Text style={styles.actionText}>Supprimer</Text>
+  </TouchableOpacity>
+) : (
+  <TouchableOpacity
+    style={[
+      styles.actionBtn,
+      doc.type === 'mandatory'
+        ? { backgroundColor: '#EF3E3E' } // rouge pour obligatoire
+        : { backgroundColor: '#2ECC71' } // vert pour recommandé
+    ]}
+    onPress={() => pickAndUpload(doc)}
+    disabled={uploading || loading}
+  >
+    <Text style={styles.actionText}>Ajouter</Text>
+  </TouchableOpacity>
+)}
     </View>
   );
 
@@ -289,13 +303,13 @@ const styles = StyleSheet.create({
   handleWrapper: { alignItems: 'center', paddingVertical: 6 },
   handle: { width: 44, height: 5, borderRadius: 3, backgroundColor: '#D1D5DB' },
 
-  title: { fontSize: 20, fontWeight: '800', textAlign: 'center', color: '#111', marginTop: 4 },
-  subtitle: { textAlign: 'center', color: '#666', marginTop: 2 },
+  title: { fontSize: 20, fontWeight: '800', textAlign: 'center', color: '#111', marginTop: 4, fontFamily : 'LeagueSpartanBold' },
+  subtitle: { textAlign: 'center', color: '#666', marginTop: 2, fontFamily : 'LexendDeca' },
   counter: { textAlign: 'center', color: '#333', marginTop: 8, marginBottom: 10, fontWeight: '600' },
 
   scroll: { maxHeight: '70%' },
 
-  section: { fontSize: 14, fontWeight: '700', color: '#111', marginTop: 14, marginBottom: 6 },
+  section: { fontSize: 14, fontWeight: '700', color: '#111', marginTop: 14, marginBottom: 6, fontFamily : 'LeagueSpartanBold' },
   muted: { color: '#6b7280', marginBottom: 8 },
 
   row: {
@@ -307,7 +321,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 10,
   },
-  docName: { fontWeight: '700', color: '#000', marginBottom: 2 },
+  docName: { fontWeight: '700', color: '#000', marginBottom: 2, fontFamily : 'LeagueSpartanBold' },
   fileName: { color: '#6b7280', fontSize: 12 },
 
   actionBtn: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, minWidth: 120, alignItems: 'center' },

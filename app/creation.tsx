@@ -121,7 +121,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
       } else {
       fetch(`${config.TicketUrl}/users`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${config.tokenTicket}` },
+      headers: { 'Authorization': `Bearer ${config.tokenTicket}`,'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email })
      }).then((response) => {
        if (response.status === 201) {

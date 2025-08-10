@@ -193,6 +193,16 @@ const [isModalVisible, setIsModalVisible] = useState(false);
           <View style={styles.profileDescriptionContainer}>
             <Text style={styles.profileDescription}>{item.description}</Text>
           </View>
+           <View style={styles.profileCategories}>
+                    {item.metiers.slice(0, 3).map((metier: any, index: any) => (
+                      <View key={index} style={styles.categoryBadge}>
+                        <Text style={styles.categoryText2}>{metier.name}</Text>
+                      </View>
+                    ))}
+                    <View  style={styles.categoryBadge}>
+                        <Text style={styles.categoryText2}>+</Text>
+                      </View>
+                  </View>
         </View>
       </TouchableOpacity>
     );
@@ -512,14 +522,14 @@ const styles = StyleSheet.create({
   categoryBadge: {
     backgroundColor: '#e0e0e0',
     borderRadius: 12,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     paddingVertical: 4,
     marginRight: 5,
     marginBottom: 5,
   },
 
   categoryText2: {
-    fontSize: 8,
+    fontSize: 6,
     color: '#333',
     fontFamily : 'JosefinRegular',
   },

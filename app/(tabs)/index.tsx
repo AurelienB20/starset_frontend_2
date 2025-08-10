@@ -207,7 +207,7 @@ const HomeScreen = () => {
             <Text style={styles.pseudo}>{item.pseudo}</Text>
           </View>
           <View style={styles.ratingContainer}>
-          {[...Array(5)].map((_, index) => (
+          {[...Array(0)].map((_, index) => (
             <Ionicons key={index} name="star" size={16} color="gold" />
           ))}
         </View>
