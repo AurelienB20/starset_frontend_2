@@ -1,11 +1,9 @@
 // components/ExperienceModal.tsx
-import { FontAwesome } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import React from 'react';
 import {
   Alert,
-  Image,
   Platform,
   StyleSheet,
   Text,
@@ -13,7 +11,6 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type Props = {
   visible: boolean;
@@ -108,7 +105,8 @@ const ExperienceModal = ({
           onChangeText={(text) => onChange({ ...item, description: text })}
         />
 
-        <Text style={styles.inputLabel}>Images (max 3)</Text>
+       
+        {/*<Text style={styles.inputLabel}>Images (max 3)</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {(item?.images || []).map((img: string, index: number) => (
             <View key={index} style={styles.imageWrapper}>
@@ -123,7 +121,7 @@ const ExperienceModal = ({
               <FontAwesome name="plus" size={24} color="gray" />
             </TouchableOpacity>
           )}
-        </View>
+        </View>*/}
 
         <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
           <Text style={styles.submitButtonText}>

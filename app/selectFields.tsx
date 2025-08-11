@@ -1,4 +1,7 @@
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -12,6 +15,12 @@ const InterestsScreen = () => {
     const { email, password} = route.params || {};
     
     const navigation = useNavigation();
+
+    let [fontsLoaded] = useFonts({
+          
+      LexendDeca : LexendDeca_400Regular,
+      LeagueSpartanBold : LeagueSpartan_700Bold
+    });
 
   useEffect(() => {
     fetchInterests();
@@ -145,34 +154,36 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     margin: 5,
   },
   selectedInterestButton: {
-    backgroundColor: 'green', // Change en vert quand l’item est sélectionné
-    borderColor: 'darkgreen',
+    backgroundColor: '#2ECC71', // Change en vert quand l’item est sélectionné
+    borderColor: '#2ECC71',
     
   },
   interestText: {
     fontSize: 12,
     color: 'black',
+    fontFamily : 'LexendDeca'
   },
 
   selectedInterestText: {
     fontSize: 12,
     color: 'white',
+    fontFamily : 'LexendDeca'
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#2ECC71',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: 'black',
+    fontFamily : 'LeagueSpartanBold',
+    color: 'white',
   },
   footer: {
     marginVertical: 30,

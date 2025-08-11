@@ -102,7 +102,7 @@ const ModifyPseudoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#aff',
+    
   },
   
   // HEADER

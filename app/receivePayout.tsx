@@ -15,6 +15,7 @@ const ReceivePayoutScreen = () => {
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(true);
   const [payoutsEnabled, setPayoutsEnabled] = useState(false);
+  const [hasStripeAccount, setHasStripeAccount] = useState(false);
   const [onboardingUrl, setOnboardingUrl] = useState<string | null>(null);
 
   const getAccountId = async () => {
@@ -26,28 +27,37 @@ const ReceivePayoutScreen = () => {
     }
   };
 
-  const checkStripeStatus = async () => {
-    setCheckingStatus(true);
+  // <-- NOUVEAU: vérifie s’il existe déjà un compte Stripe côté backend
+  const checkStripeAccountPresence = async () => {
     try {
       const accountId = await getAccountId();
       if (!accountId) throw new Error('Utilisateur non identifié');
 
-      const response = await fetch(`${config.backendUrl}/api/stripe/get-stripe-account-status`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/check-stripe-account`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ account_id: accountId }),
+        body: JSON.stringify({ id: accountId }),
       });
 
       const data = await response.json();
 
-      if (!response.ok || !data.success) {
-        throw new Error('Impossible de récupérer le statut Stripe');
+      if (!response.ok) {
+        throw new Error(data?.message || 'Erreur API check-stripe-account');
       }
 
-      setPayoutsEnabled(data.payouts_enabled);
-    } catch (err) {
-      console.error('Erreur statut Stripe :', err);
-      Alert.alert('Erreur', 'Impossible de vérifier le statut de réception des paiements.');
+      // data.ok === true  => un stripe_account_id existe
+      if (data.ok) {
+        setHasStripeAccount(true);
+        setPayoutsEnabled(true); // on considère que les infos sont déjà enregistrées
+      } else {
+        // aucun compte Stripe configuré : on garde l’UI actuelle (warning + activer)
+        setHasStripeAccount(false);
+        setPayoutsEnabled(false);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification du compte Stripe:', error);
+      // on ne change pas l’UI si erreur, on montre juste un warning non bloquant
+      // (optionnel) Alert.alert('Erreur', 'Impossible de vérifier le compte Stripe. Veuillez réessayer plus tard.');
     } finally {
       setCheckingStatus(false);
     }
@@ -70,8 +80,7 @@ const ReceivePayoutScreen = () => {
         throw new Error('Lien onboarding invalide');
       }
 
-      // Afficher la WebView
-      setOnboardingUrl(data.url);
+      setOnboardingUrl(data.url); // Affiche la WebView
     } catch (error) {
       console.error('Erreur onboarding :', error);
       Alert.alert('Erreur', 'Impossible de lancer le processus Stripe.');
@@ -81,10 +90,9 @@ const ReceivePayoutScreen = () => {
   };
 
   useEffect(() => {
-    // Supposons que l'utilisateur n'a pas encore de compte Stripe
-    setCheckingStatus(false);
-    setPayoutsEnabled(false); // on suppose qu’il n’a rien activé
-    // checkStripeStatus(); // on désactive l’appel
+    // On check juste la présence du compte Stripe (sans récupérer les capabilities)
+    checkStripeAccountPresence();
+    // Si tu veux aussi vérifier payouts_enabled, tu peux appeler checkStripeStatus() après.
   }, []);
 
   // 👉 Affiche WebView si onboarding en cours
@@ -97,11 +105,7 @@ const ReceivePayoutScreen = () => {
         >
           <Text style={{ color: '#fff', textAlign: 'center' }}>Fermer</Text>
         </TouchableOpacity>
-        <WebView
-          source={{ uri: onboardingUrl }}
-          startInLoadingState
-          javaScriptEnabled
-        />
+        <WebView source={{ uri: onboardingUrl }} startInLoadingState javaScriptEnabled />
       </View>
     );
   }
@@ -111,13 +115,15 @@ const ReceivePayoutScreen = () => {
       <Text style={styles.headerText}>Réception de paiements</Text>
 
       {checkingStatus ? (
-        <ActivityIndicator size="large" color="green"/>
-      ) : payoutsEnabled ? (
-        <Text style={styles.successText}>✅ Vos paiements sont activés !</Text>
+        <ActivityIndicator size="large" color="green" />
+      ) : hasStripeAccount ? (
+        <Text style={styles.successText}>✅ Vos informations ont déjà été enregistrées.</Text>
       ) : (
-        <Text style={styles.warningText}>
-          ⚠️ Veuillez compléter vos informations bancaires pour pouvoir recevoir des paiements.
-        </Text>
+        <>
+          <Text style={styles.warningText}>
+            ⚠️ Veuillez compléter vos informations bancaires pour pouvoir recevoir des paiements.
+          </Text>
+        </>
       )}
 
       <TouchableOpacity
@@ -126,7 +132,11 @@ const ReceivePayoutScreen = () => {
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Chargement...' : payoutsEnabled ? 'Mettre à jour mes infos' : 'Activer les paiements'}
+          {loading
+            ? 'Chargement...'
+            : hasStripeAccount
+              ? 'Mettre à jour mes infos'
+              : 'Activer les paiements'}
         </Text>
       </TouchableOpacity>
     </View>

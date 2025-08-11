@@ -895,10 +895,10 @@ const { user, setUser } = useUser()
 
   const handleAddCertification = async () => {
     try {
-      if (!selectedItem || (selectedItem.images || []).length === 0) {
-        Alert.alert('Erreur', 'Veuillez ajouter au moins une image de certification.');
-        return;
-      }
+      //if (!selectedItem || (selectedItem.images || []).length === 0) {
+      //  Alert.alert('Erreur', 'Veuillez ajouter au moins une image de certification.');
+      //  return;
+      //}
   
       const base64Images = [];
   

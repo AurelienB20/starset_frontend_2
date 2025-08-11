@@ -1,12 +1,24 @@
 import { useUser } from '@/context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import CountryPicker from 'react-native-country-picker-modal'; // Importer la bibliothèque
 import PhoneInput from 'react-native-phone-number-input';
 import config from '../config.json';
+
+import { Platform } from 'react-native';
+import { LocaleConfig } from 'react-native-calendars';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
+LocaleConfig.locales.fr = {
+  monthNames: ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],
+  monthNamesShort: ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'],
+  dayNames: ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'],
+  dayNamesShort: ['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'],
+  today: "Aujourd'hui",
+};
+LocaleConfig.defaultLocale = 'fr';
 
 const AccountInfoScreen = () => {
   const [firstName, setFirstName] = useState('');
@@ -25,6 +37,12 @@ const AccountInfoScreen = () => {
   const route = useRoute() as any;
   const { email, password , preferredFields, address, coordinates} = route.params || {};
    const { user, setUser } = useUser()
+
+   const [showCalendar, setShowCalendar] = useState(false);
+const [tempBirthDate, setTempBirthDate] = useState<Date>(birthDate);
+const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+
+
   
   const handleFirstNameChange = (text : any) => setFirstName(text);
   const handleLastNameChange = (text : any) => setLastName(text);
@@ -41,6 +59,22 @@ const AccountInfoScreen = () => {
     } catch (e) {
       console.error('Erreur lors de la récupération du type de compte', e);
     }
+  };
+
+  const openCalendar = () => {
+  if (isDatePickerVisible) return;
+  Keyboard.dismiss();           // 🔑 1er tap ne sert plus à fermer le clavier
+  setDatePickerVisible(true);
+};
+const closeCalendar = () => setDatePickerVisible(false);
+
+const handleConfirmBirthDate = (date: Date) => {
+  setBirthDate(date);
+  setDatePickerVisible(false);
+};
+  const confirmCalendarDate = () => {
+    setBirthDate(tempBirthDate);
+    setShowCalendar(false);
   };
 
   const handleSubmit = async () => {
@@ -134,24 +168,21 @@ const AccountInfoScreen = () => {
         value={lastName}
       />
 
-      <TouchableOpacity onPress={toggleDatePicker} style={styles.dateDiv}>
-        <TextInput
-          style={styles.birth}
-          placeholder="Date de naissance"
-          placeholderTextColor="#808080"
-          value={birthDate ? birthDate.toLocaleDateString() : ''}
-          editable={false}
-        />
-      </TouchableOpacity>
+      <Pressable
+  onPress={openCalendar}
+  style={styles.dateDiv}
+  hitSlop={16}                  // zone tactile plus grande
+>
+  {/* View non interactive au lieu d’un TextInput */}
+  <View pointerEvents="none" style={styles.nameInput}>
+    <Text style={{ textAlign: 'center', color: birthDate ? 'black' : '#808080' }}>
+      {birthDate ? birthDate.toLocaleDateString() : 'Date de naissance'}
+    </Text>
+  </View>
+</Pressable>
 
-      {showDatePicker && (
-        <DateTimePicker
-          value={birthDate || new Date(2025, 0, 1)} // valeur par défaut
-          mode="date"
-          display="spinner"
-          onChange={onChangeDate}
-        />
-      )}
+      
+
       
       <TypedPhoneInput
         ref={phoneInputRef}
@@ -193,11 +224,24 @@ const AccountInfoScreen = () => {
       )}
 
       <TouchableOpacity onPress={handleSubmit} style={styles.submitbutton}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Suivant</Text>
+        <Text style={{ fontSize: 20, fontWeight: 'bold', color : 'white' }}>Suivant</Text>
       </TouchableOpacity>
       <Text style={{ fontSize: 16, color: 'black', position: 'absolute', bottom: 30, left: 0, right: 0, textAlign: 'center' }}>
         Star set
       </Text>
+      <DateTimePickerModal
+  isVisible={isDatePickerVisible}
+  mode="date"
+  date={birthDate || new Date(2000, 0, 1)}
+  maximumDate={new Date()}
+  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+  locale="fr-FR"
+  onConfirm={(date) => {
+    setDatePickerVisible(false);
+    setBirthDate(date);
+  }}
+  onCancel={() => setDatePickerVisible(false)}
+/>
     </View>
   );
 };
@@ -210,13 +254,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   enter: {
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 40,
-    marginTop: 0,
+    marginTop: 30,
     marginHorizontal: 20,
     color: 'black',
   },
@@ -291,15 +335,19 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     width: '60%',
     height: 50,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#2ECC71',
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
     borderRadius: 25,
     marginHorizontal: 10,
+    
   },
   dateDiv: {
     alignItems: 'center',
+    width : '100%',
+    
+    maxWidth: 350,
   },
   quickNav: {
     flexDirection: 'row',

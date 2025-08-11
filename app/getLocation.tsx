@@ -1,4 +1,7 @@
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useState } from 'react';
 import {
   FlatList,
@@ -18,6 +21,11 @@ const LocationPickerScreen = () => {
   const route = useRoute() as any;
   const { email, password, preferredFields } = route.params || {};
   const navigation = useNavigation();
+
+  let [fontsLoaded] = useFonts({        
+    LexendDeca : LexendDeca_400Regular,
+    LeagueSpartanBold : LeagueSpartan_700Bold
+  });
 
   const searchAddress = async (text: string) => {
     setAddress(text);
@@ -83,7 +91,7 @@ const LocationPickerScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>entrer votre adresse postale (optionnel)</Text>
+      <Text style={styles.title}>Entrer votre adresse postale (optionnel)</Text>
       <Text style={styles.subTitle}>
         si vous n'ajoutez pas votre adresse vous ne pourrez commander que les
         services en distanciel
@@ -125,7 +133,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'LeagueSpartanBold',
     marginBottom: 20,
     textAlign: 'center',
     color: 'black',

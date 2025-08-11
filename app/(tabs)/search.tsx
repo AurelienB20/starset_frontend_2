@@ -529,7 +529,7 @@ const styles = StyleSheet.create({
   },
 
   categoryText2: {
-    fontSize: 6,
+    fontSize: 8,
     color: '#333',
     fontFamily : 'JosefinRegular',
   },
