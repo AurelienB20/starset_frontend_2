@@ -165,7 +165,6 @@ const PrestationsScreen = () => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ prestation_custom_id: id }),
             });
-
             const data = await response.json();
             if (data.success) {
               setCustomPrestations((prev: any[]) => prev.filter((item) => item.id !== id));
@@ -209,6 +208,14 @@ const PrestationsScreen = () => {
               </TouchableOpacity>
             }
           >
+            <Menu.Item
+              onPress={() => {
+                setMenuVisibleId(null);
+                openEditModal(item);
+              }}
+              title="Modifier"
+            />
+
             <Menu.Item
               onPress={() => {
                 setMenuVisibleId(null);
