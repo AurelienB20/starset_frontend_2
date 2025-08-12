@@ -1,5 +1,6 @@
 import { useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
@@ -13,6 +14,7 @@ const CroissanceScreen = () => {
   const [otherJobs, setOtherJobs] = useState<any[]>([]);
   const [workers, setWorkers] = useState<any[]>([]);
 const [loadingWorkers, setLoadingWorkers] = useState(false);
+const navigation = useNavigation()
 
 
   const news = {
@@ -25,8 +27,17 @@ const [loadingWorkers, setLoadingWorkers] = useState(false);
   useEffect(() => {
   fetchJobsOfTheDay();
   fetchJobsThatNeedHelp();
-   fetchWorkers();
+  fetchWorkers();
 }, []);
+
+const goToPrestationViewWithId = (id : any) => {
+    
+  console.log(123)
+  navigation.navigate({
+    name: 'prestationView',
+    params: { id },
+  } as never);
+};
 
 const fetchWorkers = async () => {
   try {
