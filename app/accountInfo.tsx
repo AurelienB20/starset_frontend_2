@@ -190,10 +190,7 @@ const handleConfirmBirthDate = (date: Date) => {
     </Text>
   </View>
 </Pressable>
-
-      
-
-      
+ 
       <TypedPhoneInput
         ref={phoneInputRef}
         defaultValue={phoneNumber}
