@@ -24,7 +24,7 @@ const AccountInfoScreen = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   
-  const [birthDate, setBirthDate] = useState(new Date(2025, 0, 1));
+  const [birthDate, setBirthDate] = useState(new Date(2000, 0, 1));
   
   const [phoneNumber, setPhoneNumber] = useState('');
   const phoneInputRef = useRef<PhoneInput>(null);
@@ -39,11 +39,9 @@ const AccountInfoScreen = () => {
    const { user, setUser } = useUser()
 
    const [showCalendar, setShowCalendar] = useState(false);
-const [tempBirthDate, setTempBirthDate] = useState<Date>(birthDate);
-const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [tempBirthDate, setTempBirthDate] = useState<Date>(birthDate);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
-
-  
   const handleFirstNameChange = (text : any) => setFirstName(text);
   const handleLastNameChange = (text : any) => setLastName(text);
   const handlePhoneNumberChange = (text : any) => setPhoneNumber(text);
@@ -61,15 +59,27 @@ const [isDatePickerVisible, setDatePickerVisible] = useState(false);
     }
   };
 
+  const today = new Date();
+    const minDob = new Date(1900, 0, 1);
+    const clampDate = (d: Date, min: Date, max: Date) => {
+      if (!(d instanceof Date) || isNaN(d.getTime())) return max;
+      if (d < min) return min;
+      if (d > max) return max;
+      return d;
+    };
+
   const openCalendar = () => {
-  if (isDatePickerVisible) return;
-  Keyboard.dismiss();           // 🔑 1er tap ne sert plus à fermer le clavier
-  setDatePickerVisible(true);
-};
+    if (isDatePickerVisible) return;
+    Keyboard.dismiss();
+    // si un autre modal est ouvert, ne pas empiler deux modals
+    if (showCountryPicker) return;
+    setDatePickerVisible(true);
+  };
+
 const closeCalendar = () => setDatePickerVisible(false);
 
 const handleConfirmBirthDate = (date: Date) => {
-  setBirthDate(date);
+  setBirthDate(clampDate(date, minDob, today));
   setDatePickerVisible(false);
 };
   const confirmCalendarDate = () => {
@@ -83,7 +93,7 @@ const handleConfirmBirthDate = (date: Date) => {
     console.log(fullPhoneNumber)
 
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/register`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/register-with-crypt`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,18 +240,17 @@ const handleConfirmBirthDate = (date: Date) => {
         Star set
       </Text>
       <DateTimePickerModal
-  isVisible={isDatePickerVisible}
-  mode="date"
-  date={birthDate || new Date(2000, 0, 1)}
-  maximumDate={new Date()}
-  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-  locale="fr-FR"
-  onConfirm={(date) => {
-    setDatePickerVisible(false);
-    setBirthDate(date);
-  }}
-  onCancel={() => setDatePickerVisible(false)}
-/>
+        isVisible={isDatePickerVisible}
+        mode="date"
+        date={clampDate(birthDate, minDob, today)}
+        maximumDate={today}
+        // iOS préfère fr_FR (underscore). Si doute, retire la prop locale.
+        locale={Platform.OS === 'ios' ? 'fr_FR' : undefined}
+        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+        onConfirm={handleConfirmBirthDate}
+        onCancel={() => setDatePickerVisible(false)}
+      />
+
     </View>
   );
 };
