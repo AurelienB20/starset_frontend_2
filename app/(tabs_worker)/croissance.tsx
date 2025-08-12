@@ -27,7 +27,7 @@ const navigation = useNavigation()
   useEffect(() => {
   fetchJobsOfTheDay();
   fetchJobsThatNeedHelp();
-   fetchWorkers();
+  fetchWorkers();
 }, []);
 
 const goToPrestationViewWithId = (id : any) => {
