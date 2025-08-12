@@ -208,13 +208,6 @@ const PrestationsScreen = () => {
               </TouchableOpacity>
             }
           >
-            <Menu.Item
-              onPress={() => {
-                setMenuVisibleId(null);
-                openEditModal(item);
-              }}
-              title="Modifier"
-            />
 
             <Menu.Item
               onPress={() => {
@@ -254,7 +247,13 @@ const PrestationsScreen = () => {
               {parseFloat(item.price).toFixed(2).replace('.', ',')}€
             </Text>
           </View>
+           <TouchableOpacity style={styles.addButtonModifier} onPress={() =>  openEditModal(item)}>
+          <Text style={styles.addButtonText}>
+            {modalVisible ? 'Annuler' : 'MODIFIER'}
+          </Text>
+        </TouchableOpacity>
         </View>
+       
       </TouchableOpacity>
     );
   };
@@ -339,6 +338,7 @@ export default PrestationsScreen;
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fff' },
   addButton: { backgroundColor: '#008000', padding: 15, borderRadius: 10, marginTop: 20, alignItems: 'center' },
+  addButtonModifier: { backgroundColor: '#008000', paddingVertical: 10, paddingHorizontal: 35, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonText: { color: '#fff', fontWeight: 'bold' },
   
   prestationTitle: { fontWeight: 'bold', fontSize: 16 },
