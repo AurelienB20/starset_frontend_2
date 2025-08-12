@@ -8,13 +8,12 @@ import React, { useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
-  Image,
   Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -184,12 +183,7 @@ const ChoosePrestationScreen = () => {
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity style={styles.card} onPress={() => openAddModal(item)}>
-      <Image
-        source={{
-          uri: item.picture_url || 'https://radiodisneyclub.fr/wp-content/uploads/2016/02/1CD_4872.jpg',
-        }}
-        style={styles.thumbnail}
-      />
+      
       <View style={styles.cardContent}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description} numberOfLines={2}>

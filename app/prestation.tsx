@@ -1,4 +1,3 @@
-import CertificationFormModal from '@/components/CertificationModal';
 import ExperienceModal from '@/components/ExperienceModal';
 import { useAllWorkerPrestation, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
@@ -9,9 +8,7 @@ import * as ImagePicker from 'expo-image-picker';
 import moment from 'moment';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import { IconButton, Menu } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../config.json';
 
 
@@ -58,7 +55,7 @@ const PrestationScreen = () => {
   const [remuneration, setRemuneration] = useState(prestation?.remuneration || ''); // Assurez-vous que prestation.remuneration est disponible
 
   const [certifications, setCertifications] = useState<any>([]);
-  const [isCertificationFormVisible, setCertificationFormVisible] = useState(false);
+  
   const [certificationTitle, setCertificationTitle] = useState('');
   const [certificationInstitution, setCertificationInstitution] = useState('');
   const [certificationDate, setCertificationDate] = useState('');
@@ -84,7 +81,7 @@ const PrestationScreen = () => {
   const [editInstitution, setEditInstitution] = useState(''); // uniquement pour certification
   const [editImages, setEditImages] = useState<string[]>([]);
   const [showEditCalendar, setShowEditCalendar] = useState(false);
-  const [isExperienceModalVisible, setExperienceModalVisible] = useState(false);
+  
   const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
 const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
 const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
@@ -93,6 +90,21 @@ const [docLoading, setDocLoading] = useState(false);
 const [docsComplete, setDocsComplete] = useState(true);
 const [docsMissing, setDocsMissing] = useState<string[]>([]);
 const { user, setUser } = useUser()
+// drafts pour les formulaires
+const [experienceDraft, setExperienceDraft] = useState<any>({
+  title: '', date: '', description: '', images: []
+});
+const [certificationDraft, setCertificationDraft] = useState<any>({
+  title: '', institution: '', date: '', description: '', images: []
+});
+
+// visibilités
+const [isExperienceModalVisible, setExperienceModalVisible] = useState(false);
+const [isCertificationFormVisible, setCertificationFormVisible] = useState(false);
+
+// menus (séparés pour éviter les collisions d'id)
+const [experienceMenuVisibleId, setExperienceMenuVisibleId] = useState<string|null>(null);
+const [certificationMenuVisibleId, setCertificationMenuVisibleId] = useState<string|null>(null);
 
  let [fontsLoaded] = useFonts({
     
@@ -176,11 +188,11 @@ const { user, setUser } = useUser()
     setShowCalendar(false);
   };
 
-  const handleExperienceDateSelect = (day: any) => {
-    const formatted = moment(day.dateString).format('DD/MM/YYYY');
-    setExperienceDate(formatted);
-    setShowExperienceCalendar(false);
-  };
+  //const handleExperienceDateSelect = (day: any) => {
+  //  const formatted = moment(day.dateString).format('DD/MM/YYYY');
+  //  setExperienceDate(formatted);
+  //  setShowExperienceCalendar(false);
+  //};
 
   // Pour ajouter une certification
   const handleAddCertificationClick = () => {
@@ -218,6 +230,31 @@ const { user, setUser } = useUser()
   }
 };
 
+const openExperienceForCreate = () => {
+  setExperienceDraft({ title:'', date:'', description:'', images:[] });
+  setCertificationFormVisible(false); // s’assurer qu’il n’y a qu’un modal ouvert
+  setExperienceModalVisible(true);
+};
+
+const openExperienceForEdit = (exp: any) => {
+  setExperienceDraft({ ...exp });
+  setCertificationFormVisible(false);
+  setExperienceModalVisible(true);
+};
+
+// CERTIFICATIONS
+const openCertificationForCreate = () => {
+  setCertificationDraft({ title:'', institution:'', date:'', description:'', images:[] });
+  setExperienceModalVisible(false);
+  setCertificationFormVisible(true);
+};
+
+const openCertificationForEdit = (cert: any) => {
+  setCertificationDraft({ ...cert });
+  setExperienceModalVisible(false);
+  setCertificationFormVisible(true);
+};
+
 
   // Pour ajouter une expérience
   const handleAddExperienceClick = () => {
@@ -247,104 +284,6 @@ const { user, setUser } = useUser()
         selectedColor: '#00cc66',
       },
     };
-  };
-
-  const handleDelete = async () => {
-    if (!selectedItem || !editType) return;
-
-    Alert.alert(
-      `Supprimer cette ${editType} ?`,
-      "Cette action est irréversible.",
-      [
-        { text: "Annuler", style: "cancel" },
-        {
-          text: "Supprimer",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const url = editType === 'experience' ? 
-                `${config.backendUrl}/api/mission/delete-experience` : 
-                `${config.backendUrl}/api/mission/delete-certification` ;
-
-              const response = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: selectedItem.id }),
-              });
-
-              if (!response.ok) throw new Error('Erreur réseau');
-
-              if (editType === 'experience') {
-                setExperiences(prev => prev.filter(e => e.id !== selectedItem.id));
-              } else {
-                setCertifications((prev: any[]) => prev.filter(c => c.id !== selectedItem.id));
-              }
-              setEditModalVisible(false);
-              setSelectedItem(null);
-              Alert.alert('Succès', `${editType} supprimée.`);
-            } catch (error : any) {
-              Alert.alert('Erreur', `Impossible de supprimer la ${editType}. `);
-              console.log(error?.message)
-            }
-          },
-        },
-      ]
-    );
-  };
-
-  const updateCertification = async () => {
-    try {
-      const base64Images = [];
-  
-      for (const uri of selectedItem.images || []) {
-        if (uri.startsWith('data:image')) {
-          base64Images.push(uri); // déjà encodée
-        } else if (uri.startsWith('file://')) {
-          // Image locale à convertir
-          const response = await fetch(uri);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          const base64 = await new Promise((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-          base64Images.push(base64 as string);
-        } else {
-          // Image distante déjà hébergée, on la garde
-          base64Images.push(uri);
-        }
-      }
-  
-      const response = await fetch(`${config.backendUrl}/api/mission/update-certification`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: selectedItem.id,
-          title: selectedItem.title,
-          institution: selectedItem.institution,
-          date: selectedItem.date,
-          description: selectedItem.description,
-          images: base64Images,
-          prestation_id,
-        }),
-      });
-  
-      if (!response.ok) throw new Error('Erreur réseau');
-  
-      const data = await response.json();
-  
-      setCertifications((prev: any[]) =>
-        prev.map(cert => cert.id === selectedItem.id ? (data ? data.certification:cert): cert)
-      );
-  
-      setCertificationFormVisible(false);
-      setSelectedItem(null);
-      Alert.alert('Succès', 'Certification mise à jour');
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erreur', 'Impossible de mettre à jour la certification');
-    }
   };
 
   const confirmToggleIsRemote = () => {
@@ -394,60 +333,6 @@ const { user, setUser } = useUser()
   };
   
 
-
-  const updateExperience = async () => {
-  try {
-    // Convertir les images si besoin comme pour création
-    const base64Images = [];
-    for (const uri of selectedItem.images || []) {
-      if (uri.startsWith('data:image')) {
-        base64Images.push(uri); // déjà encodée
-      } else if (uri.startsWith('file://')) {
-        // Image locale à convertir
-        const response = await fetch(uri);
-        const blob = await response.blob();
-        const reader = new FileReader();
-        const base64 = await new Promise((resolve, reject) => {
-          reader.onloadend = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        base64Images.push(base64 as string);
-      } else {
-        // Image distante (hébergée) : on garde l'URL
-        base64Images.push(uri);
-      }
-    }
-
-    console.log("donnees pour la mise a jour de l'experience")
-    console.log(selectedItem)
-    //console.log(base64Images)
-
-    const response = await fetch(`${config.backendUrl}/api/mission/update-experience`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: selectedItem.id,
-        title: selectedItem.title,
-        date: selectedItem.date,
-        experienceDescription: selectedItem.description,
-        images: base64Images,
-        prestation_id,
-      }),
-    });
-
-    if (!response.ok) throw new Error('Erreur réseau');
-
-    const data = await response.json();
-    
-    setExperiences(prev => prev.map(e => e.id === selectedItem.id ? (data ? data.experience:e) : e));
-    setExperienceModalVisible(false);
-    setSelectedItem(null);
-    Alert.alert('Succès', 'Expérience mise à jour');
-  } catch (error) {
-    Alert.alert('Erreur', 'Impossible de mettre à jour l\'expérience');
-  }
-};
 
   const handleDeletePhoto = async (index : any) => {
     const photoToDelete = prestationPhotos[index]; // Récupérer la photo à supprimer
@@ -500,63 +385,7 @@ const { user, setUser } = useUser()
     );
   };
 
-  const pickEditImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      base64: true,
-      quality: 0.5,
-    });
   
-    if (!result.canceled && result.assets.length > 0) {
-      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-  
-      // Mise à jour de selectedItem (images)
-      setSelectedItem((prevItem: { images: any; }) => ({
-        ...prevItem,
-        images: [...(prevItem.images || []), base64Image],
-      }));
-    }
-  };
-
-  const pickExperienceImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  
-    if (!permissionResult.granted) {
-      Alert.alert("Permission refusée", "Autorisez l'accès à la galerie.");
-      return;
-    }
-  
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.5,
-    });
-  
-    if (!result.canceled && result.assets && experienceImages.length < 3) {
-      setExperienceImages(prev => [...prev, result.assets[0].uri]);
-    } else if (experienceImages.length >= 3) {
-      Alert.alert("Limite atteinte", "Vous ne pouvez ajouter que 3 image.");
-    }
-  };
-
-  const pickCertificationImage = async () => {
-  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-  if (!permissionResult.granted) {
-    Alert.alert("Permission refusée", "Autorisez l'accès à la galerie.");
-    return;
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 0.5,
-  });
-
-  if (!result.canceled && result.assets && certificationImages.length < 3) {
-    setCertificationImages(prev => [...prev, result.assets[0].uri]);
-  } else if (certificationImages.length >= 3) {
-    Alert.alert("Limite atteinte", "Vous ne pouvez ajouter que 3 images.");
-  }
-};
 
   const addPrestationPhoto = async () => {
     // Demander la permission d'accès à la bibliothèque d'images
@@ -723,33 +552,88 @@ const { user, setUser } = useUser()
     }
   };
 
-  
-  const getPrestationPhotos = async () => {
-    try {
-      //console.log('debut get experiences')
-      
-      const response = await fetch(`${config.backendUrl}/api/mission/get-all-experience`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  // 🔥 Supprimer une expérience
+const deleteExperience = (id: string) => {
+  Alert.alert(
+    'Supprimer cette expérience ?',
+    'Cette action est irréversible.',
+    [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const res = await fetch(`${config.backendUrl}/api/mission/delete-experience`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id }),
+            });
+
+            if (!res.ok) throw new Error('Erreur réseau');
+
+            const data = await res.json();
+            if (!data?.success) throw new Error(data?.message || 'Suppression refusée');
+
+            // MAJ liste locale
+            setExperiences(prev => prev.filter(e => e.id !== id));
+            // fermer le menu s’il était ouvert sur cet item
+            setExperienceMenuVisibleId(null);
+
+            Alert.alert('Succès', 'Expérience supprimée.');
+          } catch (err) {
+            console.log(err);
+            Alert.alert('Erreur', "Impossible de supprimer l'expérience.");
+          }
         },
-        body: JSON.stringify({ prestation_id }),
-      });
+      },
+    ]
+  );
+};
 
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+// 📄 Supprimer une certification
+const deleteCertification = (id: string) => {
+  Alert.alert(
+    'Supprimer cette certification ?',
+    'Cette action est irréversible.',
+    [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const res = await fetch(`${config.backendUrl}/api/mission/delete-certification`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id }),
+            });
 
-      const data = await response.json();
-      //console.log('experiences :', data.experiences);
+            if (!res.ok) throw new Error('Erreur réseau');
 
-      // Stocker les prestations dans l'état
-      if(data) setExperiences(data.experiences);
-      
-    } catch (error) {
-      console.error('Une erreur est survenue lors de la récupération des experiences:', error);
-    }
-  };
+            const data = await res.json();
+            if (!data?.success) throw new Error(data?.message || 'Suppression refusée');
+
+            // MAJ liste locale
+            setCertifications((prev: any[]) => prev.filter(c => c.id !== id));
+            // fermer le menu s’il était ouvert sur cet item
+            setCertificationMenuVisibleId(null);
+
+            Alert.alert('Succès', 'Certification supprimée.');
+          } catch (err) {
+            console.log(err);
+            Alert.alert('Erreur', 'Impossible de supprimer la certification.');
+          }
+        },
+      },
+    ]
+  );
+};
+
+
+
+  
+  
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -827,57 +711,6 @@ const { user, setUser } = useUser()
     );
   };
 
-  const createExperience = async () => {
-    try {
-      if (!selectedItem) return;
-  
-      const base64Images = [];
-  
-      for (const uri of selectedItem.images || []) {
-        if (uri.startsWith('data:image')) {
-          base64Images.push(uri); // déjà en base64
-        } else {
-          const response = await fetch(uri);
-          const blob = await response.blob();
-  
-          const reader = new FileReader();
-          const base64 = await new Promise((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-  
-          base64Images.push(base64);
-        }
-      }
-  
-      const response = await fetch(`${config.backendUrl}/api/mission/create-experience`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: selectedItem.title,
-          date: selectedItem.date,
-          description: selectedItem.description,
-          images: base64Images,
-          prestation_id,
-        }),
-      });
-  
-      if (!response.ok) throw new Error('Erreur réseau');
-  
-      const data = await response.json();
-      if(data) setExperiences(prev => [...prev, data.experience]);
-  
-      // Reset
-      setExperienceModalVisible(false)
-      setSelectedItem(null);
-  
-      Alert.alert('Succès', 'Expérience ajoutée avec succès');
-    } catch (error) {
-      console.error('Erreur création expérience:', error);
-      Alert.alert('Erreur', 'Impossible d\'ajouter l\'expérience');
-    }
-  };
 
   const openImageModal = (imageUri : any) => {
     setSelectedImage(imageUri);
@@ -893,61 +726,6 @@ const { user, setUser } = useUser()
     navigation.navigate('multiplePrestation' as never) 
   }
 
-  const handleAddCertification = async () => {
-    try {
-      //if (!selectedItem || (selectedItem.images || []).length === 0) {
-      //  Alert.alert('Erreur', 'Veuillez ajouter au moins une image de certification.');
-      //  return;
-      //}
-  
-      const base64Images = [];
-  
-      for (const uri of selectedItem.images || []) {
-        if (uri.startsWith('data:image')) {
-          base64Images.push(uri);
-        } else {
-          const response = await fetch(uri);
-          const blob = await response.blob();
-  
-          const reader = new FileReader();
-          const base64 = await new Promise((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-          });
-  
-          base64Images.push(base64);
-        }
-      }
-  
-      const response = await fetch(`${config.backendUrl}/api/mission/create-certification`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: selectedItem.title,
-          institution: selectedItem.institution,
-          date: selectedItem.date,
-          description: selectedItem.description,
-          images: base64Images,
-          prestation_id,
-        }),
-      });
-  
-      if (!response.ok) throw new Error("Erreur lors de l'ajout de la certification");
-  
-      const data = await response.json();
-      if(data) setCertifications((prev: any[]) => [...prev, data.certification]);
-  
-      // Reset
-      setCertificationFormVisible(false);
-      setSelectedItem(null);
-  
-      Alert.alert('Succès', 'Certification ajoutée avec succès');
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout de la certification:', error);
-      Alert.alert('Erreur', 'Impossible d\'ajouter la certification');
-    }
-  };
 
 
   const confirmTogglePrestationPublished = async () => {
@@ -1055,6 +833,18 @@ const { user, setUser } = useUser()
       console.error('Une erreur est survenue lors de la mise à jour de la publication:', error);
     }
   };
+
+  const handleExperienceDateSelect = (day: any) => {
+  const formatted = moment(day.dateString).format('DD/MM/YYYY');
+  setExperienceDraft((d: any) => ({ ...d, date: formatted }));
+  setShowExperienceCalendar(false);
+};
+
+const handleCertificationDateSelect = (day: any) => {
+  const formatted = moment(day.dateString).format('DD/MM/YYYY');
+  setCertificationDraft((d: any) => ({ ...d, date: formatted }));
+  setShowCalendar(false);
+};
 
   const handleEditDescription = () => {
     setIsEditing(true); // Active le mode édition local
@@ -1439,38 +1229,12 @@ const { user, setUser } = useUser()
         {/* Menu des 3 points */}
         <View style={styles.experienceMenuContainer}>
           <Menu
-            visible={menuVisibleId === experience.id}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                size={24}
-                onPress={() => openMenu(experience.id)}
-                style={styles.menuIconButton}
-              />
-            }
-            contentStyle={styles.menuContent}
-          >
-            <Menu.Item
-              onPress={() => {
-                openOptions(experience, 'experience'); // remplit les states
-                closeMenu();
-                setExperienceModalVisible(true); // ensuite on ouvre le modal
-              }}
-              title="Modifier"
-            />
-            <Menu.Item
-              
-              onPress={() => {
-                setEditType('experience');
-                setSelectedItem(experience);
-                handleDelete(); // ← là ça passe car setSelectedItem est juste avant
-                closeMenu();
-              }}
-              title="Supprimer"
-              titleStyle={{ color: 'red' }}
-            />
-          </Menu>
+  visible={experienceMenuVisibleId === experience.id}
+  onDismiss={() => setExperienceMenuVisibleId(null)}
+  anchor={<IconButton icon="dots-vertical" onPress={() => setExperienceMenuVisibleId(experience.id)} />}>
+  <Menu.Item title="Modifier" onPress={() => { openExperienceForEdit(experience); }} />
+  <Menu.Item title="Supprimer" onPress={() => deleteExperience(experience.id)} />
+</Menu>
         </View>
       </View>
     ))}
@@ -1478,34 +1242,26 @@ const { user, setUser } = useUser()
     {/* Formulaire d’édition ou de création */}
     {isExperienceModalVisible && (
   <ExperienceModal
-      visible={isExperienceModalVisible}
-      onClose={() => {
-        setExperienceModalVisible(false);
-        if (editType === 'experience') {
-          setEditType(null);
-          setSelectedItem(null);
-          setEditTitle('');
-          setEditDescription('');
-          setEditDate('');
-          setEditImages([]);
-        } else {
-          setTitle('');
-          setExperienceDescription('');
-          setExperienceDate('');
-          setExperienceImages([]);
-        }
-      }}
-      isEditMode={editType === 'experience'}
-      item = {selectedItem}
-      showCalendar={showExperienceCalendar}
-      onChange={(updatedItem) => {setSelectedItem(updatedItem), console.log(updatedItem)}}
-      onAddImage={editType === 'experience' ? pickExperienceImage : pickCertificationImage}
-      onSubmit={editType === 'experience' ? updateExperience : createExperience}
-      onToggleCalendar={() => setShowExperienceCalendar(!showExperienceCalendar)}
-    />)}
+  visible={isExperienceModalVisible}
+  onClose={() => setExperienceModalVisible(false)}
+  isEditMode={!!experienceDraft.id}
+  entityType="experience"
+  item={experienceDraft}
+  prestationId={prestation_id}
+  showCalendar={showExperienceCalendar}
+  onChange={setExperienceDraft}
+  onToggleCalendar={() => setShowExperienceCalendar(v => !v)}
+  onUpsertSuccess={(exp) => {
+    if (experienceDraft.id) {
+      setExperiences(prev => prev.map(e => e.id === exp.id ? exp : e));
+    } else {
+      setExperiences(prev => [...prev, exp]);
+    }
+  }}
+/>)}
     <TouchableOpacity
       style={styles.addButton}
-      onPress={() => setExperienceModalVisible(true)}
+      onPress={openExperienceForCreate}
     >
       <Text style={styles.addButtonText}>
         Ajouter une experience
@@ -1515,7 +1271,7 @@ const { user, setUser } = useUser()
   )}
 
 
-  <Modal
+  {/*<Modal
     animationType="slide"
     transparent={true}
     visible={showExperienceCalendar}
@@ -1535,7 +1291,7 @@ const { user, setUser } = useUser()
         />
       </View>
     </View>
-  </Modal>
+  </Modal>*/}
 
       {/* Placeholder for the "Certifications" tab */}
       {selectedTab === 'certifications' && (
@@ -1598,37 +1354,13 @@ const { user, setUser } = useUser()
 
         {/* Menu paramètres */}
         <View style={styles.certificationMenuContainer}>
-          <Menu
-            visible={menuVisibleId === certification.id}
-            onDismiss={closeMenu}
-            anchor={
-              <IconButton
-                icon="dots-vertical"
-                size={24}
-                onPress={() => openMenu(certification.id)}
-              />
-            }
-            contentStyle={styles.menuContent}
-          >
-            <Menu.Item
-              onPress={() => {
-                openOptions(certification, 'certification');
-                setCertificationFormVisible(true);
-                closeMenu();
-              }}
-              title="Modifier"
-            />
-            <Menu.Item
-              onPress={() => {
-                setEditType('certification');
-                setSelectedItem(certification);
-                handleDelete();
-                closeMenu();
-              }}
-              title="Supprimer"
-              titleStyle={{ color: 'red' }}
-            />
-          </Menu>
+<Menu
+  visible={certificationMenuVisibleId === certification.id}
+  onDismiss={() => setCertificationMenuVisibleId(null)}
+  anchor={<IconButton icon="dots-vertical" onPress={() => setCertificationMenuVisibleId(certification.id)} />}>
+  <Menu.Item title="Modifier" onPress={() => { openCertificationForEdit(certification); }} />
+  <Menu.Item title="Supprimer" onPress={() => deleteCertification(certification.id)} />
+</Menu>
         </View>
       </View>
     </View>
@@ -1642,34 +1374,28 @@ const { user, setUser } = useUser()
     )}
 
 {isCertificationFormVisible && (
-<CertificationFormModal
-      onClose={() => {
-        setCertificationFormVisible(false);
-      }}
-      isEditMode={editType === 'certification'}
-      item={selectedItem || {
-        title: '',
-        institution: '',
-        date: '',
-        description: '',
-        images: certificationImages,
-      }}
-      showCalendar={showCalendar}
-      onChange={(updatedItem) => {
-        setSelectedItem(updatedItem);
-      }}
-      onAddImage={editType === 'certification' ? pickEditImage : pickCertificationImage}
-      onSubmit={editType === 'certification' ? updateCertification : handleAddCertification}
-      onToggleCalendar={() => setShowCalendar(!showCalendar)}
-      onDateSelect={(date: string) => {
-        setSelectedItem((prev: any) => ({ ...prev, date }));
-        setShowCalendar(false);
-      }}
-    />)}
+<ExperienceModal
+  visible={isCertificationFormVisible}
+  onClose={() => setCertificationFormVisible(false)}
+  isEditMode={!!certificationDraft.id}
+  entityType="certification"
+  prestationId={prestation_id}
+  item={certificationDraft}
+  showCalendar={showCalendar}
+  onChange={setCertificationDraft}
+  onToggleCalendar={() => setShowCalendar(v => !v)}
+  onUpsertSuccess={(cert) => {
+    setCertifications((prev: any[]) =>
+      certificationDraft.id
+        ? prev.map(c => c.id === cert.id ? cert : c)
+        : [...prev, cert]
+    );
+  }}
+/>)}
 
 <TouchableOpacity
       style={styles.addButton}
-      onPress={() => setCertificationFormVisible(true)}
+      onPress={openCertificationForCreate}
     >
       <Text style={styles.addButtonText}>
         Ajouter une certification
@@ -1707,7 +1433,7 @@ const { user, setUser } = useUser()
         </View>
       </Modal>
       
-      <Modal
+      {/*<Modal
         animationType="slide"
         transparent={true}
         visible={showCalendar}
@@ -1715,7 +1441,7 @@ const { user, setUser } = useUser()
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            {/* Petite croix pour fermer le modal */}
+            {/* Petite croix pour fermer le modal 
             <TouchableOpacity onPress={toggleCalendar} style={styles.closeIcon}>
               <Icon name="close" size={24} color="#000" />
             </TouchableOpacity>
@@ -1728,11 +1454,11 @@ const { user, setUser } = useUser()
               style={styles.calendar}
             />
 
-            {/* Bouton Horaires */}
+            {/* Bouton Horaires *
            
           </View>
         </View>
-      </Modal>
+      </Modal>*/}
     </ScrollView>
   );
 };

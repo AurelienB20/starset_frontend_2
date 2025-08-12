@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -262,6 +263,7 @@ const PrestationsScreen = () => {
 
   return (
     <PaperProvider>
+      <ScrollView>
 
     <View style={styles.container}>
       <FlatList
@@ -269,14 +271,8 @@ const PrestationsScreen = () => {
         renderItem={renderPrestation}
         keyExtractor={(item: any) => item.id.toString()}
       />
-      
-      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(!modalVisible)}>
-  <Text style={styles.addButtonText}>
-    {modalVisible ? 'Annuler' : 'Ajouter une prestation'}
-  </Text>
-</TouchableOpacity>
 
-{modalVisible && (
+      {modalVisible && (
   <View style={styles.inlineForm}>
     <Text style={styles.prestationHeader}>PRESTATION {customPrestations.length + 1}</Text>
 
@@ -306,6 +302,14 @@ const PrestationsScreen = () => {
     </TouchableOpacity>
   </View>
 )}
+      
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(!modalVisible)}>
+  <Text style={styles.addButtonText}>
+    {modalVisible ? 'Annuler' : 'Ajouter une prestation'}
+  </Text>
+</TouchableOpacity>
+
+
 
     </View>
     <Modal visible={showPriceModal} transparent animationType="fade">
@@ -328,6 +332,7 @@ const PrestationsScreen = () => {
     </View>
   </View>
 </Modal>
+</ScrollView>
 
     </PaperProvider>
   );
@@ -336,13 +341,13 @@ const PrestationsScreen = () => {
 export default PrestationsScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  container: {  padding: 20, backgroundColor: '#fff' },
   addButton: { backgroundColor: '#008000', padding: 15, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonModifier: { backgroundColor: '#008000', paddingVertical: 10, paddingHorizontal: 35, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonText: { color: '#fff', fontWeight: 'bold' },
   
   prestationTitle: { fontWeight: 'bold', fontSize: 16 },
-  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalContainer: { flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 20, width: '90%' },
   closeIcon: { position: 'absolute', right: 10, top: 10 },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 10 },
@@ -453,7 +458,7 @@ const styles = StyleSheet.create({
   padding: 20,
   borderRadius: 12,
   marginTop: 20,
-  marginBottom: 30,
+  marginBottom: 80,
 },
 
 label: {

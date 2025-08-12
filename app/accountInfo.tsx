@@ -93,7 +93,7 @@ const handleConfirmBirthDate = (date: Date) => {
     console.log(fullPhoneNumber)
 
     try {
-      const response = await fetch(`${config.backendUrl}/api/auth/register-with-crypt`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
