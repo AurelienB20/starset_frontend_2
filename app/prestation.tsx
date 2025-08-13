@@ -2,10 +2,8 @@ import ExperienceModal from '@/components/ExperienceModal';
 import { useAllWorkerPrestation, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
-import moment from 'moment';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
@@ -19,22 +17,6 @@ import {
   getPrestation
 } from '../api/prestationApi';
 
-const emptyCertification = {
-  title: '',
-  institution: '',
-  date: '',
-  description: '',
-  images: [],
-};
-
-const emptyExperience = {
-  title: '',
-  date: '',
-  description: '',
-  images: [],
-};
-
-
 const PrestationScreen = () => {
   const [description, setDescription] = useState('');
   const [selectedTab, setSelectedTab] = useState('photos'); // 'photos', 'experiences', or 'certifications'
@@ -46,44 +28,19 @@ const PrestationScreen = () => {
   const { currentWorkerPrestation: prestation, setCurrentWorkerPrestation } = useCurrentWorkerPrestation();
 
   const [experiences, setExperiences] = useState<any[]>([]);
-  const [isPopupVisible, setIsPopupVisible] = useState(false); // État pour gérer la visibilité du popup
-
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [experienceDescription, setExperienceDescription] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [remuneration, setRemuneration] = useState(prestation?.remuneration || ''); // Assurez-vous que prestation.remuneration est disponible
 
   const [certifications, setCertifications] = useState<any>([]);
-  
-  const [certificationTitle, setCertificationTitle] = useState('');
-  const [certificationInstitution, setCertificationInstitution] = useState('');
-  const [certificationDate, setCertificationDate] = useState('');
   const [isImageModalVisible, setImageModalVisible] = useState(false); // Contrôle de la visibilité du modal
   const [selectedImage, setSelectedImage] = useState(null); // Image sélectionnée
   const { allWorkerPrestation, setAllWorkerPrestation } = useAllWorkerPrestation();
   const [showCalendar, setShowCalendar] = useState(false);
-  const [showExperienceForm, setShowExperienceForm] = useState(false);
   const [showExperienceCalendar, setShowExperienceCalendar] = useState(false);
-  const [experienceDate, setExperienceDate] = useState('');
   const [selectedMode, setSelectedMode] = useState<'sur place' | 'distanciel'>(prestation?.is_remote ? 'distanciel' : 'sur place');
 
   const [selectedTarifMode, setSelectedTarifMode] = useState<'heure' | 'prestation'>(prestation?.type_of_remuneration === 'hourly' ? 'heure' : 'prestation');
-  const [certificationImages, setCertificationImages] = useState<any[]>([]);
-  const [experienceImages, setExperienceImages] = useState<string[]>([]);
-
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [isEditModalVisible, setEditModalVisible] = useState(false);
-  const [editType, setEditType] = useState<'experience' | 'certification' | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editDate, setEditDate] = useState('');
-  const [editDescription, setEditDescription] = useState('');
-  const [editInstitution, setEditInstitution] = useState(''); // uniquement pour certification
-  const [editImages, setEditImages] = useState<string[]>([]);
-  const [showEditCalendar, setShowEditCalendar] = useState(false);
   
-  const [isTarifChangePopupVisible, setIsTarifChangePopupVisible] = useState(false);
-const [newTarifMode, setNewTarifMode] = useState<'heure' | 'prestation'>('heure');
 const [mandatoryDocuments, setMandatoryDocuments] = useState<any[]>([]);
 const [isDoucmentPopUpVisible, setIsDocumentPopUpVisible] = useState(false);
 const [docLoading, setDocLoading] = useState(false);
@@ -128,78 +85,7 @@ const [certificationMenuVisibleId, setCertificationMenuVisibleId] = useState<str
     navigation.navigate('availability' as never);
   };
 
-  const getWorkerId = async () => {
-    try {
-      const worker_id = await AsyncStorage.getItem('worker_id');
-      if (worker_id !== null) {
-        return worker_id;
-      }
-    } catch (e) {
-      console.error('Erreur lors de la récupération du type de compte', e);
-    }
-  };
-
-  const openOptions = (item: any, type: 'experience' | 'certification') => {
-  setSelectedItem(item);
-  setEditType(type);
-  setEditModalVisible(true);
-};
-
-  const openEditForm = () => {
-    if (!selectedItem) return;
-
-    setEditTitle(selectedItem.title);
-    setEditDate(selectedItem.date);
-    setEditDescription(selectedItem.description);
-    if (editType === 'certification') {
-      setEditInstitution(selectedItem.institution || '');
-    }
-    setEditImages(selectedItem.images || []);
-    setEditModalVisible(false);
-    setShowExperienceForm(false); // cacher formulaire création normal
-    setCertificationFormVisible(false);
-
-    // ouvrir formulaire édition selon type
-    if (editType === 'experience') setShowExperienceForm(true);
-    else if (editType === 'certification') setCertificationFormVisible(true);
-  };
-
-  const toggleCalendar = () => {
-    setShowCalendar(!showCalendar);
-  };
-
-  const handleEditCertification = (certification: any) => {
-    closeMenu();
-    // Ta logique d'édition ici (ex: setSelectedItem, ouvrir formulaire...)
-    //openEditFormForCertification(certification);
-  };
-
-  const handleDeleteCertification = (certification: any) => {
-    closeMenu();
-    // Ta logique de suppression ici (ex: setSelectedItem, confirmer suppression...)
-    setSelectedItem(certification);
-    setEditType('certification');
-    //confirmDeleteCertification(); // Ou ta fonction d’alerte de confirmation
-  };
-
-  const handleDateSelect = (day: any) => {
-    const formatted = moment(day.dateString).format('DD/MM/YYYY');
-    setCertificationDate(formatted);
-    setShowCalendar(false);
-  };
-
-  //const handleExperienceDateSelect = (day: any) => {
-  //  const formatted = moment(day.dateString).format('DD/MM/YYYY');
-  //  setExperienceDate(formatted);
-  //  setShowExperienceCalendar(false);
-  //};
-
-  // Pour ajouter une certification
-  const handleAddCertificationClick = () => {
-    setEditType('certification');
-    setSelectedItem({ ...emptyCertification });
-    setCertificationFormVisible(true);
-  };
+  
 
   const refreshMandatoryDocsStatus = async () => {
   if (!prestation_id) return;
@@ -254,37 +140,6 @@ const openCertificationForEdit = (cert: any) => {
   setExperienceModalVisible(false);
   setCertificationFormVisible(true);
 };
-
-
-  // Pour ajouter une expérience
-  const handleAddExperienceClick = () => {
-    setEditType('experience');
-    setSelectedItem({ ...emptyExperience });
-    setExperienceModalVisible(true);
-  };
-  
-  const getExperienceMarkedDates = () => {
-    if (!experienceDate) return {};
-    const dateISO = moment(experienceDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
-    return {
-      [dateISO]: {
-        selected: true,
-        selectedColor: '#00cc66',
-      },
-    };
-  };
-
-  const getMarkedDates = () => {
-    if (!certificationDate) return {};
-  
-    const dateISO = moment(certificationDate, 'DD/MM/YYYY').format('YYYY-MM-DD');
-    return {
-      [dateISO]: {
-        selected: true,
-        selectedColor: '#00cc66',
-      },
-    };
-  };
 
   const confirmToggleIsRemote = () => {
     const nextMode = selectedMode === 'sur place' ? 'distanciel' : 'sur place';
@@ -463,8 +318,6 @@ const openCertificationForEdit = (cert: any) => {
     }
   }
 
-
-
   const handleSaveRemuneration = async () => {
     // Code pour sauvegarder la rémunération
     setModalVisible(false);
@@ -480,10 +333,7 @@ const openCertificationForEdit = (cert: any) => {
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
-
     const data = await response.json();
-    
-
   };
 
   const handleFormattedRemuneration = (text: string) => {
@@ -527,8 +377,6 @@ const openCertificationForEdit = (cert: any) => {
 
   const getAllCertification = async () => {
     try {
-      
-      
       const response = await fetch(`${config.backendUrl}/api/mission/get-all-certification`, {
         method: 'POST',
         headers: {
@@ -540,9 +388,7 @@ const openCertificationForEdit = (cert: any) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
       const data = await response.json();
-      //console.log('certification :', data.certifications);
 
       // Stocker les prestations dans l'état
       if(data) setCertifications(data.certifications);
@@ -629,15 +475,6 @@ const deleteCertification = (id: string) => {
     ]
   );
 };
-
-
-
-  
-  
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-  };
 
   const handleSaveDescription = async () => {
     setIsEditing(false);
@@ -726,8 +563,6 @@ const deleteCertification = (id: string) => {
     navigation.navigate('multiplePrestation' as never) 
   }
 
-
-
   const confirmTogglePrestationPublished = async () => {
   // Toujours rafraîchir juste avant, pour être sû
   await refreshMandatoryDocsStatus();
@@ -780,7 +615,6 @@ const deleteCertification = (id: string) => {
   return;
 }
 
-
   const action = prestation?.published ? "dépublier" : "publier";
   Alert.alert(
     '',
@@ -795,7 +629,6 @@ const deleteCertification = (id: string) => {
     ]
   );
 };
-
 
   const togglePrestationPublished = async () => {
     try {
@@ -834,17 +667,6 @@ const deleteCertification = (id: string) => {
     }
   };
 
-  const handleExperienceDateSelect = (day: any) => {
-  const formatted = moment(day.dateString).format('DD/MM/YYYY');
-  setExperienceDraft((d: any) => ({ ...d, date: formatted }));
-  setShowExperienceCalendar(false);
-};
-
-const handleCertificationDateSelect = (day: any) => {
-  const formatted = moment(day.dateString).format('DD/MM/YYYY');
-  setCertificationDraft((d: any) => ({ ...d, date: formatted }));
-  setShowCalendar(false);
-};
 
   const handleEditDescription = () => {
     setIsEditing(true); // Active le mode édition local
@@ -1270,29 +1092,6 @@ const handleCertificationDateSelect = (day: any) => {
     </View>
   )}
 
-
-  {/*<Modal
-    animationType="slide"
-    transparent={true}
-    visible={showExperienceCalendar}
-    onRequestClose={() => setShowExperienceCalendar(false)}
-  >
-    <View style={styles.modalContainer}>
-      <View style={styles.modalContent}>
-        <TouchableOpacity onPress={() => setShowExperienceCalendar(false)} style={styles.closeIcon}>
-          <Icon name="close" size={24} color="#000" />
-        </TouchableOpacity>
-
-        <Text style={styles.modalTitle}>Choisissez une date</Text>
-        <Calendar
-          onDayPress={handleExperienceDateSelect}
-          markedDates={getExperienceMarkedDates()}
-          style={styles.calendar}
-        />
-      </View>
-    </View>
-  </Modal>*/}
-
       {/* Placeholder for the "Certifications" tab */}
       {selectedTab === 'certifications' && (
         
@@ -1401,24 +1200,11 @@ const handleCertificationDateSelect = (day: any) => {
         Ajouter une certification
       </Text>
     </TouchableOpacity>
-    
-    
       </View>
       )}
       <View style={styles.publishContainer}>
-        {/*<TouchableOpacity
-            style={[
-            styles.publishButton,
-            prestation?.published ? styles.unpublishButton : styles.publishButton,
-            ]}
-            onPress={confirmTogglePrestationPublished}
-        >
-            <Text style={styles.publishButtonText}>
-            {prestation?.published ? "Retirer" : "Publier"}
-            </Text>
-        </TouchableOpacity>*/}
-        </View>
-      
+        
+      </View>
       <Modal
         visible={isImageModalVisible}
         transparent={true}
@@ -1432,33 +1218,6 @@ const handleCertificationDateSelect = (day: any) => {
           </TouchableOpacity>
         </View>
       </Modal>
-      
-      {/*<Modal
-        animationType="slide"
-        transparent={true}
-        visible={showCalendar}
-        onRequestClose={toggleCalendar}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {/* Petite croix pour fermer le modal 
-            <TouchableOpacity onPress={toggleCalendar} style={styles.closeIcon}>
-              <Icon name="close" size={24} color="#000" />
-            </TouchableOpacity>
-
-            <Text style={styles.modalTitle}>Choisissez une date</Text>
-            <Calendar
-              onDayPress={handleDateSelect}
-              
-              markedDates={getMarkedDates()}
-              style={styles.calendar}
-            />
-
-            {/* Bouton Horaires *
-           
-          </View>
-        </View>
-      </Modal>*/}
     </ScrollView>
   );
 };
