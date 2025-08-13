@@ -674,8 +674,6 @@ const unlikeImage = async (imageId: string) => {
         <Text style={styles.profileName}>{account?.firstname}</Text>
       </View>
       
-      
-
       <View style={styles.tagsContainer}>
       
     <Text style={styles.profileDescription}>
