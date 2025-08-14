@@ -49,7 +49,7 @@ const { setAllWorkerPrestation } = useAllWorkerPrestation();
       const data = await response.json();
       if (data.success) {
         const account = data.account;
-        setUser(account);
+        getProfile(account?.id)
         saveData(account);
       
         await getWorkerPlannedPrestation(account.worker);

@@ -160,7 +160,8 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#5fc85fff',
+    
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: 'black',
+    color: 'white',
     textAlign: 'center',
   },
 });

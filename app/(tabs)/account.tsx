@@ -197,6 +197,32 @@ const AccountScreen = () => {
     }
   };
 
+  const MigrateSensitiveData = async () => {
+    try {
+      // Récupérer l'ID du compte
+     
+  
+      const response = await fetch(`${config.backendUrl}/api/auth/migrate-sensitive-data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      
+  
+    } catch (error) {
+      console.error('Error fetching profile picture:', error);
+      return null; // Retourne null en cas d'erreur
+    }
+  };
+
+
   const getUserPlannedPrestation = async () => {
     try {
       // Récupérer l'ID du compte
@@ -502,6 +528,13 @@ console.log(prestationId);
   <View style={styles.iconWithText}>
     <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
     <Text style={styles.menuItemText}>Politique de confidentialite</Text>
+  </View>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={MigrateSensitiveData}>
+  <View style={styles.iconWithText}>
+    <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
+    <Text style={styles.menuItemText}>Migrate sensitive data</Text>
   </View>
 </TouchableOpacity>
 

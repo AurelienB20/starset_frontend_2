@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
-import config from '../config.json';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUser } from '@/context/userContext';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import config from '../config.json';
 
 const VerificationScreen = () => {
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -24,6 +24,11 @@ const VerificationScreen = () => {
 
   const sendCode = async () => {
     setIsLoading(true);
+    console.log(1)
+    console.log(1)
+    console.log(1)
+    console.log(1)
+    console.log(1)
     try {
       const response = await fetch(`${config.backendUrl}/api/auth/send-email-verification-code`, {
         method: 'POST',

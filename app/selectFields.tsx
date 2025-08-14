@@ -154,7 +154,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 20,
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal : 10,
+    
     margin: 5,
   },
   selectedInterestButton: {
@@ -165,7 +166,8 @@ const styles = StyleSheet.create({
   interestText: {
     fontSize: 12,
     color: 'black',
-    fontFamily : 'LexendDeca'
+    fontFamily : 'LexendDeca',
+    
   },
 
   selectedInterestText: {

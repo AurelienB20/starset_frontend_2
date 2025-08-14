@@ -116,22 +116,21 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   
       const data = await response.json();
   
-      if (data.success === true) {
-        setErrorMessage('e-mail existe déjà');
-      } else {
+      
       fetch(`${config.TicketUrl}/api/v1/users`, {
       method: 'POST',
 
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.tokenTicket}` },
       body: JSON.stringify({ email: email, organization: "starset"})
      }).then(() => {
+      console.log('c est ici tb')
 
          navigation.navigate({
            name: 'mailVerificationCode',
            params: { email, password },
          } as never);
        });
-      }
+      
     } catch (error) {
       console.error(error);
       setErrorMessage("Erreur lors de l'enregistrement. Veuillez réessayer.");
