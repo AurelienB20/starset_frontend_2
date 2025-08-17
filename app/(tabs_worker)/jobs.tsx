@@ -614,6 +614,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     textAlign: 'center',
     marginBottom: 20,
+    color : 'black'
   },
   searchInput: {
     height: 40,

@@ -332,7 +332,8 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 16,
-    fontFamily: 'LeagueSpartanBold'
+    fontFamily: 'LeagueSpartanBold',
+    color : 'black'
   },
   message: {
     fontSize: 14,

@@ -5,6 +5,7 @@ import moment from 'moment';
 import React from 'react';
 import {
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -239,12 +240,19 @@ const getMarkedDates = () => {
 };
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          {/* Header */}
-          <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
+    <View style={styles.modalBackdrop}>
+      <View style={styles.modalContent}>
+        <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
             <Icon name="close" size={24} color="#000" />
           </TouchableOpacity>
+        <ScrollView
+          style={{ height: '100%',}}
+          contentContainerStyle={{ paddingBottom: 0 }}
+          nestedScrollEnabled
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Header */}
+          
 
           {(modalType === 'arrival' || modalType === 'departure') && (
             <TouchableOpacity
@@ -424,18 +432,32 @@ const getMarkedDates = () => {
               </TouchableOpacity>
             </>
           )}
-        </View>
+         </ScrollView>
       </View>
-    </Modal>
+    </View>
+  </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)',
+    
+  },
+  modalBackdrop: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContent: {
-    width: '85%', backgroundColor: 'white', borderRadius: 10, padding: 20, alignItems: 'center',
+    width: '85%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    maxHeight : '80%'
+    // ❌ enlève maxHeight ici
   },
   modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold', marginTop : 20 },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
@@ -449,3 +471,4 @@ const styles = StyleSheet.create({
 });
 
 export default DateTimeSelectionModal;
+

@@ -136,12 +136,7 @@ const JobViewScreen = () => {
       <Text style={styles.jobDescription}>{metier.description}</Text>
 
       {/* Missions */}
-      <Text style={styles.sectionTitle}>MISSIONS</Text>
-      {missions.map((mission : any, index : any) => (
-        <Text key={index} style={styles.missionItem}>
-          • {mission}
-        </Text>
-      ))}
+      
 
       {/* Documents obligatoires / recommandés */}
       <Text style={styles.sectionTitle}>DOCUMENTS OBLIGATOIRES/RECOMMANDÉS</Text>
@@ -214,6 +209,7 @@ const styles = StyleSheet.create({
     fontFamily : 'BebasNeue',
     textAlign: 'center',
     marginBottom: 10,
+    color : 'black'
   },
   jobDescription: {
     fontSize: 16,
@@ -225,6 +221,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily : 'BebasNeue',
     marginBottom: 10,
+    color : 'black'
   },
 
   missionItem: {

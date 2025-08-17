@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     textAlign: 'center',
     marginBottom: 20,
+    color : 'black'
   },
   
 
@@ -312,6 +313,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'BebasNeue',
     flexWrap: 'wrap',
+    color : 'black'
   },
 });
 

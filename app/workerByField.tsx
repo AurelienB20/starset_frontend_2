@@ -132,7 +132,8 @@ const styles = StyleSheet.create({
 
   headerTitle: {
     fontSize: 20,
-    fontFamily : 'LeagueSpartanBold'
+    fontFamily : 'LeagueSpartanBold',
+    color : 'black'
     
     
   },

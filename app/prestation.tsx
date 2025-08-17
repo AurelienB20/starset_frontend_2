@@ -945,7 +945,7 @@ const deleteCertification = (id: string) => {
           onPress={() => setModalVisible(true)}
         >
           {prestation?.remuneration ? (
-            <Text style={styles.tarifText}>{prestation.remuneration} €</Text>
+            <Text style={styles.tarifText}>{remuneration} €</Text>
           ) : (
             <FontAwesome name="euro" size={30} color="black" />
           )}

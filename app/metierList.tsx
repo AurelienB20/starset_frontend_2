@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
+    color : 'black'
   },
 
   content: {
@@ -159,7 +160,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     fontFamily : 'BebasNeue',
-    flexWrap : 'wrap'
+    flexWrap : 'wrap',
+    color : 'black'
   },
 
   emptyText: {
