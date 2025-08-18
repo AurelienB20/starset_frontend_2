@@ -1239,6 +1239,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     fontFamily:"../assets/fonts/BebasNeue_Regular.ttf",
+    color : 'black'
   },
 
   descriptionInput: {
@@ -1486,7 +1487,6 @@ const styles = StyleSheet.create({
   
   inputModal: {
     fontSize: 30,
-    
     color: '#000',
     textAlign: 'center',     
     paddingVertical: 10,
@@ -1771,6 +1771,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontFamily: "../assets/fonts/JosefinSans-Regular.ttf",
     fontWeight: 'bold', 
+    color : 'black',
     fontSize: 16,
     alignSelf : 'flex-start'
   },
@@ -1968,6 +1969,7 @@ sectionTitle: {
   fontWeight: 'bold',
   fontSize: 16,
   marginBottom: 5,
+  color : 'black'
 },
 
 toggleContainer: {

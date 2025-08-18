@@ -578,7 +578,7 @@ const onRefresh = React.useCallback(() => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitleLS}>Supprimer la prestation ?</Text>
-            <Text style={{ textAlign: 'center', marginBottom: 20, fontFamily : 'LexendDeca' }}>
+            <Text style={{ textAlign: 'center', marginBottom: 20, fontFamily : 'LexendDeca', color : 'black' }}>
               Cette action est irréversible. Voulez-vous vraiment continuer ?
             </Text>
             <View style={styles.modalButtons}>
@@ -698,7 +698,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     marginBottom: 15,
     textAlign: 'center',
-    fontFamily : 'LeagueSpartanBold'
+    fontFamily : 'LeagueSpartanBold',
+    color : 'black'
   },
 
   modalOption: {

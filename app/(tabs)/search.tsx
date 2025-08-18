@@ -158,7 +158,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
         style={styles.profileContainerList}
         onPress={() => goToPrestationViewWithId(item.metiers[0]?.id)}
       >
-        <View>
+        <View style={{ height: 100 }}>
         {item.profile_picture_url ? (
           <Image source={{ uri: item.profile_picture_url }} style={styles.profileImage} />
         ) : (

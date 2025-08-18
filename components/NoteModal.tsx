@@ -66,7 +66,7 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
         onPress={() => toggleTag(tag)}
         style={[styles.tag, isSelected && styles.tagSelected]}
       >
-        <Text style={{ color: 'black',  }}>{tag}</Text>
+        <Text style={{ color: 'black', fontSize : 10 }}>{tag}</Text>
       </TouchableOpacity>
     );
   };
@@ -133,10 +133,10 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
               <Text style={styles.sectionTitle}>NOTEZ LA PRESTATION</Text>
               <View style={styles.starsContainer}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <TouchableOpacity key={star} onPress={() => setRating(star)}>
+                  <TouchableOpacity key={star} onPress={() => setRating(star)} style={{ marginHorizontal: 5 }}>
                     <FontAwesome
                       name={star <= rating ? 'star' : 'star-o'}
-                      size={32}
+                      size={40}
                       color={star <= rating ? '#FFD700' : 'gray'}
                     />
                   </TouchableOpacity>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     marginHorizontal: 20,
-    backgroundColor: '#e6f2e6',
+    
     borderRadius: 20,
     padding: 20,
     maxHeight: '90%',

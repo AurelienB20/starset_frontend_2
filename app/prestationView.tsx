@@ -1148,7 +1148,7 @@ const unlikeImage = async (imageId: string) => {
     />
   }
 >
-  <Menu.Item onPress={confirmReport} title="Signaler" titleStyle={{ fontFamily: 'LexendDeca'}} />
+  <Menu.Item onPress={confirmReport} title="Signaler" titleStyle={{ fontFamily: 'LexendDeca', color : 'black'}} />
 </Menu>
       </View>
     </View>
@@ -1283,7 +1283,8 @@ const styles = StyleSheet.create({
   descriptionContainerText: {
     fontSize: 12,
     textAlign : 'center',
-    fontFamily : 'Glacial-Regular'
+    fontFamily : 'Glacial-Regular',
+    color : 'black'
   },
 
   tabContainer: {
@@ -1353,7 +1354,8 @@ const styles = StyleSheet.create({
   experienceDescription: {
     fontSize: 16,
     marginBottom: 10,
-    fontFamily : 'LexendDeca'
+    fontFamily : 'LexendDeca',
+    color : 'black'
   },
   experienceImages: {
     flexDirection: 'row',
@@ -1696,6 +1698,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     fontFamily: 'BebasNeue_400Regular' ,
+    color : 'black'
   },
 
   conversationModalButtonContainer: {
@@ -1829,6 +1832,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     fontFamily: 'Glacial-Bold', 
+    color : 'black'
   },
   
   reviewText: {
