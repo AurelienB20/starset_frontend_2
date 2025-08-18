@@ -1,5 +1,9 @@
 import { useUser } from '@/context/userContext';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { FontAwesome } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
@@ -25,6 +29,13 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
   const [prestation, setPrestation] = useState<any>(null);
   const [account, setAccount] = useState<any>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  let [fontsLoaded] = useFonts({
+        
+        LexendDeca : LexendDeca_400Regular,
+        BebasNeue: BebasNeue_400Regular,
+        LeagueSpartanBold : LeagueSpartan_700Bold
+      });
 
   useEffect(() => {
     if (visible) {
@@ -66,10 +77,16 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
         onPress={() => toggleTag(tag)}
         style={[styles.tag, isSelected && styles.tagSelected]}
       >
-        <Text style={{ color: 'black', fontSize : 10 }}>{tag}</Text>
-      </TouchableOpacity>
-    );
-  };
+        <Text 
+          style={[
+            { fontSize: 13, color: 'black' },
+            isSelected && { color: 'white' }   // ✅ texte blanc si sélectionné
+          ]}
+        >
+          {tag}</Text>
+            </TouchableOpacity>
+          );
+        };
 
   const handleSubmit = async () => {
     try {
@@ -115,7 +132,7 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
               <Image
                 source={{
                   uri:
-                    prestation?.profile_picture_url ||
+                    account?.profile_picture_url ||
                     'https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png',
                 }}
                 style={styles.avatar}
@@ -157,8 +174,8 @@ const NoteModal = ({ visible, onClose, planned_prestation }: any) => {
                 <Text style={styles.buttonText}>Envoyer</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity onPress={onClose} style={[styles.button, { backgroundColor: 'gray' }]}>
-                <Text style={styles.buttonText}>Annuler</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <FontAwesome name="close" size={24} color="black" />
               </TouchableOpacity>
             </ScrollView>
           </KeyboardAvoidingView>
@@ -176,7 +193,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     marginHorizontal: 20,
-    
+    backgroundColor : 'white',
     borderRadius: 20,
     padding: 20,
     maxHeight: '90%',
@@ -185,24 +202,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     marginBottom: 10,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    textAlign : 'center',
+    fontSize: 24,
+    fontFamily : 'BebasNeue',
     color: 'black',
   },
   subtitle: {
     fontSize: 14,
     color: 'gray',
     marginBottom: 20,
+    fontFamily : 'LexendDeca'
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily : 'LeagueSpartanBold',
     color: 'black',
     marginTop: 15,
     marginBottom: 5,
@@ -219,11 +238,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: 'gray',
-    fontSize: 12,
+    fontSize: 16,
   },
   tagSelected: {
-    borderColor: '#00cc44',
-    borderWidth: 2,
+    backgroundColor: '#00cc44',
+    borderColor :  '#00cc44'
+    
+    
   },
   starsContainer: {
     flexDirection: 'row',
@@ -243,8 +264,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#00cc44',
     paddingVertical: 12,
     paddingHorizontal: 40,
-    borderRadius: 20,
-    marginTop: 20,
+    borderRadius: 10,
+    marginTop: 40,
+    width : '100%'
   },
   buttonText: {
     color: 'white',
@@ -252,6 +274,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+
+  closeButton: {
+  position: 'absolute',
+  top: 5,
+  right: 5,
+  zIndex: 10,
+  padding: 5,
+},
+
 });
 
 export default NoteModal;
