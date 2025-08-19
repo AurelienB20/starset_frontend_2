@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Animated, Image, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
+import TextRecognition from 'react-native-text-recognition';
 import WebView from 'react-native-webview';
 import config from '../config.json';
 
@@ -258,7 +259,8 @@ const filteredDocs = availableDocTypes.filter(doc =>
           mimetype: 'image/jpeg',
           data: base64Data,
         };
-  
+        const result = await TextRecognition.recognize(selectedImage);
+        console.log('Text recognition result:', result);
         const uploadResponse = await fetch(`${config.backendUrl}/api/mission/add-worker-document`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -312,6 +314,7 @@ const filteredDocs = availableDocTypes.filter(doc =>
               });
   
               const data = await response.json();
+              console.log('Suppression document response:', data);
               if (data.success) {
                 Alert.alert('Succès', 'Document supprimé.');
                 fetchWorkerDocs();
