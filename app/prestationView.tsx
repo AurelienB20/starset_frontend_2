@@ -13,8 +13,9 @@ import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
 import moment, { MomentInput } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Assurez-vous d'avoir installé cette bibliothèque
 import config from '../config.json';
 
@@ -70,6 +71,7 @@ const PrestationViewScreen = () => {
   const [signupPromptModalVisible, setSignupPromptModalVisible] = useState(false);
   const [ finishedPrestationCount, setFinishedPrestationCount] = useState(0);
 
+  const insets = useSafeAreaInsets();
 
     const profileImageSize = scrollY.interpolate({
       inputRange: [0, 70],
@@ -649,7 +651,7 @@ const unlikeImage = async (imageId: string) => {
 
 
   return (
-    <View>
+    <View style={{paddingBottom: (Platform.OS === 'android' ? insets.bottom : 0)}}>
       <Animated.View style={[styles.profileContainer]}>
        
         

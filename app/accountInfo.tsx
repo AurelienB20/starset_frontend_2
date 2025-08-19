@@ -195,7 +195,6 @@ const handleConfirmBirthDate = (date: Date) => {
         ref={phoneInputRef}
         defaultValue={phoneNumber}
         defaultCode="FR"
-        layout="first"
         onChangeFormattedText={(text : any) => setPhoneNumber(text)}
         containerStyle={{
           borderWidth: 2,

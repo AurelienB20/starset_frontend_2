@@ -1,4 +1,4 @@
-import { useUser } from '@/context/userContext';
+import { useAllWorkerPlannedPrestation, useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
@@ -15,6 +15,11 @@ const CroissanceScreen = () => {
   const [workers, setWorkers] = useState<any[]>([]);
 const [loadingWorkers, setLoadingWorkers] = useState(false);
 const navigation = useNavigation()
+const { allWorkerPlannedPrestation } = useAllWorkerPlannedPrestation();
+
+const completedCount = allWorkerPlannedPrestation?.filter(
+  (p: any) => p.status === 'finished' || p.status === 'completed'
+).length || 0;
 
 
   const news = {
@@ -100,6 +105,11 @@ const fetchJobsThatNeedHelp = async () => {
     setIsModalVisible(true);
   };
 
+  const goToNews = () => {
+    
+    navigation.navigate('news' as never)
+  };
+
   
 
   const workersMock = [
@@ -114,7 +124,6 @@ const fetchJobsThatNeedHelp = async () => {
     showsVerticalScrollIndicator={false}>
       <View style={styles.croissanceContainer}>
         <Image style ={styles.tinyLogo}source={require('../../assets/images/Croissance.png')}/>
-        
       </View>
 
       <View style={styles.statsContainer}>
@@ -128,7 +137,7 @@ const fetchJobsThatNeedHelp = async () => {
           <Text style={styles.statText}>TOP JOB</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statNumber}>{user?.completed_prestation}</Text>
+          <Text style={styles.statNumber}>{completedCount}</Text>
           <Text style={styles.statText}>Missions accomplies</Text>
         </View>
         <View style={styles.statItem}>
@@ -224,7 +233,7 @@ const fetchJobsThatNeedHelp = async () => {
       />
 
       <Text style={[styles.sectionHeader, {textAlign : 'left'}]}>STARSET NEWS</Text>
-      <View style={styles.newsCard}>
+      <TouchableOpacity style={styles.newsCard} onPress={goToNews}>
         <View style={styles.newsHeader}>
           <Text style={styles.newsTitle}>
             {news.title} <FontAwesome name="smile-o" size={20} />
@@ -232,7 +241,7 @@ const fetchJobsThatNeedHelp = async () => {
           <Text style={styles.newsDate}>{news.date}</Text>
         </View>
         <Text style={styles.newsDescription}>{news.description}</Text>
-      </View>
+      </TouchableOpacity>
 
       <Modal
         animationType="slide"
