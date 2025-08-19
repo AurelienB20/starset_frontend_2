@@ -4,59 +4,71 @@ import { LexendDeca_400Regular } from "@expo-google-fonts/lexend-deca";
 import { useFonts } from "expo-font";
 import React from "react";
 import {
-    Dimensions,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 const exampleArticle = `
 [TITLE] Bienvenue sur STARSET [/TITLE]
 
 [TEXT]
-Le 11 juillet dernier, STARSET a officiellement pris son envol lors d’une soirée de lancement exceptionnelle.
-Un moment fort, à la hauteur de l’ambition de notre application.
+Le 11 juillet dernier, STARSET a officiellement pris son envol lors d’une soirée de lancement exceptionnelle au prestigieux Relais Spa de Marne-la-Vallée. 
+Un moment fort, à la hauteur de l’ambition de notre application : devenir la plateforme de référence en jobbing, connectant particuliers et professionnels 
+pour des missions du quotidien comme du babysitting, du pet-sitting, de l’aide à domicile, et bien plus encore.
 [/TEXT]
 
 [SUBTITLE] Une soirée inspirante et pleine de rencontres [/SUBTITLE]
 
 [TEXT]
-Le 11 juillet dernier, STARSET a officiellement pris son envol lors d’une soirée de lancement exceptionnelle.
-Un moment fort, à la hauteur de l’ambition de notre application.
+Parmi les invités d’honneur, STARSET a eu le plaisir d’accueillir des représentants du groupe Orano (ex-Areva), des entrepreneurs, des experts de l’innovation, 
+et des personnalités du monde du sport comme Mehdi Marzouki, champion de water-polo et figure influente dans l’univers du sport français.
+
+L’objectif ? Offrir une avant-première exclusive de l’application et présenter notre vision : une plateforme humaine, sécurisée et intuitive, pensée pour valoriser vos compétences, 
+simplifier les missions et faire du jobbing un levier d’indépendance et de flexibilité.
 [/TEXT]
 
-[BANNER] https://tse2.mm.bing.net/th/id/OIP.aMudBA3q3prJFT7wkjbq_gHaDe?rs=1&pid=ImgDetMain&o=7&rm=3 [/BANNER]
-
-[TEXT]
-Parmi les invités d’honneur, STARSET a accueilli des entrepreneurs, des experts de l’innovation,
-et des personnalités du sport.
-[/TEXT]
+[BANNER] https://fakeurl.com/banner3.jpg [/BANNER]
 
 [SUBTITLE] L’app STARSET dévoilée en avant-première [/SUBTITLE]
 
 [TEXT]
-Les invités ont pu tester l’application avant son ouverture au public. Résultat :
-de nombreuses inscriptions et des premiers retours enthousiastes.
+Les invités ont pu tester l’application avant son ouverture au public. Résultat : de nombreuses inscriptions et des premiers retours enthousiastes sur la simplicité de navigation, 
+la clarté des profils, et la mise en relation rapide et ciblée avec des particuliers à la recherche de talents comme vous.
+[/TEXT]
+
+[SUBTITLE] Et maintenant… à vous de jouer ! [/SUBTITLE]
+
+[TEXT]
+Cette soirée de lancement marque le début d’une aventure collective. STARSET a été conçue pour vous donner les moyens de travailler à votre rythme, selon vos disponibilités, 
+et dans les domaines qui vous passionnent.
+
+Vous avez un profil ? Alors activez-le. Complétez-le. Mettez-vous en ligne.
+
+Chaque jour, de nouvelles missions sont proposées par des particuliers à la recherche de talents de confiance.
+
+Ce n’est que le début, et vous faites partie des premiers à pouvoir bâtir votre réseau et votre réputation sur STARSET.
+[/TEXT]
+
+[SUBTITLE] STARSET, c’est plus qu’une appli. C’est une communauté [/SUBTITLE]
+
+[TEXT]
+Nous sommes fiers de vous avoir parmi nous dès les premiers pas de l’aventure. 
+D’autres événements, rencontres, avantages et surprises vous attendent dans les mois à venir…
+
+Alors, prêt(e) à briller avec STARSET ?
 [/TEXT]
 
 [ROWIMAGES]
-https://www.photo-paysage.com/albums/userpics/10001/thumb_Reflets-lac_Vallon-montagne-alpes-foret-IMG_1831.jpeg
-https://www.photo-paysage.com/albums/userpics/10001/thumb_Reflets-lac_Vallon-montagne-alpes-foret-IMG_1831.jpeg
-https://www.photo-paysage.com/albums/userpics/10001/thumb_Reflets-lac_Vallon-montagne-alpes-foret-IMG_1831.jpeg
+https://fakeurl.com/photo4.jpg
+https://fakeurl.com/photo5.jpg
+https://fakeurl.com/photo6.jpg
 [/ROWIMAGES]
-
-[TEXT]
-Chaque jour, de nouvelles missions seront proposées par des particuliers à la recherche de talents de confiance.
-[/TEXT]
-
-[BANNER] https://tse2.mm.bing.net/th/id/OIP.aMudBA3q3prJFT7wkjbq_gHaDe?rs=1&pid=ImgDetMain&o=7&rm=3 [/BANNER]
-
-[TEXT]
-Alors, prêt(e) à briller avec STARSET ?
-[/TEXT]
 `;
+
 
 const { width } = Dimensions.get("window");
 
