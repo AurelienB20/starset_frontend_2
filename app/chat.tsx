@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons'; // You can use icons for the send
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Dimensions, Image, Keyboard, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Provider } from 'react-native-paper';
+import { Alert, Dimensions, Image, Keyboard, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Menu, Provider } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import config from '../config.json';
 import socket from './socket';
 
@@ -26,6 +27,7 @@ const ChatScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
   const menuAnchorRef = useRef(null);
+  const insets = useSafeAreaInsets();
 
 
   const getConversationDetails = async () => {
@@ -312,7 +314,7 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
   
   return (
     <Provider>
-    <View style={[styles.container, { paddingBottom: keyboardHeight }]}>
+    <View style={[styles.container, { paddingBottom: keyboardHeight + (Platform.OS === 'android' ? insets.bottom : 0)}]}>
       <SafeAreaView style={{ flex: 1 }}>
       {/* Placeholder image at the top center */}
       <View style={styles.header}>
@@ -339,27 +341,79 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
       {/* Scrollable message list */}
       {/*<ScrollView style={styles.messageContainer} contentContainerStyle={{ flexGrow: 1 }}> */}
       <ScrollView style={styles.messageContainer}>
-        {messages.map((message: any, index: React.Key | null | undefined) => (
-          <View
-            key={index}
-            style={[
-              styles.messageBubble,
-              message.sender_id === sender_id ? styles.myMessage : styles.otherMessage,
-            ]}
-          >
-            <View style={message.sender_id === sender_id ? styles.myTextWrapper : styles.otherTextWrapper}>
-              <Text style={styles.messageText}>{message.message_text}</Text>
-              {message.picture_url ? (
-                <Image
-                  source={{ uri: message.picture_url }}
-                  style={{ width: 200, height: 200, borderRadius: 10, marginTop: 5 }}
-                  resizeMode="cover"
-                />
-              ) : null}
-              
-            </View>
-          </View>
-        ))}
+      {messages.map((message: any, index: any) => (
+        <>
+
+  <TouchableOpacity
+    key={index}
+    onLongPress={() => {
+      if (message.sender_id === sender_id) {   // ✅ Seulement si c’est mon message
+        setSelectedMessageId(message.id);
+        setMenuVisible(true);
+      }
+    }}
+    activeOpacity={0.8}
+    delayLongPress={300} // optionnel, délai avant déclenchement
+  >
+    <View
+      style={[
+        styles.messageBubble,
+        message.sender_id === sender_id ? styles.myMessage : styles.otherMessage,
+      ]}
+    >
+      <View
+        style={
+          message.sender_id === sender_id
+            ? styles.myTextWrapper
+            : styles.otherTextWrapper
+        }
+      >
+        <Text style={styles.messageText}>{message.message_text}</Text>
+        {message.picture_url ? (
+          <Image
+            source={{ uri: message.picture_url }}
+            style={{
+              width: 200,
+              height: 200,
+              borderRadius: 10,
+              marginTop: 5,
+            }}
+            resizeMode="cover"
+          />
+        ) : null}
+      </View>
+    </View>
+  </TouchableOpacity>
+  <Menu
+    visible={menuVisible}
+    onDismiss={() => setMenuVisible(false)}
+    anchor={{ x: 200, y: 400 }} // ⚠️ pour tester, tu peux calculer la position plus tard
+  >
+    <Menu.Item
+      onPress={() => {
+        setMenuVisible(false);
+        if (selectedMessageId) {
+          Alert.alert(
+            "Confirmation",
+            "Voulez-vous vraiment supprimer ce message ?",
+            [
+              { text: "Annuler", style: "cancel" },
+              {
+                text: "Supprimer",
+                style: "destructive",
+                onPress: () => handleDeleteMessage(selectedMessageId),
+              },
+            ]
+          );
+        }
+      }}
+      title="Supprimer"
+      leadingIcon="delete"
+    />
+  </Menu>
+  </>
+))}
+
       </ScrollView>
 
       {/* Fixed input bar */}
@@ -395,6 +449,8 @@ const fetchPrestationIdByWorker = async (workerId: any) => {
         <Ionicons name="send" size={24} color="white" />
       </TouchableOpacity>
     </View>
+
+
     </SafeAreaView>
     </View>
     </Provider>

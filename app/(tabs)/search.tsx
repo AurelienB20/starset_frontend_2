@@ -158,7 +158,7 @@ const [isModalVisible, setIsModalVisible] = useState(false);
         style={styles.profileContainerList}
         onPress={() => goToPrestationViewWithId(item.metiers[0]?.id)}
       >
-        <View>
+        <View style={{ height: 100 }}>
         {item.profile_picture_url ? (
           <Image source={{ uri: item.profile_picture_url }} style={styles.profileImage} />
         ) : (
@@ -442,6 +442,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 16,
     fontFamily: 'BebasNeue-Regular', // Utilisation de la police
+    color : 'black'
   },
   descriptionText: {
     fontSize: 16,
@@ -493,6 +494,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 19,
     fontFamily: 'Glacial-Bold', // Utilisation du nom défini dans useFonts
+    color : 'black'
   },
 
   profileUsername: {
@@ -506,6 +508,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     textAlign : 'center',
     fontFamily: 'BebasNeue',
+    color : 'black'
   },
 
   profileDescriptionContainer: {
@@ -706,6 +709,7 @@ jobTitle: {
   fontFamily: 'LeagueSpartanBold',
   textAlign: 'center',
   marginBottom: 10,
+  color : 'black'
   
 },
 
@@ -714,13 +718,15 @@ jobDescription: {
   color: '#333',
   textAlign: 'center',
   marginBottom: 20,
-  fontFamily : 'LexendDeca'
+  fontFamily : 'LexendDeca',
+
 },
 
 sectionTitle: {
   fontSize: 18,
   fontFamily: 'BebasNeue',
   marginBottom: 10,
+  color : 'black'
 },
 
 missionItem: {

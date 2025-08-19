@@ -107,6 +107,27 @@ const ConversationScreen = () => {
       });
     }
   };
+
+  const rejectConversation = async (conversation_id: string) => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/conversation/reject-conversation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ conversation_id }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erreur lors du refus de la conversation');
+      }
+  
+      await getAllConversation(); // Rafraîchir la liste
+    } catch (error) {
+      console.error('Erreur lors du refus:', error);
+    }
+  };
+  
   
 
   const acceptConversation = async (conversation_id: string) => {
@@ -289,7 +310,7 @@ const ConversationScreen = () => {
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={styles.rejectButton}
-                      onPress={() => console.log('Refuser non implémenté')}
+                      onPress={() => rejectConversation(item.id)}
                     >
                       <Text style={styles.buttonText}>Refuser</Text>
                     </TouchableOpacity>

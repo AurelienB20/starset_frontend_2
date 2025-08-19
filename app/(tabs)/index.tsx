@@ -588,7 +588,7 @@ const styles = StyleSheet.create({
   },
   suggestionText: {
     fontSize: 16,
-    color: '#000',
+    color: 'black',
   },
   
 

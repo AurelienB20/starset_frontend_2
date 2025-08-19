@@ -83,7 +83,7 @@ const ModifyAccountScreen = () => {
             try {
               setIsDeleting(true); // Lancement du chargement
               const accountId = await AsyncStorage.getItem('account_id');
-              const response = await fetch(`${config.backendUrl}/api/account/delete-account-soft`, {
+              const response = await fetch(`${config.backendUrl}/api/auth/delete-account-soft`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ account_id: accountId }),
@@ -126,6 +126,12 @@ const ModifyAccountScreen = () => {
       <InfoRow label="E-mail" value={user?.email} onPress={() => {navigation.navigate('modifyEmail' as never)}} />
       <InfoRow label="Adresse" value={user?.address || 'Ajouter une adresse'} onPress={() => {navigation.navigate('modifyLocation' as never)}} />
       <InfoRow label="Description" value={user?.description || 'Ajouter une description'} onPress={() => {navigation.navigate('modifyDescription' as never)}} />
+      <InfoRow
+        label="Mot de passe"
+        value="********"
+        onPress={() => { navigation.navigate('modifyPassword' as never); }}
+        
+      />
       <View style={{ alignSelf: 'flex-start', marginBottom: 10, marginTop : 10 }}>
         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Info Worker</Text>
       </View>

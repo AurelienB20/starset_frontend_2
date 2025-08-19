@@ -166,8 +166,9 @@ useEffect(() => {
   // Trouver une prestation qui correspond aux critères
   const targetPrestation = allUserPlannedPrestation.find(
     (p) =>
-      p.has_seen_rating_popup === false &&
-      (p.status === "finished" || p.status === "completed")
+      true
+      //p.has_seen_rating_popup === false &&
+      //(p.status === "finished" || p.status === "completed")
   );
 
   if (targetPrestation) {
