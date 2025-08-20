@@ -1,5 +1,6 @@
 import DateTimeSelectionModal from '@/components/DateTimeSelectionModal'; // ajuste le chemin si besoin
 import ReportModal from '@/components/ReportModal';
+import ShareProfileModal from '@/components/ShareModal';
 import SignupPromptModal from '@/components/SignupPromptModal';
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
@@ -11,10 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as Font from 'expo-font';
 import { useFonts } from 'expo-font';
-import * as Linking from 'expo-linking';
 import moment, { MomentInput } from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, FlatList, Image, Modal, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, FlatList, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconButton, Menu } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Assurez-vous d'avoir installé cette bibliothèque
@@ -71,6 +71,7 @@ const PrestationViewScreen = () => {
   const [selectedDates, setSelectedDates] = useState<any>({});
   const [signupPromptModalVisible, setSignupPromptModalVisible] = useState(false);
   const [ finishedPrestationCount, setFinishedPrestationCount] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
   const insets = useSafeAreaInsets();
 
@@ -132,26 +133,6 @@ const PrestationViewScreen = () => {
       { cancelable: false }
     );
     setMenuVisible(false);
-  };
-
-    const sharePrestation = async () => {
-      try {
-        const redirectUrl = Linking.createURL(route.name, {
-           queryParams: { id: prestation_id },
-        });
-        // iOS préfère `url`, Android utilise surtout `message`
-        const url = redirectUrl;
-        const title = 'Installer Starset et regarder cette prestation, elle peut vous intéresser';
-        const result = await Share.share(
-          Platform.select({
-            ios: { url, message: undefined, title },
-            android: { message: `${title}\n${url}` },
-            default: { message: `${title}\n${url}` },
-          })
-        );
-      } catch (e) {
-        console.warn('Erreur de partage:', e);
-      }
   };
 
   const toggleDatePicker = () => {
@@ -1158,7 +1139,7 @@ const unlikeImage = async (imageId: string) => {
       >
         <Icon name="mail" size={30} color="black" />
       </TouchableOpacity>
-    
+  
         <Menu
   visible={menuVisible}
   onDismiss={() => setMenuVisible(false)}
@@ -1172,8 +1153,13 @@ const unlikeImage = async (imageId: string) => {
   }
 >
   <Menu.Item onPress={confirmReport} title="Signaler" titleStyle={{ fontFamily: 'LexendDeca'}} />
-  <Menu.Item onPress={sharePrestation} title="Partager" titleStyle={{ fontFamily: 'LexendDeca'}} />
 </Menu>
+<TouchableOpacity onPress={() => setShowModal(true)}>
+  <Image
+    source={require('../assets/images/share-icon.png')}
+    style={{ width: 24, height: 24 }}
+  />
+</TouchableOpacity>
       </View>
     </View>
     {/* Ajouter au panier */}
@@ -1194,6 +1180,13 @@ const unlikeImage = async (imageId: string) => {
   </View>
   </TouchableOpacity>
  
+  <ShareProfileModal
+      visible={showModal}
+      onClose={() => setShowModal(false)}
+      route={route}
+      prestation_id={prestation.id}
+    />
+
       </View>
     </View>
   );
