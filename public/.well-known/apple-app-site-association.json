@@ -1,0 +1,10 @@
+{
+    "applinks": { 
+        "details": [
+            {
+                "appID": "QX2482TFHC.com.starset.frontend",
+                "paths": [ "/prestationView*" ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,12 @@
+[
+    {
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.starset77.frontend_starset_2",
+            "sha256_cert_fingerprints": [
+                "32:EB:11:54:AB:B5:F3:F9:23:D9:00:59:06:AB:BC:FA:A3:5B:BA:DB:13:83:48:86:8E:82:75:4F:C9:C2:43:A1"
+            ]
+        }
+    }
+]
