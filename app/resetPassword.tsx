@@ -1,6 +1,6 @@
 import { useUser } from '@/context/userContext';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { CommonActions, useNavigation, useRoute } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
@@ -65,6 +65,12 @@ const ResetPasswordScreen = () => {
 
       const data = await response.json();
       console.log('Password reset success:', data);
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'isVisitor' }],
+        })
+      );
 
       Alert.alert('Succès', 'Votre mot de passe a été mis à jour avec succès !');
       

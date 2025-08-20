@@ -116,8 +116,8 @@ const saveData = async (account: any) => {
         setErrorMessage('');
         getProfile(data.id)
         navigation.navigate({
-           name: '(tabs)',
-          params: { screen: 'home' },
+          name: 'resetPassword',
+          params: {accountId: data.id},
         } as never);
       }
     } catch (error) {
