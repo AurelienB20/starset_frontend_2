@@ -1,6 +1,10 @@
 import { useAllWorkerPlannedPrestation, useUser } from '@/context/userContext';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
@@ -17,6 +21,12 @@ const [loadingWorkers, setLoadingWorkers] = useState(false);
 const navigation = useNavigation()
 const { allWorkerPlannedPrestation } = useAllWorkerPlannedPrestation();
 
+let [fontsLoaded] = useFonts({       
+  LexendDeca : LexendDeca_400Regular,
+  BebasNeue: BebasNeue_400Regular,
+  LeagueSpartanBold : LeagueSpartan_700Bold
+});
+
 const completedCount = allWorkerPlannedPrestation?.filter(
   (p: any) => p.status === 'finished' || p.status === 'completed'
 ).length || 0;
@@ -28,6 +38,27 @@ const completedCount = allWorkerPlannedPrestation?.filter(
     description:
       'We are excited to introduce new features to our platform that will make your job search easier and more efficient!',
   };
+  const simpleArticle = `
+[TITLE] Bienvenue sur STARSET [/TITLE]
+
+[SUBTITLE] Retour sur la Soirée de Lancement de STARSET [/SUBTITLE]
+
+[DATE] 21/08/2025 [/DATE]
+
+[TEXT]
+Le 11 juillet dernier, STARSET a officiellement pris son envol lors d’une soirée de lancement exceptionnelle au prestigieux Relais Spa de Marne-la-Vallée. 
+Un moment fort, à la hauteur de l’ambition de notre application : devenir la plateforme de référence en jobbing, connectant particuliers et professionnels 
+pour des missions du quotidien comme du babysitting...
+[/TEXT]
+
+[ROWIMAGES]
+https://api.starsetfrance.com/media/news/starset_news_1_image_1.png
+https://api.starsetfrance.com/media/news/starset_news_1_image_2.png
+[/ROWIMAGES]
+`;
+
+
+
 
   useEffect(() => {
   fetchJobsOfTheDay();
@@ -42,6 +73,34 @@ const goToPrestationViewWithId = (id : any) => {
     name: 'prestationView',
     params: { id },
   } as never);
+};
+
+const parseSimpleArticle = (raw: string) => {
+  const getBetween = (tag: string) => {
+    const regex = new RegExp(`\\[${tag}\\]([\\s\\S]*?)\\[\\/${tag}\\]`, 'm');
+    const match = raw.match(regex);
+    return match ? match[1].trim() : "";
+  };
+
+  const getRowImages = () => {
+    const regex = /\[ROWIMAGES\]([\s\S]*?)\[\/ROWIMAGES\]/m;
+    const match = raw.match(regex);
+    if (match) {
+      return match[1]
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((l) => l.length > 0);
+    }
+    return [];
+  };
+
+  return {
+    title: getBetween("TITLE"),
+    subtitle: getBetween("SUBTITLE"),
+    date: getBetween("DATE"),
+    text: getBetween("TEXT"),
+    images: getRowImages(),
+  };
 };
 
 const fetchWorkers = async () => {
@@ -110,14 +169,7 @@ const fetchJobsThatNeedHelp = async () => {
     navigation.navigate('news' as never)
   };
 
-  
-
-  const workersMock = [
-    'https://randomuser.me/api/portraits/men/36.jpg',
-    'https://randomuser.me/api/portraits/women/47.jpg',
-    'https://randomuser.me/api/portraits/men/64.jpg',
-    'https://randomuser.me/api/portraits/women/73.jpg',
-  ];
+  const article = parseSimpleArticle(simpleArticle);
 
   return (
     <ScrollView contentContainerStyle={styles.container}
@@ -232,16 +284,34 @@ const fetchJobsThatNeedHelp = async () => {
         contentContainerStyle={{ paddingRight: 20 }}
       />
 
-      <Text style={[styles.sectionHeader, {textAlign : 'left'}]}>STARSET NEWS</Text>
-      <TouchableOpacity style={styles.newsCard} onPress={goToNews}>
-        <View style={styles.newsHeader}>
-          <Text style={styles.newsTitle}>
-            {news.title} <FontAwesome name="smile-o" size={20} />
-          </Text>
-          <Text style={styles.newsDate}>{news.date}</Text>
-        </View>
-        <Text style={styles.newsDescription}>{news.description}</Text>
-      </TouchableOpacity>
+<Text style={[styles.sectionHeader, {textAlign : 'left'}]}>STARSET NEWS</Text>
+
+<View style={styles.articleContainer}>
+  {/* 3 images à gauche */}
+  <View style={styles.articleImages}>
+    {article.images.map((url, i) => (
+      <Image key={i} source={{ uri: url }} style={styles.articleImage} />
+    ))}
+  </View>
+
+  {/* Contenu texte au milieu (qui prendra toute la largeur dispo) */}
+  <View style={styles.articleContent}>
+    <Text style={styles.articleTitle}>{article.title}</Text>
+    {article.subtitle ? (
+      <Text style={styles.articleSubtitle}>{article.subtitle}</Text>
+    ) : null}
+    <Text
+      style={styles.articleText}
+      numberOfLines={5}
+      ellipsizeMode="tail"
+    >
+      {article.text}
+    </Text>
+  </View>
+
+  {/* Date flottante en absolute */}
+  <Text style={styles.articleDate}>{article.date}</Text>
+</View>
 
       <Modal
         animationType="slide"
@@ -476,14 +546,76 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+
   },
   
   modalContent: {
     backgroundColor: '#FFFFFF',
     padding: 20,
     borderRadius: 10,
-    width: '90%',
+    width: '98%',
+    paddingTop : 10
   },
+
+  articleContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginVertical: 20,
+    position: "relative", // ← nécessaire pour le absolute
+  },
+  
+  articleImages: {
+    
+    flexDirection: "column",
+    height : '100%',
+    justifyContent : 'center',
+    marginRight : 10
+    
+  },
+  
+  articleImage: {
+    width: 90,
+    height: 60,
+    marginBottom: 8,
+    borderRadius: 6,
+  },
+  
+  articleContent: {
+    flex: 2,
+    paddingTop : 10,
+    paddingRight : 8
+    //paddingHorizontal: 10,
+  },
+  
+  articleTitle: {
+    fontSize: 15,
+    fontFamily : 'BebasNeue',
+    color: "#000",
+    marginBottom: 6,
+  },
+  
+  articleSubtitle: {
+    fontSize: 12,
+    fontFamily : 'LeagueSpartanBold',
+    color: "#333",
+    marginBottom: 6,
+  },
+  
+  articleText: {
+    fontSize: 8,
+    color: "#444",
+    fontFamily : 'LexendDeca'
+  },
+  
+  articleDate: {
+    position: "absolute",
+    top: 0,          // ← colle en haut
+    right: 0,        // ← colle à droite
+    fontSize: 10,
+    color: "#888",
+  },
+  
+  
 });
 
 export default CroissanceScreen;

@@ -31,7 +31,7 @@ L’objectif ? Offrir une avant-première exclusive de l’application et prése
 simplifier les missions et faire du jobbing un levier d’indépendance et de flexibilité.
 [/TEXT]
 
-[BANNER] https://fakeurl.com/banner3.jpg [/BANNER]
+[BANNER] https://api.starsetfrance.com/media/news/starset_news_1_image_1.png [/BANNER]
 
 [SUBTITLE] L’app STARSET dévoilée en avant-première [/SUBTITLE]
 
@@ -63,10 +63,16 @@ Alors, prêt(e) à briller avec STARSET ?
 [/TEXT]
 
 [ROWIMAGES]
-https://fakeurl.com/photo4.jpg
-https://fakeurl.com/photo5.jpg
-https://fakeurl.com/photo6.jpg
+https://api.starsetfrance.com/media/news/starset_news_1_image_2.png
+https://api.starsetfrance.com/media/news/starset_news_1_image_3.png
+https://api.starsetfrance.com/media/news/starset_news_1_image_4.jpg
 [/ROWIMAGES]
+
+[AUTHOR]
+Rédige par 
+[IMG] https://api.starsetfrance.com/media/news/author_photo.png [/IMG]
+[/AUTHOR]
+
 `;
 
 
@@ -88,7 +94,9 @@ const ArticleScreen = ({ text = exampleArticle }) => {
     let blocks: any[] = [];
     let currentRowImages: string[] = [];
     let currentText: string[] = [];
+    let currentAuthor: { url?: string; name?: string } | null = null;
     let isTextBlock = false;
+    let isAuthorBlock = false;
 
     lines.forEach((line) => {
       if (line.startsWith("[TITLE]")) {
@@ -108,6 +116,16 @@ const ArticleScreen = ({ text = exampleArticle }) => {
       } else if (line.startsWith("[/ROWIMAGES]")) {
         blocks.push({ type: "rowImages", urls: currentRowImages });
         currentRowImages = [];
+      } else if (line.startsWith("[AUTHOR]")) {
+        isAuthorBlock = true;
+        currentAuthor = {};
+      } else if (line.startsWith("[/AUTHOR]")) {
+        if (currentAuthor) blocks.push({ type: "author", ...currentAuthor });
+        isAuthorBlock = false;
+        currentAuthor = null;
+      } else if (line.startsWith("[IMG]") && isAuthorBlock) {
+        const url = line.replace("[IMG]", "").replace("[/IMG]", "").trim();
+        if (currentAuthor) currentAuthor.url = url;
       } else {
         if (isTextBlock) {
           currentText.push(line);
@@ -190,6 +208,7 @@ const styles = StyleSheet.create({
     color: "#333",
     lineHeight: 22,
     marginBottom: 10,
+    fontFamily : 'LexendDeca'
   },
   banner: {
     width: width - 32,
