@@ -109,7 +109,7 @@ const saveData = async (account: any) => {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!data.success) {
         setErrorMessage(data.message || 'Code incorrect, veuillez vérifier et réessayer.');
       } else {
         setSuccessMessage(data.message || 'Adresse e-mail vérifiée avec succès !');

@@ -286,7 +286,7 @@ const fetchJobsThatNeedHelp = async () => {
 
 <Text style={[styles.sectionHeader, {textAlign : 'left'}]}>STARSET NEWS</Text>
 
-<View style={styles.articleContainer}>
+<TouchableOpacity style={styles.articleContainer} onPress={goToNews}>
   {/* 3 images à gauche */}
   <View style={styles.articleImages}>
     {article.images.map((url, i) => (
@@ -311,7 +311,7 @@ const fetchJobsThatNeedHelp = async () => {
 
   {/* Date flottante en absolute */}
   <Text style={styles.articleDate}>{article.date}</Text>
-</View>
+</TouchableOpacity>
 
       <Modal
         animationType="slide"
@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
   articleImages: {
     
     flexDirection: "column",
-    height : '100%',
+    //height : '100%',
     justifyContent : 'center',
     marginRight : 10
     

@@ -70,7 +70,7 @@ https://api.starsetfrance.com/media/news/starset_news_1_image_4.jpg
 
 [AUTHOR]
 Rédige par 
-[IMG] https://api.starsetfrance.com/media/news/author_photo.png [/IMG]
+[IMG] https://api.starsetfrance.com/media/news/starset_news_1_image_5.png [/IMG]
 [/AUTHOR]
 
 `;
@@ -81,7 +81,6 @@ const { width } = Dimensions.get("window");
 const ArticleScreen = ({ text = exampleArticle }) => {
 
     let [fontsLoaded] = useFonts({
-            
         LexendDeca : LexendDeca_400Regular,
         BebasNeue: BebasNeue_400Regular,
         LeagueSpartanBold : LeagueSpartan_700Bold
