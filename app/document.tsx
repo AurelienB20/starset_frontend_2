@@ -207,7 +207,7 @@ const filteredDocs = availableDocTypes.filter(doc =>
             <Menu.Item
               onPress={() => {
                 setMenuVisible(false);
-                handleDeleteDocument(doc.name);
+                handleDeleteDocument(doc.url);
               }}
               title="Supprimer"
               leadingIcon="delete"
@@ -294,7 +294,7 @@ const filteredDocs = availableDocTypes.filter(doc =>
     }
   };
 
-  const handleDeleteDocument = async (documentType: string) => {
+  const handleDeleteDocument = async (documentUrl: string) => {
     Alert.alert(
       "Confirmer la suppression",
       "Voulez-vous vraiment supprimer ce document ?",
@@ -305,12 +305,11 @@ const filteredDocs = availableDocTypes.filter(doc =>
           style: "destructive",
           onPress: async () => {
             try {
-              const normalizedType = documentType.replace(/\s+/g, '_');
-  
+              console.log('Suppression document URL:', documentUrl);
               const response = await fetch(`${config.backendUrl}/api/mission/delete-worker-document`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ document_id: normalizedType }),
+                body: JSON.stringify({ document_url: documentUrl }),
               });
   
               const data = await response.json();
