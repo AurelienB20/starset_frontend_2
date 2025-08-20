@@ -1845,10 +1845,9 @@ const styles = StyleSheet.create({
   },
   
   reviewName: {
-    fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 8,
-    fontFamily: 'Glacial-Bold', 
+    fontFamily: 'LeagueSpartanBold', 
     color : 'black'
   },
   

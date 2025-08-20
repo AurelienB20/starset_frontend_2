@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import React from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const AboutScreen = () => {
   return (
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 10,
+    color : 'black'
   },
   text: {
     fontSize: 16,
@@ -98,6 +99,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     marginVertical: 2,
+    color: 'black'
   },
   socialIcons: {
     flexDirection: 'row',

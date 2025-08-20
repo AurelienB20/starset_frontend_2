@@ -160,6 +160,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
+    color : 'black'
   },
 
   profilePseudo: {
@@ -170,6 +171,7 @@ const styles = StyleSheet.create({
   profileDescription: {
     fontSize: 12,
     marginVertical: 5,
+    color : 'black'
   },
 
   profileCategories: {
@@ -188,5 +190,6 @@ const styles = StyleSheet.create({
 
   badgeText: {
     fontSize: 10,
+    color : 'black'
   },
 });

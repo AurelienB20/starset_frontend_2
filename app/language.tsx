@@ -69,7 +69,8 @@ const styles = StyleSheet.create({
     marginRight: 15
   },
   languageText: {
-    fontSize: 16
+    fontSize: 16,
+    color : 'black'
   },
   check: {
     fontSize: 18,

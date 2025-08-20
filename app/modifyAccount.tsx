@@ -133,7 +133,7 @@ const ModifyAccountScreen = () => {
         
       />
       <View style={{ alignSelf: 'flex-start', marginBottom: 10, marginTop : 10 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Info Worker</Text>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color : 'black' }}>Info Worker</Text>
       </View>
       <InfoRow
         label="Type de profil"
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   profilePictureContainer: { alignItems: 'center', marginBottom: 20 },
   profilePicture: { width: 100, height: 100, borderRadius: 50, borderWidth: 2 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#E0E0E0' },
-  infoLabel: { fontFamily : 'LeagueSpartanBold' , fontSize: 16 },
+  infoLabel: { fontFamily : 'LeagueSpartanBold' , fontSize: 16, color : 'black' },
   infoValue: { fontSize: 16, color: '#000', fontFamily : 'LexendDeca' },
   addButton: { marginTop: 10, backgroundColor: '#00cc66', padding: 10, borderRadius: 10 },
   addButtonText: { color: '#FFF', fontWeight: 'bold' },

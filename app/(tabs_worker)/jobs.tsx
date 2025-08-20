@@ -651,7 +651,8 @@ const styles = StyleSheet.create({
   },
   jobTitle: {
     fontSize: 26,
-    fontFamily : 'BebasNeue'
+    fontFamily : 'BebasNeue',
+    color : 'black'
   },
   jobStats: {
     fontSize: 16,

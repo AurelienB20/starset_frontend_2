@@ -352,8 +352,8 @@ const styles = StyleSheet.create({
 
 profileRole: {
   fontSize: 20,
-  
-  fontFamily : 'LeagueSpartanBold'
+  fontFamily : 'LeagueSpartanBold',
+  color : 'black'
 },
 
 

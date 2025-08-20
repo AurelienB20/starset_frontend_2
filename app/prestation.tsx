@@ -11,6 +11,7 @@ import config from '../config.json';
 
 
 import PrestationDocumentModal from '@/components/documentPopup';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { useFonts } from 'expo-font';
 import {
   getAllExperience,
@@ -64,7 +65,7 @@ const [experienceMenuVisibleId, setExperienceMenuVisibleId] = useState<string|nu
 const [certificationMenuVisibleId, setCertificationMenuVisibleId] = useState<string|null>(null);
 
  let [fontsLoaded] = useFonts({
-    
+    BebasNeue : BebasNeue_400Regular,
     LeagueSpartanBold : LeagueSpartan_700Bold
   });
 
@@ -704,7 +705,7 @@ const deleteCertification = (id: string) => {
   navigation.setOptions({
     headerRight: () => (
       <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
-        <Text style={{ marginRight: 8, fontWeight: 'bold', fontSize: 12 }}>
+        <Text style={{ marginRight: 8, fontWeight: 'bold', fontSize: 12, color : 'black' }}>
           {prestation?.published ? 'Publié' : 'Non publié'}
         </Text>
         <TouchableOpacity onPress={confirmTogglePrestationPublished}>
@@ -1234,11 +1235,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontWeight: 'bold',
-    fontSize: 24,
+    
+    fontSize: 30,
     textAlign: 'center',
     marginBottom: 20,
-    fontFamily:"../assets/fonts/BebasNeue_Regular.ttf",
+    fontFamily:"BebasNeue",
     color : 'black'
   },
 
@@ -1254,7 +1255,7 @@ const styles = StyleSheet.create({
     justifyContent : 'flex-start',
     alignItems : 'flex-start',
     textAlignVertical: 'top', // 👈 Ceci colle le texte en haut
-    
+    color : 'black'
   },
 
   modifyButton: {
@@ -1368,6 +1369,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 10,
+    color : 'black'
   },
 
   descriptionInput2: {
@@ -1378,6 +1380,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 10,
+    color : 'black'
   },
 
   submitButton: {
@@ -1419,6 +1422,7 @@ const styles = StyleSheet.create({
   remunerationText: {
     fontSize: 24,
     fontWeight: 'bold',
+    color : 'black'
   },
   availabilityContainer: {
     marginVertical: 10,
@@ -1582,6 +1586,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
+    color : 'black'
   },
   modalOption: {
     width: '100%',
@@ -1629,6 +1634,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    color : 'black'
   },
   tarifPopupInput: {
     borderWidth: 1,
@@ -1790,6 +1796,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 10,
+    color  : 'black'
   },
   
   availabilityButton: {
@@ -1809,6 +1816,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 10,
+    color : 'black'
   },
   
   tarifButton: {
