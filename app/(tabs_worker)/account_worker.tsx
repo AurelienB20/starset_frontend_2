@@ -306,7 +306,8 @@ const styles = StyleSheet.create({
 
   typeOAccount: {
     fontSize: 30,
-    fontWeight : 'bold'
+    fontWeight : 'bold',
+    color : 'black'
   },
 
   rightHeader : {

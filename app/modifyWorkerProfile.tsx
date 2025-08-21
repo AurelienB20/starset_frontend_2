@@ -183,6 +183,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 28,
     marginBottom: 10,
+    color : 'black'
   },
   subtitle: {
     fontSize: 16,
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
     
   },
   buttonTextSelected: {
-    
+    color : 'black',
     fontWeight: 'bold',
     fontSize: 18,
   },
@@ -222,6 +223,7 @@ const styles = StyleSheet.create({
     //color: '#2e8b57',
     fontWeight: 'bold',
     fontSize: 18,
+    color : 'black'
   },
   confirmButton: {
     marginTop: 50,
@@ -278,6 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
+    color : 'black'
   },
   modalInput: {
     borderWidth: 1,

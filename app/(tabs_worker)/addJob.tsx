@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 20,
+    color : 'black'
   },
   // Pour les métiers filtrés
   jobCardFiltered: {

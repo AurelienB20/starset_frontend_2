@@ -374,6 +374,7 @@ console.log(prestationId);
       headerTitleStyle: {
         fontWeight: 'bold',
         fontSize: 25,
+        color : 'black'
       },
       // Enlever la barre fine entre le header et le reste
       headerShadowVisible: false, // Pour React Navigation v6+
@@ -882,7 +883,8 @@ const styles = StyleSheet.create({
 
   typeOAccount: {
     fontSize: 30,
-    fontWeight : 'bold'
+    fontWeight : 'bold',
+    color : 'black'
   },
 
   rightHeader : {
@@ -908,6 +910,7 @@ const styles = StyleSheet.create({
   popupText: {
     fontSize: 16,
     padding: 5,
+    color : 'black'
   },
   closeButton: {
     color: 'blue',
@@ -934,6 +937,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
     textAlign: 'center',
+    color : 'black'
   },
   modalButtons: {
     flexDirection: 'row',
@@ -1021,6 +1025,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+    color : 'black'
   },
 
   waitingBadge: {
@@ -1159,6 +1164,7 @@ const styles = StyleSheet.create({
   prestationCardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
+    color : 'black'
   },
   
   prestationCardDate: {
@@ -1223,7 +1229,7 @@ profileInfoHeader: {
 
 profileRole: {
   fontSize: 20,
-  
+  color : 'black',
   fontFamily : 'LeagueSpartanBold'
 },
 
@@ -1240,6 +1246,7 @@ logoutTitle: {
   textAlign: 'center',
   fontFamily: 'BebasNeue',
   marginBottom: 5,
+  color : 'black'
 },
 
 logoutButtons: {

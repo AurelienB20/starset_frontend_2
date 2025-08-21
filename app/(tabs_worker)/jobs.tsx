@@ -624,6 +624,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: 16,
     marginBottom: 20,
+    color : 'black'
   },
   missionBanner: {
     backgroundColor: '#00cc66',
@@ -693,6 +694,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+    color : 'black'
   },
 
   modalTitleLS: {
@@ -712,6 +714,7 @@ const styles = StyleSheet.create({
   },
   modalOptionText: {
     fontSize: 18,
+    color : 'black'
   },
   selectedOption: {
     backgroundColor: '#00cc66',
@@ -756,6 +759,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color : 'black'
   },
 
   requestModalDetail: {
@@ -772,6 +776,7 @@ const styles = StyleSheet.create({
   requestModalInfo: {
     fontSize: 14,
     marginBottom: 5,
+    color : 'black'
   },
 
   requestModalTotal: {

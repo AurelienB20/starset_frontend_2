@@ -452,6 +452,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily : 'LeagueSpartanBold',
     marginBottom: 10,
+    color : 'black'
   },
   row: {
     justifyContent: 'space-between',
@@ -507,6 +508,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color : 'black'
   },
   profileUsername: {
     color: '#888',
@@ -517,6 +519,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     textAlign : 'center',
     fontFamily: 'BebasNeue',
+    color : 'black'
   },
   profileCategories: {
     flexDirection: 'row',
@@ -614,6 +617,7 @@ const styles = StyleSheet.create({
   profileSuggestionName: {
     fontSize: 16,
     fontWeight: 'bold',
+    color : 'black'
   },
   profileSuggestionUsername: {
     fontSize: 14,

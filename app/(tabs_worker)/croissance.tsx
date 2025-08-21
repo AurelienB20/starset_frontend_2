@@ -488,6 +488,7 @@ const styles = StyleSheet.create({
     fontFamily : 'BebasNeue',
     textAlign: 'center',
     marginBottom: 10,
+    color : 'black'
   },
   jobDescription: {
     fontSize: 16,
@@ -499,6 +500,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily : 'BebasNeue',
     marginBottom: 10,
+    color : 'black'
   },
 
   missionItem: {

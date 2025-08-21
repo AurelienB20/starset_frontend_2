@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 10,
     fontSize: 16,
+    color : 'black'
   },
   card: {
     flexDirection: 'row',
@@ -320,6 +321,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     marginBottom: 3,
+    color : 'black'
   },
   description: {
     fontSize: 12,
@@ -360,6 +362,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 15,
     textAlign: 'center',
+    color : 'black'
   },
   calendar: {
     marginBottom: 10,
@@ -382,6 +385,7 @@ const styles = StyleSheet.create({
   timeSeparator: {
     fontSize: 24,
     marginHorizontal: 10,
+    color : 'black'
   },
   modalButton: {
     backgroundColor: 'green',

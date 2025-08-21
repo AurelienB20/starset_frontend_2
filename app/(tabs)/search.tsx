@@ -393,6 +393,7 @@ const styles = StyleSheet.create({
   },
   stepText: {
     fontSize: 24,
+    color : 'black'
   },
   sectionHeader: {
     fontSize: 20,

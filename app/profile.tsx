@@ -401,7 +401,8 @@ const styles = StyleSheet.create({
   },
 
   descriptionContainerText : {
-    fontSize : 12
+    fontSize : 12,
+    color : 'black'
   },
   modalContainer: {
     flex: 1,
@@ -419,6 +420,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 10,
+    color : 'black'
   },
   dateButton: {
     backgroundColor: '#eee',

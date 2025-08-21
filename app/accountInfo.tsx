@@ -88,7 +88,7 @@ const handleConfirmBirthDate = (date: Date) => {
   };
 
   const handleSubmit = async () => {
-    const fullPhoneNumber = `+${callingCode}${phoneNumber}`.replace(/\s/g, '');
+    const fullPhoneNumber = phoneNumber.startsWith('+') ? phoneNumber : `+${callingCode}${phoneNumber}`;
     console.log('fullPhoneNumber')
     console.log(fullPhoneNumber)
 
@@ -128,7 +128,7 @@ const handleConfirmBirthDate = (date: Date) => {
   const saveData = async (account: any) => {
     try {
       await AsyncStorage.setItem('account_id', account['id']);
-      await AsyncStorage.setItem('worker_id', account['worker']);
+      await AsyncStorage.setItem('worker_id', account.worker ?? '');
     } catch (e) {
       console.error('Erreur lors de la sauvegarde du type de compte', e);
     }

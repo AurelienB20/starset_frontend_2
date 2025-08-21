@@ -1,7 +1,6 @@
-import React, { useRef } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 
 const PrestationViewScreen = () => {
   const navigation = useNavigation();
@@ -78,6 +77,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    color : 'black'
   },
   profileDescription: {
     fontSize: 16,

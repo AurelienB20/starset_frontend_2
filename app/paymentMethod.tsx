@@ -255,6 +255,7 @@ const styles = StyleSheet.create({
    fontSize: 20,
    fontWeight: 'bold',
    marginBottom: 10,
+   color : 'black'
  },
  cardField: {
    width: '100%',

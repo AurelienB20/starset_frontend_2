@@ -285,10 +285,10 @@ let [fontsLoaded] = useFonts({
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', color : 'black' },
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10, width: '80%' },
-  modalTitle: { fontSize: 22, fontFamily : 'LeagueSpartanBold', marginBottom: 20, textAlign: 'center' },
+  modalTitle: { fontSize: 22, fontFamily : 'LeagueSpartanBold', marginBottom: 20, textAlign: 'center', color : 'black' },
   input: { height: 40, borderColor: 'gray', borderWidth: 1, borderRadius: 5, marginBottom: 10, paddingHorizontal: 10 },
   button: {backgroundColor: '#00BF63', padding: 10, borderRadius: 8, marginTop: 10 },
   buttonText: { fontSize: 18, textAlign: 'center', fontFamily : 'LeagueSpartanBold', color : 'white' },

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import config from '../config.json';
-import { useNavigation, useRoute } from '@react-navigation/native';
 import { useUser } from '@/context/userContext';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import config from '../config.json';
 
 const VerificationScreen = () => {
   const [isCodeSent, setIsCodeSent] = useState(false);

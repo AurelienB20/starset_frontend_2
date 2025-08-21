@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
   addButtonModifier: { backgroundColor: '#008000', paddingVertical: 10, paddingHorizontal: 35, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonText: { color: '#fff', fontWeight: 'bold' },
   
-  prestationTitle: { fontWeight: 'bold', fontSize: 16 },
+  prestationTitle: { fontWeight: 'bold', fontSize: 16, color : 'black' },
   modalContainer: { flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 20, width: '90%' },
   closeIcon: { position: 'absolute', right: 10, top: 10 },
@@ -422,6 +422,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 5,
+    color : 'black'
   },
   
   priceContainer: {

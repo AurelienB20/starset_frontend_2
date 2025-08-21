@@ -269,10 +269,10 @@ const [showCardField, setShowCardField] = useState(false);
       })}
 
       <View style={{ width: '100%', marginTop: 10 }}>
-        <Text style={{ fontSize: 16 }}>
+        <Text style={{ fontSize: 16, color : 'black' }}>
           Frais de service (10%) : {serviceFee.toFixed(2)} €
         </Text>
-        <Text style={{ fontSize: 16 }}>
+        <Text style={{ fontSize: 16 , color : 'black'}}>
           Frais de transaction (1,5% + 0,25€ × {itemCount}) : {transactionFee.toFixed(2)} €
         </Text>
       </View>
@@ -281,7 +281,7 @@ const [showCardField, setShowCardField] = useState(false);
       <Text style={styles.totalText}>Total à payer : {finalTotal.toFixed(2)} €</Text>
 
       <View style={{ width: '100%', marginTop: 20 }}>
-  <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Méthode de paiement</Text>
+  <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10, color : 'black' }}>Méthode de paiement</Text>
 
   {savedCards.length > 0 ? (
     savedCards.map((card) => (
@@ -297,7 +297,7 @@ const [showCardField, setShowCardField] = useState(false);
           backgroundColor: '#fff',
         }}
       >
-        <Text style={{ fontSize: 16 }}>
+        <Text style={{ fontSize: 16, color : 'black' }}>
           {`${card.card.brand.toUpperCase()} •••• ${card.card.last4}`}
         </Text>
         <Text style={{ fontSize: 12, color: '#666' }}>
@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 10,
+    color : 'black'
   },
   descriptionText: {
     fontSize: 14,
@@ -404,6 +405,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 30,
+    color : 'black'
   },
   button: {
     backgroundColor: 'green',

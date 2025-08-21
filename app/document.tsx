@@ -491,6 +491,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    color : 'black'
   },
   searchInput: {
     borderWidth: 1,
