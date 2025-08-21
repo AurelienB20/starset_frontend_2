@@ -1126,7 +1126,14 @@ const unlikeImage = async (imageId: string) => {
             </View>
           )}      
             {/* Icônes à droite */}
+           
       <View style={styles.headerIcons}>
+         <TouchableOpacity onPress={() => setShowModal(true)}>
+          <Image
+            source={require('../assets/images/share-icon.png')}
+            style={{ width: 24, height: 24 }}
+          />
+        </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
           if (!user || Object.keys(user).length === 0) {
@@ -1154,12 +1161,6 @@ const unlikeImage = async (imageId: string) => {
 >
   <Menu.Item onPress={confirmReport} title="Signaler" titleStyle={{ fontFamily: 'LexendDeca'}} />
 </Menu>
-<TouchableOpacity onPress={() => setShowModal(true)}>
-  <Image
-    source={require('../assets/images/share-icon.png')}
-    style={{ width: 24, height: 24 }}
-  />
-</TouchableOpacity>
       </View>
     </View>
     {/* Ajouter au panier */}

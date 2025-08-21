@@ -2,14 +2,14 @@ import { Feather } from "@expo/vector-icons"; // Icônes expo ou react-native-ve
 import * as Linking from 'expo-linking';
 import React from "react";
 import {
-    Image,
-    Modal,
-    Platform,
-    Share,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  Modal,
+  Platform,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 type ShareProfileModalProps = {
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 300,
+    height: 400,
     marginBottom: 20,
     backgroundSize: "cover",
     overflow: "hidden",
@@ -112,10 +112,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 25,
     lineHeight: 20,
+    fontFamily: 'LexendDecaRegular',
   },
   shareButton: {
     flexDirection: "row",
-    backgroundColor: "#999",
+    backgroundColor: "#00cc66",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 30,
@@ -124,6 +125,7 @@ const styles = StyleSheet.create({
   },
   shareText: {
     color: "#fff",
+    fontFamily: "LeagueSpartanBold",
     fontWeight: "bold",
     fontSize: 16,
   },
