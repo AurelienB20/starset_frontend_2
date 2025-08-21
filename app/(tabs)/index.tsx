@@ -439,7 +439,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     paddingHorizontal: 10,
-    fontFamily : 'LexendDeca'
+    fontFamily : 'LexendDeca',
+    color : 'black'
   },
   searchIcon: {
     marginLeft: 10,

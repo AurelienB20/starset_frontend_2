@@ -191,7 +191,7 @@ const getProfile = async (accountId: string) => {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={goToCreate}>
-        <Text style={{fontFamily : 'LexendDeca'}}>
+        <Text style={{fontFamily : 'LexendDeca', color : 'black'}}>
           Vous n'avez pas encore de compte ?{' '}
           <Text style={styles.createAccount}>inscrivez-vous !</Text>
         </Text>
@@ -332,12 +332,14 @@ passwordContainer: {
 forgotPassword: {
   marginTop: 5,
   alignSelf : 'flex-end'
+
 },
 forgotPasswordText: {
   
   fontSize: 12,
   textAlign : 'right',
-  marginRight : 40
+  marginRight : 40,
+  color : 'black'
 },
 
 footer: {

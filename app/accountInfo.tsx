@@ -128,7 +128,7 @@ const handleConfirmBirthDate = (date: Date) => {
   const saveData = async (account: any) => {
     try {
       await AsyncStorage.setItem('account_id', account['id']);
-      await AsyncStorage.setItem('worker_id', account.worker ?? '');
+      await AsyncStorage.setItem('worker_id', account?.worker?.id ?? '');
     } catch (e) {
       console.error('Erreur lors de la sauvegarde du type de compte', e);
     }

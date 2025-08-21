@@ -381,6 +381,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     textAlign: 'center',
     fontSize: 18,
+    color : 'black'
   },
   timeSeparator: {
     fontSize: 24,
