@@ -239,6 +239,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'gray',
     fontSize: 16,
+    color : 'black'
   },
   tagSelected: {
     backgroundColor: '#00cc44',

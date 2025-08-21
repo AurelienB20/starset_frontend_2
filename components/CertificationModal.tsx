@@ -181,10 +181,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
+    color : 'black'
   },
   label: {
     fontWeight: '600',
     marginTop: 10,
+    color : 'black'
   },
   input: {
     backgroundColor: '#fff',
@@ -246,6 +248,7 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    
   },
   calendar: {
     marginTop: 20,

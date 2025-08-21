@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 19,
     fontFamily: 'Glacial-Bold',
+    color : 'black'
   },
   pseudo: {
     color: '#888',
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     textAlign: 'center',
     fontFamily: 'BebasNeue',
+    color : 'black'
   },
   nameAndRating: {
     justifyContent: 'space-between',

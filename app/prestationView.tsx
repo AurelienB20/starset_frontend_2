@@ -30,7 +30,7 @@ const PrestationViewScreen = () => {
   const [metiers, setMetiers] = useState<any>([]);
   const [prestation, setPrestation] = useState<any>({});
   const [prestationImages, setPrestationImages] = useState<any>([]);
-  const [comments , setComments] = useState<any>([])
+  const [comments, setComments] = useState<any>([])
   const [experiences, setExperiences] = useState([])
   const [certifications, setCertifications] = useState([])
   const [isDatePickerVisible, setDatePickerVisible] = useState(false); // State for the date picker modal
@@ -160,7 +160,9 @@ const PrestationViewScreen = () => {
       }
   
       setLikedImages((prev) =>
-        isLiked ? prev.filter((id) => id !== image.id) : [...prev, image.id]
+        isLiked
+          ? prev.filter((addr) => addr !== image.adress)
+          : [...prev, image.adress]
       );
     } catch (error) {
       console.error('Erreur lors du like/unlike:', error);
@@ -906,7 +908,7 @@ const unlikeImage = async (imageId: string) => {
       )}
 
       {selectedTab === 'avis' && (
-         <View >         
+         <View>         
           {Array.isArray(comments) && comments.length > 0 ? (
   <View style={{ maxHeight: 200 }}>
     <FlatList
@@ -968,9 +970,6 @@ const unlikeImage = async (imageId: string) => {
       )}*/}
 
       {/* Date Picker Modal */}
-      
-
-      
             {/* Custom Time Input Modal */}
         {/* Arrival Time Input Modal */}
       
@@ -998,9 +997,9 @@ const unlikeImage = async (imageId: string) => {
                   style={styles.modalLikeButton}
                 >
                   <Icon
-                    name={Array.isArray(likedImages) && likedImages.includes(selectedImage?.id) ? 'favorite' : 'favorite-border'}
+                    name={Array.isArray(likedImages) && likedImages.includes(selectedImage?.adress) ? 'favorite' : 'favorite-border'}
                     size={32}
-                    color={Array.isArray(likedImages) && likedImages.includes(selectedImage?.id) ? 'red' : 'white'}
+                    color={Array.isArray(likedImages) && likedImages.includes(selectedImage?.adress) ? 'red' : 'white'}
                   />
                 </TouchableOpacity>
               </>

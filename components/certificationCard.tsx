@@ -62,7 +62,7 @@ const CertificationCard: React.FC<Props> = ({ certification }) => {
           <Text style={styles.certificationTitle}>{certification.title}</Text>
           <Text style={styles.certificationDate}>{certification.date}</Text>
           <Text style={styles.certificationInstitution}>
-            <Text style={{ fontStyle: 'italic' }}>{certification.institution}</Text>
+            <Text style={{ fontStyle: 'italic', color : 'black' }}>{certification.institution}</Text>
           </Text>
           <Text style={styles.certificationDescription}>{certification.description}</Text>
         </View>

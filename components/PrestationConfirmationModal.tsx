@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     fontFamily : 'BebasNeue',
     marginBottom: 10,
     textAlign: 'center',
-
+    color : 'black'
   },
   metierText: {
     fontSize: 24,

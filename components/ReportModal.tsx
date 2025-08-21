@@ -204,6 +204,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
     fontFamily: 'LeagueSpartan_700Bold',
+    color : 'black'
   },
   description: {
     fontSize: 14,
@@ -218,7 +219,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     marginTop: 20,
-    fontFamily: 'Lexend_400Regular'
+    fontFamily: 'Lexend_400Regular',
+    color : 'black'
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 14,
+    color : 'black'
   },
   input: {
     backgroundColor: '#f0f0f0',
@@ -266,6 +269,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '600',
     marginTop: 10,
+    color : 'black'
   },
    imageRow: {
     flexDirection: 'row',

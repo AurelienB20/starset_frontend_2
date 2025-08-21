@@ -281,7 +281,7 @@ const getMarkedDates = () => {
               
               {selectedDates.length > 0 && (
                 <>
-                  <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>Disponibilités :</Text>
+                  <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10, color : 'black' }}>Disponibilités :</Text>
                   <View style={{ height: 300, marginTop: 10, width : '100%' }}>
                   <BigCalendar
   events={filteredEvents}
@@ -333,6 +333,7 @@ const getMarkedDates = () => {
                         fontSize: 60,
                         textAlign: 'center',
                         fontWeight: 'bold',
+                        color : 'black'
                       }}>
                         {item.label}
                       </Text>
@@ -340,7 +341,7 @@ const getMarkedDates = () => {
                   />
                 </View>
                 
-                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, }}>:</Text>
+                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, color : 'black'}}>:</Text>
                   <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
                   <WheelPicker
                     height={350} // Garder une grande hauteur pour scroll fluide
@@ -353,6 +354,7 @@ const getMarkedDates = () => {
                         fontSize: 60,
                         textAlign: 'center',
                         fontWeight: 'bold',
+                        color : 'black'
                       }}>
                         {item.label}
                       </Text>
@@ -386,6 +388,7 @@ const getMarkedDates = () => {
                         fontSize: 60,
                         textAlign: 'center',
                         fontWeight: 'bold',
+                        color : 'black'
                       }}>
                         {item.label}
                       </Text>
@@ -393,7 +396,7 @@ const getMarkedDates = () => {
                   />
                 </View>
                 
-                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, }}>:</Text>
+                  <Text style={{ fontSize: 40, alignSelf: 'center', fontWeight : 'bold',marginTop: 5, color : 'black'}}>:</Text>
                   <View style={{ height: 200, overflow: 'hidden', justifyContent: 'center', width : 100 }}>
                   <WheelPicker
                     height={350} // Garder une grande hauteur pour scroll fluide
@@ -406,6 +409,7 @@ const getMarkedDates = () => {
                         fontSize: 60,
                         textAlign: 'center',
                         fontWeight: 'bold',
+                        color : 'black'
                       }}>
                         {item.label}
                       </Text>
@@ -459,10 +463,10 @@ const styles = StyleSheet.create({
     maxHeight : '80%'
     // ❌ enlève maxHeight ici
   },
-  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold', marginTop : 20 },
+  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold', marginTop : 20, color : 'black' },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
-  input: { width: 60, height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, textAlign: 'center', fontSize: 24 },
-  timeSeparator: { fontSize: 40, marginHorizontal: 10 },
+  input: { width: 60, height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, textAlign: 'center', fontSize: 24, color : 'black' },
+  timeSeparator: { fontSize: 40, marginHorizontal: 10, color : 'black' },
   horairesButton: { backgroundColor: '#00cc66', padding: 10, borderRadius: 8, marginTop: 20, width: '100%', alignItems: 'center' },
   horairesButtonText: { color: '#fff', fontSize: 16, fontFamily : 'LexendDeca' },
   closeIcon: { position: 'absolute', top: 10, right: 10, padding: 5 },
