@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom : 20 },
   modalContent: { backgroundColor: 'rgba(0, 0, 0, 0.1)', borderRadius: 10, padding: 20, maxHeight: '100%' },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color : 'black' },
-  inputLabel: { fontWeight: '600', marginTop: 10 },
+  inputLabel: { fontWeight: '600', marginTop: 10, color: 'black' },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,

@@ -175,6 +175,16 @@ const ArticleScreen = ({ text = exampleArticle }) => {
             </View>
           );
         }
+        if (block.type === "author") {
+          return (
+            <Image
+              key={index}
+              source={{ uri: block.url }}
+              style={styles.signature}
+              resizeMode="cover"
+            />
+          );
+        }
         return null;
       })}
     </ScrollView>
@@ -215,6 +225,10 @@ const styles = StyleSheet.create({
     //borderRadius: 10,
     marginVertical: 15,
     backgroundColor: "#eee",
+  },
+  signature: {
+    width: width - 32,
+    height: 100,
   },
   rowImages: {
     flexDirection: "row",

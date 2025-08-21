@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginTop: 5,
+    color : 'black'
   },
   textArea: {
     backgroundColor: '#fff',
@@ -205,6 +206,7 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
     marginTop: 5,
+    color : 'black'
   },
   imageRow: {
     flexDirection: 'row',
