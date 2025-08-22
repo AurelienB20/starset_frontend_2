@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#eee",
   },
   signature: {
-    width: width - 32,
-    height: 95,
+    width: width - 42,
+    height: 92,
   },
   rowImages: {
     flexDirection: "row",

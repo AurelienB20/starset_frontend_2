@@ -2070,11 +2070,13 @@ certificationInstitution: {
     fontWeight: 'bold',
     marginBottom: 10,
     alignSelf: 'center',
+    color: '#000'
   },
   
   popupText: {
     fontSize: 16,
     marginBottom: 8,
+    color: '#000'
   },
   
   bold: {

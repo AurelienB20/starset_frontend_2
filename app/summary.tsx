@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
+    color: '#000'
   },
   totalText: {
     fontSize: 20,
