@@ -65,9 +65,9 @@ const HomeScreen = () => {
       LeagueSpartanBold : LeagueSpartan_700Bold
     });
   
-  const suggestions = [
+  /*const suggestions = [
     'Babysitter de nuit',
-  ];
+  ];*/
   const [recentSearches, setRecentSearches] = useState([]); // Historique de recherche
 
   // Met à jour la recherche sans déclencher l'affichage

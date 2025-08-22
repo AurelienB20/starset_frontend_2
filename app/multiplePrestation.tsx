@@ -346,11 +346,11 @@ const styles = StyleSheet.create({
   addButtonModifier: { backgroundColor: '#008000', paddingVertical: 10, paddingHorizontal: 35, borderRadius: 10, marginTop: 20, alignItems: 'center' },
   addButtonText: { color: '#fff', fontWeight: 'bold' },
   
-  prestationTitle: { fontWeight: 'bold', fontSize: 16, color : 'black' },
+  prestationTitle: { fontWeight: 'bold', fontSize: 16, color : '#333' },
   modalContainer: { flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: '#fff', borderRadius: 10, padding: 20, width: '90%' },
   closeIcon: { position: 'absolute', right: 10, top: 10 },
-  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, marginBottom: 10, color : '#333'},
   submitButton: { backgroundColor: '#008000', borderRadius: 8, padding: 12, alignItems: 'center', marginTop: 20 },
   submitButtonText: { color: '#fff', fontWeight: 'bold' },
   imageWrapper: { position: 'relative' },
