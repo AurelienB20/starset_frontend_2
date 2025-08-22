@@ -92,10 +92,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'white',
     marginBottom: 20,
+    color: 'black',
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#00743C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,

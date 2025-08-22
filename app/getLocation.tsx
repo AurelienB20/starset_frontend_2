@@ -102,6 +102,7 @@ const LocationPickerScreen = () => {
         value={address}
         onChangeText={searchAddress}
         placeholder="Entrez votre adresse..."
+        placeholderTextColor="#808080"
       />
 
       <FlatList

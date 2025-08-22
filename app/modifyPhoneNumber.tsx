@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'white',
     marginBottom: 10,
+    color: 'black',
   },
   inputError: {
     borderColor: 'red',
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#00743C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,

@@ -38,6 +38,10 @@ const AccountWorkerScreen = () => {
   );
   }
 
+  const goToAbout = async () => {
+    navigation.navigate('about' as never);
+  }
+
   const goToLanguage = async () => {
     navigation.navigate('language' as never);
   }
@@ -156,7 +160,7 @@ const AccountWorkerScreen = () => {
   <Text style={styles.menuItemText}>Langues</Text>
 </TouchableOpacity>
 
-<TouchableOpacity style={styles.menuItem}>
+<TouchableOpacity style={styles.menuItem} onPress={goToAbout}>
   <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>À propos</Text>
 </TouchableOpacity>

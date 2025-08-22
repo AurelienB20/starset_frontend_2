@@ -118,10 +118,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     marginBottom: 10,
     textAlignVertical: 'top',
+    color: 'black',
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#00743C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
