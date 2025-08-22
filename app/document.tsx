@@ -370,7 +370,7 @@ const filteredDocs = availableDocTypes.filter(doc =>
               selectedValue={selectedDocType}
               onValueChange={(itemValue) => setSelectedDocType(itemValue)}
             >
-              <Picker.Item label="Sélectionnez un document..." value="" />
+              <Picker.Item label="Sélectionnez un document..." style={{ color: '#000' }} value="" />
               {filteredDocs
                 .filter(doc => !doc.toLowerCase().includes('au moins'))
                 .map(doc => (
