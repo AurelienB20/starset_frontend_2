@@ -68,8 +68,11 @@ https://api.starsetfrance.com/media/news/starset_news_1_image_3.png
 https://api.starsetfrance.com/media/news/starset_news_1_image_4.jpg
 [/ROWIMAGES]
 
-[AUTHOR]
+[TEXT]
 Rédige par 
+[/TEXT]
+
+[AUTHOR]
 [IMG] https://api.starsetfrance.com/media/news/starset_news_1_image_5.png [/IMG]
 [/AUTHOR]
 
@@ -228,7 +231,7 @@ const styles = StyleSheet.create({
   },
   signature: {
     width: width - 32,
-    height: 100,
+    height: 95,
   },
   rowImages: {
     flexDirection: "row",
