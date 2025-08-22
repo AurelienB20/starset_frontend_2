@@ -284,17 +284,17 @@ const getMarkedDates = () => {
                   <Text style={{ fontWeight: 'bold', fontSize: 16, marginTop: 10, color : 'black' }}>Disponibilités :</Text>
                   <View style={{ height: 300, marginTop: 10, width : '100%' }}>
                   <BigCalendar
-  events={filteredEvents}
-  height={200}
-  mode="week"
-  date={selectedDates[0]}
-  swipeEnabled={true}
-  hourRowHeight={30} // 🔽 Réduit la hauteur de chaque heure
-  eventCellStyle={() => ({
-    paddingVertical: 2,
-    paddingHorizontal: 4,
-  })}
-/>
+                    events={filteredEvents}
+                    height={200}
+                    mode="week"
+                    date={selectedDates[0]}
+                    swipeEnabled={true}
+                    hourRowHeight={30} // 🔽 Réduit la hauteur de chaque heure
+                    eventCellStyle={() => ({
+                      paddingVertical: 2,
+                      paddingHorizontal: 4,
+                    })}
+                  />
                   </View>
                 </>
               )}
