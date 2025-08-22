@@ -69,7 +69,7 @@ https://api.starsetfrance.com/media/news/starset_news_1_image_4.jpg
 [/ROWIMAGES]
 
 [TEXT]
-Rédige par 
+Rédigé par
 [/TEXT]
 
 [AUTHOR]

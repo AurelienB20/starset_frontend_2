@@ -1959,6 +1959,7 @@ certificationHeader: {
 certificationTitle: {
   fontSize: 16,
   fontWeight: 'bold',
+  color: 'black'
 },
 
 certificationDateRight: {

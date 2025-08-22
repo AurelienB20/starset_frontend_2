@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     maxHeight : '80%'
     // ❌ enlève maxHeight ici
   },
-  modalTitle: { fontSize: 20, marginBottom: 10, fontFamily : 'LeagueSpartanBold', marginTop : 20, color : 'black' },
+  modalTitle: { fontSize: 20, marginBottom: 10, marginTop: 90, fontFamily : 'LeagueSpartanBold', color : 'black' },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
   input: { width: 60, height: 50, borderColor: '#ccc', borderWidth: 1, borderRadius: 8, textAlign: 'center', fontSize: 24, color : 'black' },
   timeSeparator: { fontSize: 40, marginHorizontal: 10, color : 'black' },
