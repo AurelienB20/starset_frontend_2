@@ -199,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: 'white',
     marginTop: 10,
+    color:'black',
   },
   charCount: {
     fontSize: 12,

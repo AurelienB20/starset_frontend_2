@@ -137,6 +137,7 @@ const SummaryScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Ajouter une instruction ou information primordiale"
+        placeholderTextColor="#808080"
         value={instruction}
         onChangeText={setInstruction}
       />
@@ -194,6 +195,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     marginBottom: 10,
+    color: '#000'
   },
   totalText: {
     fontSize: 20,

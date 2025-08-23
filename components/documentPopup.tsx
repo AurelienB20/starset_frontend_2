@@ -162,11 +162,10 @@ const PrestationDocumentModal: React.FC<Props> = ({
           style: 'destructive',
           onPress: async () => {
             try {
-              const normalized = normalizeDoc(doc.name);
               const del = await fetch(`${config.backendUrl}/api/mission/delete-worker-document`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ document_id: normalized }),
+                body: JSON.stringify({ document_url: doc.url }),
               });
               const data = await del.json();
               if (!data.success) throw new Error('La suppression a échoué');

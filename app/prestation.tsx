@@ -1170,7 +1170,7 @@ const deleteCertification = (id: string) => {
 
       ))
     ) : (
-      <Text style={{ textAlign: 'center', marginVertical : 20 }}>Aucune certification disponible</Text>
+      <Text style={{ textAlign: 'center', marginVertical : 20, color: 'black' }}>Aucune certification disponible</Text>
     )}
 
 {isCertificationFormVisible && (
@@ -2050,8 +2050,6 @@ mandatoryBannerBtnText: {
   color: '#fff',
   fontWeight: '600',
 },
-
-
 
 });
 

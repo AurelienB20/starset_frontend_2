@@ -279,6 +279,7 @@ const ExperienceModal = ({
         <TextInput
           style={styles.input}
           placeholder="Titre"
+          placeholderTextColor="#666"
           value={item?.title || ''}
           onChangeText={(text) => onChange({ ...item, title: text })}
         />
@@ -289,6 +290,7 @@ const ExperienceModal = ({
             <TextInput
               style={styles.input}
               placeholder="Institution"
+              placeholderTextColor="#666"
               value={(item as CertificationItem)?.institution || ''}
               onChangeText={(text) => onChange({ ...item, institution: text })}
             />
@@ -324,6 +326,7 @@ const ExperienceModal = ({
         <TextInput
           style={styles.textArea}
           placeholder="Description"
+          placeholderTextColor="#666"
           multiline
           value={item?.description || ''}
           onChangeText={(text) => onChange({ ...item, description: text })}
@@ -366,8 +369,8 @@ export default ExperienceModal;
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', marginBottom : 20 },
   modalContent: { backgroundColor: 'rgba(0, 0, 0, 0.1)', borderRadius: 10, padding: 20, maxHeight: '100%' },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color : 'black' },
-  inputLabel: { fontWeight: '600', marginTop: 10 },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color : '#333' },
+  inputLabel: { fontWeight: '600', marginTop: 10, color: '#333' },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
@@ -375,6 +378,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginTop: 5,
+    color: '#333'
   },
   textArea: {
     backgroundColor: '#fff',
@@ -385,6 +389,7 @@ const styles = StyleSheet.create({
     height: 100,
     textAlignVertical: 'top',
     marginTop: 5,
+    color: '#333'
   },
   imageRow: {
     flexDirection: 'row',

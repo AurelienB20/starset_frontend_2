@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 16,
     backgroundColor: 'white',
+    color: 'black',
   },
   item: {
     paddingVertical: 10,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     marginTop: 20,
-    backgroundColor: '#70FF70',
+    backgroundColor: '#00743C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 20,
