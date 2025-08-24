@@ -144,6 +144,9 @@ const ArticleScreen = ({ text = exampleArticle }) => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.croissanceContainer}>
+              <Image style ={styles.tinyLogo}source={require('../assets/images/starset-news.png')}/>
+            </View>
       {blocks.map((block, index) => {
         if (block.type === "title") {
           return <Text key={index} style={styles.title}>{block.content}</Text>;
@@ -184,7 +187,7 @@ const ArticleScreen = ({ text = exampleArticle }) => {
               key={index}
               source={{ uri: block.url }}
               style={styles.signature}
-              resizeMode="cover"
+              
             />
           );
         }
@@ -198,8 +201,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    padding: 16,
-    marginBottom : 30
+    paddingHorizontal: 16,
+    paddingBottom : 0,
+    marginBottom : 10
   },
   title: {
     fontSize: 40,
@@ -230,8 +234,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#eee",
   },
   signature: {
-    width: width - 42,
-    height: 92,
+    
+    height: 50,
+    
+    resizeMode: 'contain',
+    left : 0
   },
   rowImages: {
     flexDirection: "row",
@@ -244,6 +251,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     //borderRadius: 8,
     backgroundColor: "#ddd",
+  },
+
+  tinyLogo: {
+    
+    resizeMode: 'contain',
+    width : '100%',
+    height : 80
+   
+  },
+  
+  croissanceContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
