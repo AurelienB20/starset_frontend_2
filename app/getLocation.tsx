@@ -113,7 +113,7 @@ const LocationPickerScreen = () => {
             onPress={() => handleSelect(item)}
             style={styles.item}
           >
-            <Text>{item.description}</Text>
+            <Text style={styles.suggestionText}>{item.description}</Text>
           </TouchableOpacity>
         )}
       />
@@ -173,6 +173,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center',
+  },
+
+  suggestionText: {
+    color : 'black',
   },
 });
 

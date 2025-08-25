@@ -19,22 +19,17 @@ const PaymentScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [savedCards, setSavedCards] = useState<any[]>([]);
   const { confirmSetupIntent } = useStripe();
-  const totalRemuneration2 = route.params?.totalRemuneration || 0
-  
-  
   const instruction = route.params?.instruction || ""
-
-  const itemCount = Array.isArray(cart) ? cart.length : 0;
-
+  let totalRemuneration2 = route.params?.totalRemuneration || 0
+  
+  
 const PERCENT_FEE = 0.015;     // 1,5%
 const PER_ITEM_FIXED_FEE = 0.25; // 0,25 € par item
 
-const serviceFee = totalRemuneration2 * 0.10;
-const percentFeeAmount = totalRemuneration2 * PERCENT_FEE;
-const fixedFeeAmount = itemCount * PER_ITEM_FIXED_FEE;
-
-const transactionFee = percentFeeAmount + fixedFeeAmount;
-const finalTotal = totalRemuneration2 + serviceFee + transactionFee;
+const [itemCount, setItemCount] = useState(0);
+const [serviceFee, setServiceFee] = useState(0);
+const [transactionFee, setTransactionFee] = useState(0);
+const [finalTotal, setFinalTotal] = useState(0);
 
 const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 const [useSavedCard, setUseSavedCard] = useState<boolean>(false);
@@ -45,7 +40,7 @@ const [cardDetails, setCardDetails] = useState<any>(null);
 const [showCardField, setShowCardField] = useState(false);
 
   useEffect(() => {
-    
+    recalculateTotals(cart);
     fetchSavedCards();
   }, []);
 
@@ -59,12 +54,39 @@ const [showCardField, setShowCardField] = useState(false);
           text: 'Supprimer',
           style: 'destructive',
           onPress: () => {
-            setCart((prevCart: any[]) => prevCart.filter((_, i) => i !== indexToRemove));
+            setCart((prevCart: any[]) => {
+              const updatedCart = prevCart.filter((_, i) => i !== indexToRemove);
+              recalculateTotals(updatedCart); // 👈 recalcul direct
+              return updatedCart;
+            });
           },
         },
       ]
     );
   };
+
+  const recalculateTotals = (updatedCart: any[]) => {
+    let itemCount = Array.isArray(updatedCart) ? updatedCart.length : 0;
+  
+    const totalRemuneration = updatedCart.reduce(
+      (sum, item) => sum + (item.totalRemuneration || 0),
+      0
+    );
+  
+    const serviceFeeCalc = totalRemuneration * 0.10;
+    const percentFeeAmountCalc = totalRemuneration * PERCENT_FEE;
+    const fixedFeeAmountCalc = itemCount * PER_ITEM_FIXED_FEE;
+  
+    const transactionFeeCalc = percentFeeAmountCalc + fixedFeeAmountCalc;
+    const finalTotalCalc = totalRemuneration + serviceFeeCalc + transactionFeeCalc;
+  
+    // Mets à jour dans le state
+    setServiceFee(serviceFeeCalc);
+    setTransactionFee(transactionFeeCalc);
+    setFinalTotal(finalTotalCalc);
+    setItemCount(itemCount);
+  };
+  
   
 
   const handleAddCard = async () => {

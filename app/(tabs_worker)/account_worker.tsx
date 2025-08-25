@@ -42,6 +42,10 @@ const AccountWorkerScreen = () => {
     navigation.navigate('about' as never);
   }
 
+  const goToMatching = async () => {
+    navigation.navigate('matching' as never);
+  }
+
   const goToLanguage = async () => {
     navigation.navigate('language' as never);
   }
@@ -163,6 +167,11 @@ const AccountWorkerScreen = () => {
 <TouchableOpacity style={styles.menuItem} onPress={goToAbout}>
   <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>À propos</Text>
+</TouchableOpacity>
+
+<TouchableOpacity style={styles.menuItem} onPress={goToMatching}>
+  <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
+  <Text style={styles.menuItemText}>matching cv</Text>
 </TouchableOpacity>
 
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
