@@ -1,4 +1,6 @@
 import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue';
+import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
+import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import React, { useMemo, useState } from 'react';
@@ -27,7 +29,11 @@ const StarSetScreen = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
 
-  let [fontsLoaded] = useFonts({ BebasNeue: BebasNeue_400Regular });
+  let [fontsLoaded] = useFonts({
+          LexendDeca : LexendDeca_400Regular,
+          BebasNeue: BebasNeue_400Regular,
+          LeagueSpartanBold : LeagueSpartan_700Bold
+      });
 
   const toggleSelection = (list: string[], setList: (v: string[]) => void, value: string) => {
     if (list.includes(value)) {
@@ -166,7 +172,7 @@ const StarSetScreen = () => {
       {/* Situation */}
       <Text style={styles.sectionTitle}>QUELLE EST VOTRE SITUATION ACTUELLE ?</Text>
       <View style={styles.pickerContainer}>
-        <Picker selectedValue={situation} onValueChange={itemValue => setSituation(itemValue)}>
+        <Picker style={{ color: 'white' , fontFamily : 'LexendDeca' }} selectedValue={situation} onValueChange={itemValue => setSituation(itemValue)}>
           <Picker.Item label="Choisir..." value="" />
           <Picker.Item label="Étudiant" value="etudiant" />
           <Picker.Item label="Agriculteur" value="agriculteur" />
@@ -178,6 +184,7 @@ const StarSetScreen = () => {
       <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
       <View style={styles.pickerContainer}>
         <Picker
+        style={{ color: 'white' , fontFamily : 'LexendDeca'  }}
           selectedValue={newCertification}
           onValueChange={itemValue => {
             if (itemValue && !certifications.includes(itemValue)) {
@@ -275,21 +282,22 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   title: {
-    fontWeight: 'bold',
-    fontSize: 18,
+    fontFamily : 'BebasNeue',
+    fontSize: 28,
     marginBottom: 20,
     textAlign: 'center',
-    color: '#006400',
+    color: '#007f00ff',
   },
   sectionTitle: {
     marginTop: 20,
     marginBottom: 10,
-    fontWeight: 'bold',
-    color: '#000',
+    fontFamily : 'BebasNeue',
+    color: '#007f00ff',
+    fontSize : 22
   },
-  whiteText: { color: 'white', fontWeight: 'bold' },
-  darkText: { color: '#333' },
-  pickerContainer: { backgroundColor: '#FFD700', borderRadius: 8, marginBottom: 15 },
+  whiteText: { color: 'white', fontFamily : 'LexendDeca' },
+  darkText: { color: 'white',fontFamily : 'LexendDeca' },
+  pickerContainer: { backgroundColor: '#FFD700', borderRadius: 8, marginBottom: 15, color : 'white' },
   tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', marginVertical: 10 },
   tag: {
     backgroundColor: '#FFD700',
@@ -315,7 +323,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignItems: 'center',
   },
-  analyseText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
+  analyseText: { color: 'white', fontFamily : 'LeagueSpartanBold', fontSize: 16 },
 });
 
 // ——— Styles de la vue résultat ———
@@ -362,7 +370,7 @@ const stylesR = StyleSheet.create({
     marginRight: 12,
   },
   avatar: { width: 44, height: 44, borderRadius: 22, marginRight: 12 },
-  job: { flex: 1, fontWeight: 'bold', color: '#000' },
+  job: { flex: 1, fontFamily : 'BebasNeue', color: '#000', fontSize : 20 },
   score: { fontWeight: 'bold', color: '#0F7B0F' },
   nextBtn: {
     position: 'absolute',
