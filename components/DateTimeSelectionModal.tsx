@@ -424,6 +424,14 @@ const getMarkedDates = () => {
                   if (!departureHour) onDepartureHourChange('00');
                   if (!departureMinute) onDepartureMinuteChange('00');
 
+                  const start = moment(`${startDate}T${arrivalHour.padStart(2, '0')}:${arrivalMinute.padStart(2, '0')}`);
+                  const end   = moment(`${endDate || startDate}T${departureHour.padStart(2, '0')}:${departureMinute.padStart(2, '0')}`);
+
+                  if (end.isBefore(start)) {
+                    alert("L'heure de départ ne peut pas être antérieure à l'heure d'arrivée.");
+                    return;
+                  }
+
                   if (isHourWithinAvailability()) {
                     onConfirm();
                   } else {
@@ -460,8 +468,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
-    maxHeight : '80%'
-    // ❌ enlève maxHeight ici
+    maxHeight : '70%'
+    
   },
   modalTitle: { fontSize: 20, marginBottom: 10, marginTop: 90, fontFamily : 'LeagueSpartanBold', color : 'black' },
   inputRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 20 },

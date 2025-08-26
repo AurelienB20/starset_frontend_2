@@ -372,11 +372,10 @@ const HomeScreen = () => {
               keyExtractor={(item, index) => index.toString()}
             />
 
-            <FlatList
-              data={null}
+            <FlatList<any>
+              data={[]}
               renderItem={renderProfileSuggestion}
-              keyExtractor={(item) => item.id}
-              style={styles.profileSuggestionList}
+              keyExtractor={(item: any) => item.id}
             />
           </ScrollView>
         </View>

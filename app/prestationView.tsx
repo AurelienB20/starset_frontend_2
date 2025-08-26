@@ -1,5 +1,6 @@
 import DateTimeSelectionModal from '@/components/DateTimeSelectionModal'; // ajuste le chemin si besoin
 import ReportModal from '@/components/ReportModal';
+import SafeImage from '@/components/SafeImage';
 import ShareProfileModal from '@/components/ShareModal';
 import SignupPromptModal from '@/components/SignupPromptModal';
 import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
@@ -72,6 +73,7 @@ const PrestationViewScreen = () => {
   const [signupPromptModalVisible, setSignupPromptModalVisible] = useState(false);
   const [ finishedPrestationCount, setFinishedPrestationCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [retryKey, setRetryKey] = useState(Date.now())
 
   const insets = useSafeAreaInsets();
 
@@ -809,11 +811,14 @@ const unlikeImage = async (imageId: string) => {
       {/* Contenu des onglets */}
       {selectedTab === 'photos' && (
         <View style={styles.photosContainer}>
-          {prestationImages.map((photo : any, index : any) => (
-            <TouchableOpacity key={index} onPress={() => openImageModal(photo)} style={styles.photoButton}>
-              <Image source={{ uri: photo.adress }} style={styles.photo} />
-            </TouchableOpacity>
-          ))}
+          {prestationImages.map((photo: { adress: any; }, index: any) => (
+  <SafeImage
+    key={index}
+    uri={photo.adress}
+    style={styles.photoButton}
+    onPress={() => openImageModal(photo)}
+  />
+))}
         </View>
         
       )}
@@ -974,39 +979,59 @@ const unlikeImage = async (imageId: string) => {
         {/* Arrival Time Input Modal */}
       
 
-      <Modal
-        visible={isImageModalVisible}
-        transparent={true}
-        onRequestClose={closeImageModal}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={closeImageModal}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalBackground}>
-            {selectedImage && (
-              <>
-                <Image source={{ uri: selectedImage?.adress }} style={styles.fullScreenImage} />
-                <TouchableOpacity
-                  activeOpacity={1}
-                  onPress={(e) => {
-                    e.stopPropagation(); // Empêche la propagation vers l'overlay
-                    toggleLikeImage(selectedImage); // Appelle la fonction dédiée
-                  }}
-                  style={styles.modalLikeButton}
-                >
-                  <Icon
-                    name={Array.isArray(likedImages) && likedImages.includes(selectedImage?.adress) ? 'favorite' : 'favorite-border'}
-                    size={32}
-                    color={Array.isArray(likedImages) && likedImages.includes(selectedImage?.adress) ? 'red' : 'white'}
-                  />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+        <Modal
+  visible={isImageModalVisible}
+  transparent={true}
+  onRequestClose={closeImageModal}
+>
+  <TouchableOpacity
+    activeOpacity={1}
+    onPress={closeImageModal}
+    style={styles.modalOverlay}
+  >
+    <View style={styles.modalBackground}>
+      {selectedImage && (
+        <>
+          <Image
+            key={retryKey} // 🔑 force RN à relancer l’image
+            source={{ uri: selectedImage?.adress }}
+            style={styles.fullScreenImage}
+            resizeMode="contain"
+            onError={() => {
+              console.log("Image échouée dans le modal:", selectedImage?.adress);
+              setTimeout(() => setRetryKey(Date.now()), 1000); // retry après 1s
+            }}
+          />
+
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={(e) => {
+              e.stopPropagation();
+              toggleLikeImage(selectedImage);
+            }}
+            style={styles.modalLikeButton}
+          >
+            <Icon
+              name={
+                Array.isArray(likedImages) &&
+                likedImages.includes(selectedImage?.adress)
+                  ? "favorite"
+                  : "favorite-border"
+              }
+              size={32}
+              color={
+                Array.isArray(likedImages) &&
+                likedImages.includes(selectedImage?.adress)
+                  ? "red"
+                  : "white"
+              }
+            />
+          </TouchableOpacity>
+        </>
+      )}
+    </View>
+  </TouchableOpacity>
+</Modal>
       
       <Modal
         animationType="slide"
