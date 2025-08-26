@@ -103,6 +103,7 @@ const ModifyLocationScreen = () => {
         value={query}
         onChangeText={searchAddress}
         placeholder="Entrez votre adresse..."
+        placeholderTextColor="gray"
       />
 
       <FlatList
@@ -110,7 +111,7 @@ const ModifyLocationScreen = () => {
         keyExtractor={(item : any) => item.place_id}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleSelect(item)} style={styles.item}>
-            <Text>{item.description}</Text>
+            <Text style={{ color: 'black' }}>{item.description}</Text>
           </TouchableOpacity>
         )}
       />
@@ -150,6 +151,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderColor: '#ddd',
+    color: 'black',
   },
   confirmButton: {
     marginTop: 20,
