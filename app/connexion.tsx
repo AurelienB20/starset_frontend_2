@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
-
 const ConnexionScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -218,7 +217,7 @@ const styles = StyleSheet.create({
    
     borderRadius: 50,
     marginBottom: 100,
-    top: 80,
+    top: 40,
     justifyContent : 'center', 
     alignItems : 'center'
   },

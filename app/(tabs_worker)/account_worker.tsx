@@ -151,7 +151,12 @@ const AccountWorkerScreen = () => {
       </TouchableOpacity>
 
       
-
+      <TouchableOpacity 
+        style={styles.matchButton} 
+        onPress={goToMatching}
+      >
+        <Text style={styles.matchButtonText}>MATCHER MON PROFIL</Text>
+      </TouchableOpacity>
 
 
 <TouchableOpacity style={styles.menuItem}  onPress={goToModifyAccount}>
@@ -167,11 +172,6 @@ const AccountWorkerScreen = () => {
 <TouchableOpacity style={styles.menuItem} onPress={goToAbout}>
   <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
   <Text style={styles.menuItemText}>À propos</Text>
-</TouchableOpacity>
-
-<TouchableOpacity style={styles.menuItem} onPress={goToMatching}>
-  <MaterialIcons name="info-outline" size={24} color="#000" style={styles.menuIcon} />
-  <Text style={styles.menuItemText}>matching cv</Text>
 </TouchableOpacity>
 
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
@@ -193,7 +193,7 @@ const AccountWorkerScreen = () => {
       </>
     ) : (
       // 🟥 AFFICHAGE SI NON CONNECTÉ
-      <View style={{ alignItems: 'center', padding: 20 }}>
+      <View style={{ alignItems:'center', padding: 20 }}>
         <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#008000', marginBottom: 30, textAlign: 'center' }}>
           Pas encore de compte
         </Text>
@@ -368,6 +368,19 @@ profileRole: {
   fontSize: 20,
   fontFamily : 'LeagueSpartanBold',
   color : 'black'
+},
+
+matchButton: {
+  backgroundColor: '#00A651', // vert foncé
+  paddingVertical: 15,
+  borderRadius: 10,
+  alignItems: 'center',
+  marginBottom: 20,
+},
+matchButtonText: {
+  color: '#fff',
+  fontSize: 18,
+  fontFamily: 'LeagueSpartanBold',
 },
 
 
