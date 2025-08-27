@@ -3,7 +3,7 @@ import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -28,12 +28,40 @@ const StarSetScreen = () => {
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
+  const [allMandatoryDocs, setAllMandatoryDocs] = useState<string[]>([]);
 
   let [fontsLoaded] = useFonts({
           LexendDeca : LexendDeca_400Regular,
           BebasNeue: BebasNeue_400Regular,
           LeagueSpartanBold : LeagueSpartan_700Bold
       });
+
+      useEffect(() => {
+        const fetchMandatoryDocs = async () => {
+          try {
+            const res = await fetch(`${config.backendUrl}/api/document/get-all-mandatory-document`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await res.json();
+            if (data.success) {
+              // Flatten et filtrage
+              const docs = data.data
+                .flatMap((d: any) => d.mandatory_documents)
+                .filter((doc: string) => {
+                  const lower = doc.toLowerCase();
+                  return !lower.includes('au moins') && !lower.includes('avoir');
+                });
+        
+              setAllMandatoryDocs(docs);
+            }
+          } catch (err) {
+            console.error('Erreur fetch mandatory docs:', err);
+          }
+        };
+    
+        fetchMandatoryDocs();
+      }, []);
 
   const toggleSelection = (list: string[], setList: (v: string[]) => void, value: string) => {
     if (list.includes(value)) {
@@ -184,9 +212,9 @@ const StarSetScreen = () => {
       <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
       <View style={styles.pickerContainer}>
         <Picker
-        style={{ color: 'white' , fontFamily : 'LexendDeca'  }}
+          style={{ color: 'white', fontFamily: 'LexendDeca' }}
           selectedValue={newCertification}
-          onValueChange={itemValue => {
+          onValueChange={(itemValue) => {
             if (itemValue && !certifications.includes(itemValue)) {
               setCertifications([...certifications, itemValue]);
             }
@@ -194,9 +222,9 @@ const StarSetScreen = () => {
           }}
         >
           <Picker.Item label="Choisir ici" value="" />
-          <Picker.Item label="Licence de droit" value="Licence de droit" />
-          <Picker.Item label="CRFPA" value="CRFPA" />
-          <Picker.Item label="Master Informatique" value="Master Informatique" />
+          {allMandatoryDocs.map((doc, idx) => (
+            <Picker.Item key={idx} label={doc} value={doc} />
+          ))}
         </Picker>
       </View>
       <View style={styles.tagsContainer}>
