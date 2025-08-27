@@ -74,6 +74,7 @@ const PrestationViewScreen = () => {
   const [ finishedPrestationCount, setFinishedPrestationCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [retryKey, setRetryKey] = useState(Date.now())
+  
 
   const insets = useSafeAreaInsets();
 
@@ -1194,6 +1195,7 @@ const unlikeImage = async (imageId: string) => {
     <TouchableOpacity
   style={[
     styles.addButton,
+    {marginBottom: (Platform.OS === 'android' ? insets.bottom : 0)},
     (!user || Object.keys(user).length === 0) && { backgroundColor: '#ccc' } // Bouton grisé si user vide
   ]}
   onPress={goToSummary}
@@ -1491,7 +1493,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     width: '90%',
-   
+    
     zIndex : 1000
 
   },
