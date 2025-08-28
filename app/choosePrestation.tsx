@@ -1,5 +1,5 @@
 import SignupPromptModal from '@/components/SignupPromptModal'; // adapte le chemin si nécessaire
-import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
+import { useCart, useCurrentUserPrestation, useUser } from '@/context/userContext';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRoute } from '@react-navigation/native';
 import moment from 'moment';
@@ -26,7 +26,7 @@ const ChoosePrestationScreen = () => {
   const [customPrestations, setCustomPrestations] = useState([]);
 
   const { addToCart } = useCart();
-  const { currentWorkerPrestation, setCurrentWorkerPrestation} = useCurrentWorkerPrestation()
+  const { currentUserPrestation, setCurrentUserPrestation} = useCurrentUserPrestation()
 
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,7 +44,7 @@ const ChoosePrestationScreen = () => {
 
   useEffect(() => {
     getCustomPrestations();
-    fetchAvailability(currentWorkerPrestation?.worker_id);
+    fetchAvailability(currentUserPrestation?.worker_id);
   }, []);
 
   
@@ -147,7 +147,7 @@ const ChoosePrestationScreen = () => {
     arrivalTime.setHours(parseInt(arrivalHour, 10), parseInt(arrivalMinute, 10), 0);
 
     const cartItem = {
-      prestation: currentWorkerPrestation,
+      prestation: currentUserPrestation,
       startDate: selectedDate,
       endDate: null,
       arrivalTime,

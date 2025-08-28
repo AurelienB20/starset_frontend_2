@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -19,7 +20,7 @@ import config from '../config.json';
 type JobResult = { job: string; score: number; picture_url?: string };
 
 const StarSetScreen = () => {
-  const [situation, setSituation] = useState<string>('');
+  
   const [certifications, setCertifications] = useState<string[]>([]);
   const [newCertification, setNewCertification] = useState<string>('');
   const [softSkills, setSoftSkills] = useState<string[]>([]);
@@ -29,6 +30,80 @@ const StarSetScreen = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
   const [allMandatoryDocs, setAllMandatoryDocs] = useState<string[]>([]);
+
+  const [situation, setSituation] = useState<string>('');
+  const [situationModalVisible, setSituationModalVisible] = useState(false);
+
+  const situations = [
+    'Étudiant',
+    'Agriculteur',
+    'Salarié',
+    'Artisan',
+    'Commerçant',
+    'Chef d’entreprise',
+    'Auto-entrepreneur / Indépendant',
+    'Cadre',
+    'Profession intellectuelle supérieure (médecin, avocat, ingénieur, etc.)',
+    'Profession intermédiaire (technicien, infirmier, instituteur, contremaître, etc.)',
+    'Employé de bureau / administratif',
+    'Employé de commerce (vendeur, caissier, etc.)',
+    'Employé de service (aide-soignant, assistant maternel, etc.)',
+    'Ouvrier qualifié',
+    'Ouvrier non qualifié',
+    'Demandeur d’emploi / Chômeur',
+    'Retraité',
+    'Personne au foyer / Inactif',
+  ];
+
+  const softSkillsOptions = [
+    'Esprit d’équipe',
+    'Sociabilité/Aisance relationnelle',
+    'Communication orale / écrite',
+    'Prise de parole en public',
+    'Sens de l’organisation',
+    'Rigueur / précision',
+    'Autonomie',
+    'Capacité d’adaptation / flexibilité',
+    'Gestion du stress',
+    'Esprit d’initiative',
+    'Créativité',
+    'Sens des responsabilités',
+    'Leadership',
+    'Empathie / écoute active',
+    'Patience / pédagogie',
+    'Résolution de problèmes',
+    'Capacité d’analyse / esprit critique',
+    'Fiabilité / ponctualité',
+    'Motivation / implication',
+    'Curiosité / envie d’apprendre',
+  ];
+
+  const passionsOptions = [
+    'Jeux vidéos / e-sport',
+    'Collecte/loisir créatif',
+    'Écologie protection de l’environnement',
+    'Beauté/Esthétique',
+    'Informatique / Programmation / Développement web',
+    'Bureautique / Outils numériques',
+    'Graphisme / Design / Dessin / Illustration',
+    'Photographie / Vidéo / Montage',
+    'Musique / Chant / Instrument',
+    'Danse / Théâtre / Arts de la scène',
+    'Lecture / Écriture / Blog / Journalisme',
+    'Langues étrangères / Traduction',
+    'Cuisine / Pâtisserie / Gastronomie',
+    'Sports / Fitness / Yoga / Arts martiaux',
+    'Nature / Jardinage / Agriculture urbaine',
+    'Animaux / Soins animaliers / Protection animale',
+    'Voyage / Découverte de cultures',
+    'Sciences / Mathématiques / Expérimentation',
+    'Bricolage / DIY / Artisanat',
+    'Développement personnel / Méditation',
+    'Engagement associatif / Bénévolat',
+  ];
+
+  // identique aux passions
+  const notLikedOptions = passionsOptions;
 
   let [fontsLoaded] = useFonts({
           LexendDeca : LexendDeca_400Regular,
@@ -45,13 +120,22 @@ const StarSetScreen = () => {
             });
             const data = await res.json();
             if (data.success) {
-              // Flatten et filtrage
-              const docs = data.data
-                .flatMap((d: any) => d.mandatory_documents)
-                .filter((doc: string) => {
-                  const lower = doc.toLowerCase();
-                  return !lower.includes('au moins') && !lower.includes('avoir');
-                });
+              // Flatten, nettoyage, filtrage et suppression des doublons
+              const docs : any = Array.from(
+                new Set(
+                  data.data
+                    .flatMap((d: any) => d.mandatory_documents)
+                    .map((doc: string) => doc.trim()) // supprime espaces inutiles
+                    .filter((doc: string) => {
+                      const lower = doc.toLowerCase();
+                      return (
+                        doc.length > 0 && // enlève les vides
+                        !lower.includes('au moins') &&
+                        !lower.includes('avoir')
+                      );
+                    })
+                )
+              );
         
               setAllMandatoryDocs(docs);
             }
@@ -199,14 +283,54 @@ const StarSetScreen = () => {
 
       {/* Situation */}
       <Text style={styles.sectionTitle}>QUELLE EST VOTRE SITUATION ACTUELLE ?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker style={{ color: 'white' , fontFamily : 'LexendDeca' }} selectedValue={situation} onValueChange={itemValue => setSituation(itemValue)}>
-          <Picker.Item label="Choisir..." value="" />
-          <Picker.Item label="Étudiant" value="etudiant" />
-          <Picker.Item label="Agriculteur" value="agriculteur" />
-          <Picker.Item label="Salarié" value="salarie" />
-        </Picker>
-      </View>
+      <TouchableOpacity
+        style={styles.pickerContainer}
+        onPress={() => setSituationModalVisible(true)}
+      >
+        <Text style={{ color: 'white', fontFamily: 'LexendDeca', marginHorizontal :10, marginVertical : 20 }}>
+          {situation || 'Choisir...'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Modal de choix */}
+      <Modal
+        visible={situationModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSituationModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView>
+              {situations.map((sit, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.optionButton,
+                    situation === sit ? styles.selected : styles.unselected,
+                  ]}
+                  onPress={() => {
+                    setSituation(sit);
+                    setSituationModalVisible(false);
+                  }}
+                >
+                  <Text style={situation === sit ? styles.whiteText : styles.darkText}>
+                    {sit}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {/* Bouton fermer */}
+            <TouchableOpacity
+              style={[styles.analyseButton, { marginTop: 10 }]}
+              onPress={() => setSituationModalVisible(false)}
+            >
+              <Text style={styles.analyseText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* Certifications */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
@@ -241,7 +365,7 @@ const StarSetScreen = () => {
 
       {/* Soft skills */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS QUALITÉS ET SOFT SKILLS ?</Text>
-      {['Esprit d’équipe', 'Sociabilité/Aisance relationnelle', 'Communication orale / écrite'].map(
+      {softSkillsOptions.map(
         (skill, idx) => (
           <TouchableOpacity
             key={idx}
@@ -255,12 +379,7 @@ const StarSetScreen = () => {
 
       {/* Passions */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS PASSIONS ET CENTRES D’INTÉRÊTS ?</Text>
-      {[
-        'Jeux vidéos / e-sport',
-        'Collecte/loisir créatif',
-        'Écologie protection de l’environnement',
-        'Beauté/Esthétique',
-      ].map((passion, idx) => (
+      {passionsOptions.map((passion, idx) => (
         <TouchableOpacity
           key={idx}
           style={[styles.optionButton, passions.includes(passion) ? styles.selected : styles.unselected]}
@@ -278,7 +397,7 @@ const StarSetScreen = () => {
 
       {/* Ce que vous n’appréciez pas */}
       <Text style={styles.sectionTitle}>CE QUE VOUS N’APPRÉCIEZ PAS ?</Text>
-      {['Informatique', 'Bureautique', 'Graphisme', 'Photographie'].map((item, idx) => (
+      {notLikedOptions.map((item, idx) => (
         <TouchableOpacity
           key={idx}
           style={[styles.optionButton, notLiked.includes(item) ? styles.selected : styles.unselected]}
@@ -352,6 +471,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   analyseText: { color: 'white', fontFamily : 'LeagueSpartanBold', fontSize: 16 },
+
+  modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  width: '80%',
+  maxHeight: '70%',
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 20,
+},
+
 });
 
 // ——— Styles de la vue résultat ———
@@ -411,6 +545,8 @@ const stylesR = StyleSheet.create({
     alignItems: 'center',
   },
   nextTxt: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  
 });
 
 export default StarSetScreen;

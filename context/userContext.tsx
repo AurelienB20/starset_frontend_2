@@ -19,6 +19,11 @@ interface CurrentWorkerPrestationContextType {
   setCurrentWorkerPrestation: (prestation: Prestation) => void;
 }
 
+interface CurrentUserPrestationContextType {
+  currentUserPrestation: Prestation | null;
+  setCurrentUserPrestation: (prestation: Prestation | null) => void;
+}
+
 interface AllWorkerPrestationContextType {
   allWorkerPrestation: Prestation | null;
   setAllWorkerPrestation: (prestation: Prestation) => void;
@@ -59,6 +64,7 @@ interface AllUserPlannedPrestationContextType {
 // Contexts
 const UserContext = createContext<UserContextType | undefined>(undefined);
 const CurrentWorkerPrestationContext = createContext<CurrentWorkerPrestationContextType | undefined>(undefined);
+const CurrentUserPrestationContext = createContext<CurrentUserPrestationContextType | undefined>(undefined);
 const AllWorkerPrestationContext = createContext<AllWorkerPrestationContextType | undefined>(undefined);
 const PlannedPrestationContext = createContext<PlannedPrestationContextType | undefined>(undefined);
 const UserConversationContext = createContext<UserConversationContextType | undefined>(undefined);
@@ -81,6 +87,16 @@ export const CurrentWorkerPrestationProvider: React.FC<{ children: React.ReactNo
     <CurrentWorkerPrestationContext.Provider value={{ currentWorkerPrestation, setCurrentWorkerPrestation }}>
       {children}
     </CurrentWorkerPrestationContext.Provider>
+  );
+};
+
+export const CurrentUserPrestationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentUserPrestation, setCurrentUserPrestation] = useState<Prestation | null>(null);
+
+  return (
+    <CurrentUserPrestationContext.Provider value={{ currentUserPrestation, setCurrentUserPrestation }}>
+      {children}
+    </CurrentUserPrestationContext.Provider>
   );
 };
 
@@ -176,6 +192,14 @@ export const useCurrentWorkerPrestation = () => {
   const context = useContext(CurrentWorkerPrestationContext);
   if (!context) {
     throw new Error('useWorkerPrestation doit être utilisé à l’intérieur de WorkerPrestationProvider');
+  }
+  return context;
+};
+
+export const useCurrentUserPrestation = () => {
+  const context = useContext(CurrentUserPrestationContext);
+  if (!context) {
+    throw new Error('useCurrentUserPrestation doit être utilisé à l’intérieur de CurrentUserPrestationProvider');
   }
   return context;
 };
