@@ -2,7 +2,6 @@ import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -33,6 +32,7 @@ const StarSetScreen = () => {
 
   const [situation, setSituation] = useState<string>('');
   const [situationModalVisible, setSituationModalVisible] = useState(false);
+  const [certificationModalVisible, setCertificationModalVisible] = useState(false);
 
   const situations = [
     'Étudiant',
@@ -314,7 +314,11 @@ const StarSetScreen = () => {
                     setSituationModalVisible(false);
                   }}
                 >
-                  <Text style={situation === sit ? styles.whiteText : styles.darkText}>
+                  <Text style={[
+    situation === sit ? styles.whiteText : styles.darkText,
+    { padding: 8 }
+  ]}
+>
                     {sit}
                   </Text>
                 </TouchableOpacity>
@@ -331,25 +335,59 @@ const StarSetScreen = () => {
           </View>
         </View>
       </Modal>
+      <Modal
+  visible={certificationModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setCertificationModalVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      <ScrollView>
+        {allMandatoryDocs.map((doc, idx) => (
+          <TouchableOpacity
+            key={idx}
+            style={[
+              styles.optionButton,
+              certifications.includes(doc) ? styles.selected : styles.unselected,
+            ]}
+            onPress={() => {
+              if (certifications.includes(doc)) {
+                setCertifications(certifications.filter(c => c !== doc));
+              } else {
+                setCertifications([...certifications, doc]);
+              }
+            }}
+          >
+            <Text style={certifications.includes(doc) ? styles.whiteText : styles.darkText}>
+              {doc}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Bouton fermer */}
+      <TouchableOpacity
+        style={[styles.analyseButton, { marginTop: 10 }]}
+        onPress={() => setCertificationModalVisible(false)}
+      >
+        <Text style={styles.analyseText}>FERMER</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
       {/* Certifications */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
       <View style={styles.pickerContainer}>
-        <Picker
-          style={{ color: 'white', fontFamily: 'LexendDeca' }}
-          selectedValue={newCertification}
-          onValueChange={(itemValue) => {
-            if (itemValue && !certifications.includes(itemValue)) {
-              setCertifications([...certifications, itemValue]);
-            }
-            setNewCertification('');
-          }}
+        <TouchableOpacity
+          style={styles.pickerContainer}
+          onPress={() => setCertificationModalVisible(true)}
         >
-          <Picker.Item label="Choisir ici" value="" />
-          {allMandatoryDocs.map((doc, idx) => (
-            <Picker.Item key={idx} label={doc} value={doc} />
-          ))}
-        </Picker>
+          <Text style={{ color: 'white', fontFamily: 'LexendDeca', marginHorizontal: 10, marginVertical: 10 }}>
+            Ajouter une certification
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.tagsContainer}>
         {certifications.map((cert, idx) => (
