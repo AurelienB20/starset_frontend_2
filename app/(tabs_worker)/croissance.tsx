@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import React, { useEffect, useState } from 'react';
 import { FlatList, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import config from '../../config.json';
 
 const CroissanceScreen = () => {
@@ -20,6 +21,7 @@ const CroissanceScreen = () => {
 const [loadingWorkers, setLoadingWorkers] = useState(false);
 const navigation = useNavigation()
 const { allWorkerPlannedPrestation } = useAllWorkerPlannedPrestation();
+const insets = useSafeAreaInsets();
 
 let [fontsLoaded] = useFonts({       
   LexendDeca : LexendDeca_400Regular,
@@ -172,7 +174,10 @@ const fetchJobsThatNeedHelp = async () => {
   const article = parseSimpleArticle(simpleArticle);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}
+    <ScrollView contentContainerStyle={[
+      styles.container,
+      { paddingBottom: insets.bottom + 20 }, // 👈 ajoute marge dynamique
+    ]}
     showsVerticalScrollIndicator={false}>
       <View style={styles.croissanceContainer}>
         <Image style ={styles.tinyLogo}source={require('../../assets/images/Croissance.png')}/>

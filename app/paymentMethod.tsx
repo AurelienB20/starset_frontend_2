@@ -163,6 +163,15 @@ const PaymentMethodScreen = () => {
               postalCodeEnabled={false}
               onCardChange={setCardDetails}
               style={styles.cardField}
+              cardStyle={{
+                backgroundColor: '#FFFFFF', // fond blanc fixe
+                textColor: '#000000',       // texte toujours noir
+                borderColor: '#e0e0e0',
+                borderWidth: 1,
+                borderRadius: 8,
+                placeholderColor: '#999999',
+                fontSize: 16,
+              }}
             />
             <TouchableOpacity style={styles.saveButton} onPress={handleAddCard}>
               <Text style={styles.saveButtonText}>Ajouter</Text>

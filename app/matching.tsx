@@ -31,6 +31,7 @@ const StarSetScreen = () => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
   const [allMandatoryDocs, setAllMandatoryDocs] = useState<string[]>([]);
+  const [showCertificationsList, setShowCertificationsList] = useState(false);
 
   const [situation, setSituation] = useState<string>('');
   const [situationModalVisible, setSituationModalVisible] = useState(false);
@@ -399,34 +400,92 @@ const StarSetScreen = () => {
   </View>
 </Modal>
 
-      {/* Certifications */}
-      <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
-      <View style={styles.pickerContainer}>
-        <TouchableOpacity
-          style={styles.pickerContainer}
-          onPress={() => setCertificationModalVisible(true)}
-        >
-          <Text style={{ color: 'white', fontFamily: 'LexendDeca', marginHorizontal: 10, marginVertical: 10 }}>
-            Ajouter une certification
-          </Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.tagsContainer}>
-  {certifications.map((cert, idx) => {
-    // Nettoyage du texte : supprime un éventuel "-" ou "- " au début
-    const cleanCert = cert.replace(/^-\s*/, '');
+{/* ✅ Section Certifications */}
+<Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
+<View style={styles.pickerContainer}>
+  <TouchableOpacity
+    style={styles.pickerContainer}
+    onPress={() => setShowCertificationsList(!showCertificationsList)} // toggle
+  >
+    <Text
+      style={{
+        color: 'white',
+        fontFamily: 'LexendDeca',
+        marginHorizontal: 10,
+        marginVertical: 10,
+      }}
+    >
+      {showCertificationsList
+        ? 'Masquer les certifications'
+        : 'Ajouter une certification'}
+    </Text>
+  </TouchableOpacity>
+</View>
 
+{/* ✅ Input de recherche directement dans la page */}
+{showCertificationsList && (
+  <>
+    <TextInput
+      style={styles.searchInput}
+      placeholder="Rechercher une certification..."
+      value={searchQuery}
+      onChangeText={setSearchQuery}
+    />
+
+    <ScrollView style={{ marginBottom: 10}}>
+      {allMandatoryDocs
+        .filter((doc) =>
+          doc.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .map((doc, idx) => {
+          const cleanDoc = doc.replace(/^-\s*/, '');
+          return (
+            <TouchableOpacity
+              key={idx}
+              style={[
+                styles.optionButton,
+                certifications.includes(doc)
+                  ? styles.selected
+                  : styles.unselected,
+              ]}
+              onPress={() => {
+                if (certifications.includes(doc)) {
+                  setCertifications(certifications.filter((c) => c !== doc));
+                } else {
+                  setCertifications([...certifications, doc]);
+                }
+              }}
+            >
+              <Text
+                style={[
+                  certifications.includes(doc)
+                    ? styles.whiteText
+                    : styles.darkText,
+                  { padding: 8 },
+                ]}
+              >
+                {cleanDoc}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+    </ScrollView>
+  </>
+)}
+
+{/* ✅ Tags sélectionnés */}
+<View style={styles.tagsContainer}>
+  {certifications.map((cert, idx) => {
+    const cleanCert = cert.replace(/^-\s*/, '');
     return (
       <TouchableOpacity
         key={idx}
         style={styles.tag}
         onPress={() =>
-          setCertifications(certifications.filter(c => c !== cert))
+          setCertifications(certifications.filter((c) => c !== cert))
         }
       >
-        <Text style={[styles.whiteText, { padding: 8 }]}>
-          {cleanCert} ✕
-        </Text>
+        <Text style={[styles.whiteText, { padding: 8 }]}>{cleanCert} ✕</Text>
       </TouchableOpacity>
     );
   })}
