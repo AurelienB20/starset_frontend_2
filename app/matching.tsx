@@ -17,6 +17,10 @@ import {
 } from 'react-native';
 import config from '../config.json';
 
+
+
+
+
 type JobResult = { job: string; score: number; picture_url?: string };
 
 const StarSetScreen = () => {
@@ -104,6 +108,8 @@ const StarSetScreen = () => {
     'Développement personnel / Méditation',
     'Engagement associatif / Bénévolat',
   ];
+
+  
 
   // identique aux passions
   const notLikedOptions = passionsOptions;
@@ -213,58 +219,73 @@ const StarSetScreen = () => {
 
   // ——— VUE RESULTAT ———
   const ResultView = () => {
-    const top = useMemo(() => results.slice(0, 10), [results]); // on affiche jusqu’à 10 résultats
-    if (!fontsLoaded) return null;
+  const top = useMemo(() => results.slice(0, 10), [results]);
+  if (!fontsLoaded) return null;
 
-    const medal = (rank: number) => {
-      if (rank === 1) return { color: '#FFD700', text: '1' }; // or
-      if (rank === 2) return { color: '#C0C0C0', text: '2' }; // argent
-      if (rank === 3) return { color: '#CD7F32', text: '3' }; // bronze
-      return { color: '#E5E5E5', text: String(rank) };
-    };
-
-    return (
-      <View style={stylesR.container}>
-        <Text style={[stylesR.title, { fontFamily: 'BebasNeue' }]}>
-          VOICI LE RÉSULTAT 🏆
-        </Text>
-
-        <ScrollView contentContainerStyle={stylesR.list}>
-          {top.map((item, idx) => {
-            const r = idx + 1;
-            const m = medal(r);
-            return (
-              <View key={idx} style={stylesR.card}>
-                {/* rang / médaille */}
-                <View style={[stylesR.badge, { backgroundColor: m.color }]}>
-                  <Text style={stylesR.badgeText}>{m.text}</Text>
-                </View>
-
-                {/* icône/metier */}
-                {item.picture_url ? (
-                  <Image source={{ uri: item.picture_url }} style={stylesR.avatar} />
-                ) : (
-                  <View style={stylesR.iconWrap}>
-                    <Ionicons name="briefcase-outline" size={26} color="#555" />
-                  </View>
-                )}
-
-                {/* nom métier */}
-                <Text style={stylesR.job}>{item.job.toUpperCase()}</Text>
-
-                {/* score */}
-                <Text style={stylesR.score}>{item.score}/10</Text>
-              </View>
-            );
-          })}
-        </ScrollView>
-
-        <TouchableOpacity style={stylesR.nextBtn} onPress={() => setResults([])}>
-          <Text style={stylesR.nextTxt}>SUIVANT</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const medal = (rank: number) => {
+    if (rank === 1) return require('../assets/images/first.png');
+    if (rank === 2) return require('../assets/images/second.png');
+    if (rank === 3) return require('../assets/images/third.png');
+    return null;
   };
+
+  return (
+    <View style={stylesR.container}>
+      <View style={stylesR.header}>
+      <Text style={[stylesR.title, { fontFamily: 'BebasNeue' }]}>
+        VOICI LE RÉSULTAT
+      </Text>
+      <Image
+        source={require('../assets/images/trophee.png')}
+        style={stylesR.trophy}
+      />
+    </View>
+
+      <ScrollView contentContainerStyle={stylesR.list}>
+        {top.map((item, idx) => {
+          const r = idx + 1;
+          const medalIcon = medal(r);
+
+          return (
+            <View key={idx} style={stylesR.card}>
+              {/* Médailles 1, 2, 3 */}
+              {medalIcon ? (
+                <Image source={medalIcon} style={stylesR.medalIcon} />
+              ) : (
+                <View style={stylesR.badge}>
+                  <Text style={stylesR.badgeText}>{r}</Text>
+                </View>
+              )}
+
+              {/* Icône métier */}
+              {item.picture_url ? (
+                <Image 
+  source={{ uri: item.picture_url }} 
+  style={stylesR.avatar} 
+  resizeMode="contain" 
+/>
+              ) : (
+                <View style={stylesR.iconWrap}>
+                  <Ionicons name="briefcase-outline" size={26} color="#555" />
+                </View>
+              )}
+
+              {/* Nom métier */}
+              <Text style={stylesR.job}>{item.job.toUpperCase()}</Text>
+
+              {/* Score */}
+              <Text style={stylesR.score}>{item.score}/10</Text>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      <TouchableOpacity style={stylesR.nextBtn} onPress={() => setResults([])}>
+        <Text style={stylesR.nextTxt}>SUIVANT</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
   // ——— RENDU PRINCIPAL ———
   if (loading) {
@@ -281,7 +302,7 @@ const StarSetScreen = () => {
 
   // ——— FORMULAIRE D'ANALYSE ———
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>QUELS MÉTIERS VOUS CORRESPONDENT LE MIEUX SUR STARSET ?</Text>
 
       {/* Situation */}
@@ -402,76 +423,46 @@ const StarSetScreen = () => {
 
 {/* ✅ Section Certifications */}
 <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
-<View style={styles.pickerContainer}>
-  <TouchableOpacity
-    style={styles.pickerContainer}
-    onPress={() => setShowCertificationsList(!showCertificationsList)} // toggle
-  >
-    <Text
-      style={{
-        color: 'white',
-        fontFamily: 'LexendDeca',
-        marginHorizontal: 10,
-        marginVertical: 10,
-      }}
-    >
-      {showCertificationsList
-        ? 'Masquer les certifications'
-        : 'Ajouter une certification'}
-    </Text>
-  </TouchableOpacity>
-</View>
 
-{/* ✅ Input de recherche directement dans la page */}
-{showCertificationsList && (
-  <>
-    <TextInput
-      style={styles.searchInput}
-      placeholder="Rechercher une certification..."
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-    />
+<View>
+  {/* Champ de recherche */}
+  <TextInput
+    style={styles.input}
+    placeholder="Rechercher une certification..."
+    value={searchQuery}
+    onChangeText={setSearchQuery}
+    placeholderTextColor="white"
+  />
 
-    <ScrollView style={{ marginBottom: 10}}>
-      {allMandatoryDocs
-        .filter((doc) =>
-          doc.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .map((doc, idx) => {
-          const cleanDoc = doc.replace(/^-\s*/, '');
-          return (
-            <TouchableOpacity
-              key={idx}
-              style={[
-                styles.optionButton,
-                certifications.includes(doc)
-                  ? styles.selected
-                  : styles.unselected,
-              ]}
-              onPress={() => {
-                if (certifications.includes(doc)) {
-                  setCertifications(certifications.filter((c) => c !== doc));
-                } else {
-                  setCertifications([...certifications, doc]);
-                }
-              }}
-            >
-              <Text
-                style={[
-                  certifications.includes(doc)
-                    ? styles.whiteText
-                    : styles.darkText,
-                  { padding: 8 },
-                ]}
+  {/* Suggestions qui apparaissent en dessous de l’input */}
+  {searchQuery.length > 0 && (
+    <View style={styles.suggestionsBox}>
+      <ScrollView keyboardShouldPersistTaps="handled">
+        {allMandatoryDocs
+          .filter((doc) =>
+            doc.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((doc, idx) => {
+            const cleanDoc = doc.replace(/^-\s*/, '');
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={styles.item}
+                onPress={() => {
+                  if (!certifications.includes(doc)) {
+                    setCertifications([...certifications, doc]);
+                  }
+                  setSearchQuery(''); // ferme la liste
+                }}
               >
-                {cleanDoc}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-    </ScrollView>
-  </>
-)}
+                <Text style={styles.suggestionText}>{cleanDoc}</Text>
+              </TouchableOpacity>
+            );
+          })}
+      </ScrollView>
+    </View>
+  )}
+</View>
 
 {/* ✅ Tags sélectionnés */}
 <View style={styles.tagsContainer}>
@@ -632,6 +623,43 @@ searchInput: {
   color : 'black'
 },
 
+input: {
+  height: 50,
+  
+  
+  borderRadius: 5,
+  paddingHorizontal: 10,
+  fontSize: 16,
+  backgroundColor: '#FFD700',
+  color: 'white',
+  fontFamily : 'LexendDeca'
+},
+
+suggestionsBox: {
+  position: 'absolute',
+  top: 50, // juste en dessous de l’input
+  left: 0,
+  right: 0,
+  backgroundColor: 'white',
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 5,
+  maxHeight: 300,
+  zIndex: 1000, // passe au-dessus du reste
+},
+
+item: {
+  paddingVertical: 10,
+  paddingHorizontal: 10,
+  borderBottomWidth: 1,
+  borderColor: '#ddd',
+},
+
+suggestionText: {
+  color: 'black',
+  fontFamily : 'LexendDeca'
+},
+
 });
 
 // ——— Styles de la vue résultat ———
@@ -640,6 +668,7 @@ const stylesR = StyleSheet.create({
     flex: 1,
     paddingTop: 60,
     paddingHorizontal: 20,
+    
     backgroundColor: '#fff',
   },
   title: {
@@ -658,26 +687,21 @@ const stylesR = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
     marginBottom: 12,
+    marginHorizontal: 20,
+    marginTop : 10
   },
-  badge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  badgeText: { fontWeight: 'bold', color: '#000' },
+  
   iconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    
   },
-  avatar: { width: 44, height: 44, borderRadius: 22, marginRight: 12 },
+  avatar: { width: 44, height: 44, marginRight: 12 },
   job: { flex: 1, fontFamily : 'BebasNeue', color: '#000', fontSize : 20 },
   score: { fontWeight: 'bold', color: '#0F7B0F' },
   nextBtn: {
@@ -691,6 +715,46 @@ const stylesR = StyleSheet.create({
     alignItems: 'center',
   },
   nextTxt: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  medalIcon: {
+  width: 40,
+  height: 40,
+  position: 'absolute',
+  top: -10,
+  left: -10,
+  resizeMode: 'contain',
+  zIndex: 10,
+},
+badge: {
+  position: 'absolute',
+  top: -5,
+  left: -5,
+  width: 28,
+  height: 28,
+  borderRadius: 14,
+  backgroundColor: '#E5E5E5',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 10,
+},
+badgeText: {
+  fontWeight: 'bold',
+  color: '#000',
+},
+
+header: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+trophy: {
+  width: 30,
+  height: 30,
+  marginLeft: 10,
+  marginBottom : 15,
+  resizeMode: 'contain',
+},
 
   
 
