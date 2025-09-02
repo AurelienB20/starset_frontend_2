@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../../config.json';
 import { saveMode } from '../chooseAccount';
 
@@ -115,7 +115,7 @@ const AccountWorkerScreen = () => {
 
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
 
 {user && Object.keys(user).length > 0 ? (
       // 🟩 TON CONTENU ACTUEL ICI (copie ton JSX à l’intérieur de ce bloc)
@@ -230,7 +230,7 @@ const AccountWorkerScreen = () => {
 
 
       
-    </View>
+    </ScrollView>
   );
 };
 

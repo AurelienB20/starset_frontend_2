@@ -11,6 +11,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -25,6 +26,7 @@ const StarSetScreen = () => {
   const [softSkills, setSoftSkills] = useState<string[]>([]);
   const [passions, setPassions] = useState<string[]>([]);
   const [notLiked, setNotLiked] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
@@ -327,7 +329,7 @@ const StarSetScreen = () => {
 
             {/* Bouton fermer */}
             <TouchableOpacity
-              style={[styles.analyseButton, { marginTop: 10 }]}
+              style={[styles.closeButton, { marginTop: 10 }]}
               onPress={() => setSituationModalVisible(false)}
             >
               <Text style={styles.analyseText}>FERMER</Text>
@@ -343,32 +345,52 @@ const StarSetScreen = () => {
 >
   <View style={styles.modalOverlay}>
     <View style={styles.modalContent}>
+      {/* Champ de recherche */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Rechercher une certification..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
       <ScrollView>
-        {allMandatoryDocs.map((doc, idx) => (
-          <TouchableOpacity
-            key={idx}
-            style={[
-              styles.optionButton,
-              certifications.includes(doc) ? styles.selected : styles.unselected,
-            ]}
-            onPress={() => {
-              if (certifications.includes(doc)) {
-                setCertifications(certifications.filter(c => c !== doc));
-              } else {
-                setCertifications([...certifications, doc]);
-              }
-            }}
-          >
-            <Text style={certifications.includes(doc) ? styles.whiteText : styles.darkText}>
-              {doc}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {allMandatoryDocs
+          .filter(doc =>
+            doc.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((doc, idx) => {
+            const cleanDoc = doc.replace(/^-\s*/, '');
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[
+                  styles.optionButton,
+                  certifications.includes(doc) ? styles.selected : styles.unselected,
+                ]}
+                onPress={() => {
+                  if (certifications.includes(doc)) {
+                    setCertifications(certifications.filter(c => c !== doc));
+                  } else {
+                    setCertifications([...certifications, doc]);
+                  }
+                }}
+              >
+                <Text
+                  style={[
+                    certifications.includes(doc) ? styles.whiteText : styles.darkText,
+                    { padding: 8 },
+                  ]}
+                >
+                  {cleanDoc}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
       </ScrollView>
 
       {/* Bouton fermer */}
       <TouchableOpacity
-        style={[styles.analyseButton, { marginTop: 10 }]}
+        style={[styles.closeButton, { marginTop: 10 }]}
         onPress={() => setCertificationModalVisible(false)}
       >
         <Text style={styles.analyseText}>FERMER</Text>
@@ -390,16 +412,25 @@ const StarSetScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.tagsContainer}>
-        {certifications.map((cert, idx) => (
-          <TouchableOpacity
-            key={idx}
-            style={styles.tag}
-            onPress={() => setCertifications(certifications.filter(c => c !== cert))}
-          >
-            <Text style={styles.whiteText}>{cert} ✕</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+  {certifications.map((cert, idx) => {
+    // Nettoyage du texte : supprime un éventuel "-" ou "- " au début
+    const cleanCert = cert.replace(/^-\s*/, '');
+
+    return (
+      <TouchableOpacity
+        key={idx}
+        style={styles.tag}
+        onPress={() =>
+          setCertifications(certifications.filter(c => c !== cert))
+        }
+      >
+        <Text style={[styles.whiteText, { padding: 8 }]}>
+          {cleanCert} ✕
+        </Text>
+      </TouchableOpacity>
+    );
+  })}
+</View>
 
       {/* Soft skills */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS QUALITÉS ET SOFT SKILLS ?</Text>
@@ -508,6 +539,14 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignItems: 'center',
   },
+
+  closeButton: {
+    backgroundColor: 'red',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: 'center',
+  },
   analyseText: { color: 'white', fontFamily : 'LeagueSpartanBold', fontSize: 16 },
 
   modalOverlay: {
@@ -518,10 +557,20 @@ const styles = StyleSheet.create({
 },
 modalContent: {
   width: '80%',
-  maxHeight: '70%',
+  maxHeight: '80%',
   backgroundColor: '#fff',
   borderRadius: 12,
   padding: 20,
+},
+
+searchInput: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 8,
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  marginBottom: 12,
+  color : 'black'
 },
 
 });
@@ -583,6 +632,8 @@ const stylesR = StyleSheet.create({
     alignItems: 'center',
   },
   nextTxt: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  
 
   
 });
