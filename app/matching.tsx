@@ -424,7 +424,7 @@ const StarSetScreen = () => {
 {/* ✅ Section Certifications */}
 <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
 
-<View>
+<View style={{ position: 'relative' }}>
   {/* Champ de recherche */}
   <TextInput
     style={styles.input}
@@ -645,7 +645,9 @@ suggestionsBox: {
   borderColor: '#ddd',
   borderRadius: 5,
   maxHeight: 300,
-  zIndex: 1000, // passe au-dessus du reste
+  
+   zIndex: 1000,     // iOS
+  elevation: 10,    // Android
 },
 
 item: {
@@ -653,6 +655,7 @@ item: {
   paddingHorizontal: 10,
   borderBottomWidth: 1,
   borderColor: '#ddd',
+  backgroundColor : 'white'
 },
 
 suggestionText: {
