@@ -1,16 +1,13 @@
 import { useUser } from '@/context/userContext';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { Alert, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
 
 const ModifyWorkerProfileScreen = () => {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
-  const [showKbisModal, setShowKbisModal] = useState(false);
-  const [kbisNumber, setKbisNumber] = useState('');
   const [selectedMode, setSelectedMode] = useState<'particulier' | 'company'>(
     user?.is_company ? 'company' : 'particulier'
   );
@@ -51,7 +48,7 @@ const ModifyWorkerProfileScreen = () => {
               if (!response.ok) throw new Error('Erreur serveur');
 
               Alert.alert('Succès', 'Votre type de profil a été mis à jour.');
-              navigation.navigate(isCompany ? 'CompanyTabs' as never : 'ParticulierTabs' as never);
+              navigation.navigate(isCompany ? 'workerProForm' as never : 'workerPartiForm' as never);
             } catch (error) {
               console.error('Erreur de mise à jour:', error);
               Alert.alert('Erreur', 'Impossible de mettre à jour le profil.');
@@ -60,6 +57,13 @@ const ModifyWorkerProfileScreen = () => {
         },
       ]
     );
+  };
+
+  const handleParticulierPress = () => {
+    setSelectedMode('particulier');
+  };
+  const handleProPress = () => {
+    setSelectedMode('company');
   };
 
   return (
@@ -82,7 +86,7 @@ const ModifyWorkerProfileScreen = () => {
         styles.buttonIconOnly,
         selectedMode === 'particulier' ? styles.buttonSelected : styles.buttonUnselected,
       ]}
-      onPress={() => setSelectedMode('particulier')}
+      onPress={() => handleParticulierPress()}
     >
       <Image source={require('../assets/images/people.png')} style={styles.iconFull} />
     </TouchableOpacity>
@@ -103,7 +107,7 @@ const ModifyWorkerProfileScreen = () => {
         styles.buttonIconOnly,
         selectedMode === 'company' ? styles.buttonSelected : styles.buttonUnselected,
       ]}
-      onPress={() => setShowKbisModal(true)}
+      onPress={() => handleProPress()}
     >
       <Image source={require('../assets/images/company.png')} style={styles.iconFull} />
     </TouchableOpacity>
@@ -122,42 +126,6 @@ const ModifyWorkerProfileScreen = () => {
       <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm} activeOpacity={0.8}>
         <Text style={styles.confirmButtonText}>Confirmer</Text>
       </TouchableOpacity>
-
-
-      <Modal visible={showKbisModal} transparent animationType="fade">
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContainer}>
-      
-      {/* Bouton de fermeture en haut à droite */}
-      <TouchableOpacity
-  onPress={() => setShowKbisModal(false)}
-  style={styles.closeButton}
->
-  <Icon name="close" size={24} color="#333" />
-</TouchableOpacity>
-
-      <Text style={styles.modalTitle}>Numéro de Kbis</Text>
-      <TextInput
-        style={styles.modalInput}
-        placeholder="Entrez votre numéro de Kbis"
-        value={kbisNumber}
-        onChangeText={setKbisNumber}
-        keyboardType="numeric"
-      />
-      <TouchableOpacity
-        style={styles.modalButton}
-        onPress={() => {
-          setShowKbisModal(false);
-          setSelectedMode('company');
-        }}
-      >
-        <Text style={styles.modalButtonText}>Valider</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
-
     </View>
   );
 };
@@ -314,7 +282,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: '#333',
   },
-  
+  file: { fontSize: 12, color: "gray", marginBottom: 10 },
 });
 
 export default ModifyWorkerProfileScreen;
