@@ -97,31 +97,43 @@ const AiScreen = () => {
   };
 
   const handleSendAiMessage = async () => {
-    if (!canChat) return; // NEW: sécurité
+    if (!canChat) return;
     if (!newMessage.trim()) return;
-
+  
     const user_id = await getAccountId();
-
+  
     const tempMessage = {
       message_text: newMessage,
       sender_id: user_id,
       sended_by_user: true,
     };
-
+  
     setMessages([...messages, tempMessage]);
     setNewMessage('');
     setLoading(true);
-
+  
     try {
+      // 🔥 Récupère les 3 derniers messages texte (hors workers)
+      const previousMessages = messages
+        .slice(-3) // derniers 3
+        .map(m => m.message_text);
+  
+      // construit le payload
+      const payload = {
+        user_id,
+        message_text: newMessage,
+        previous_messages: previousMessages, // on envoie aussi les 3 derniers
+      };
+  
       const response = await fetch(`${config.backendUrl}/api/ai/send-ai-message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id, message_text: newMessage }),
+        body: JSON.stringify(payload),
       });
-
+  
       const response_json = await response.json();
       const { response: messageText, workers } = response_json.data;
-
+  
       setMessages(prev => [
         ...prev,
         {
@@ -133,7 +145,7 @@ const AiScreen = () => {
     } catch (error) {
       console.error("Erreur lors de l’envoi du message IA:", error);
     }
-
+  
     setLoading(false);
   };
 

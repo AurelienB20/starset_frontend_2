@@ -3,7 +3,7 @@ import ReportModal from '@/components/ReportModal';
 import SafeImage from '@/components/SafeImage';
 import ShareProfileModal from '@/components/ShareModal';
 import SignupPromptModal from '@/components/SignupPromptModal';
-import { useCart, useCurrentWorkerPrestation, useUser } from '@/context/userContext';
+import { useCart, useCurrentUserPrestation, useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { JosefinSans_100Thin, JosefinSans_700Bold } from '@expo-google-fonts/josefin-sans';
 import { Lexend_400Regular, Lexend_700Bold } from '@expo-google-fonts/lexend';
@@ -66,7 +66,7 @@ const PrestationViewScreen = () => {
   const [menuVisible, setMenuVisible] = useState(false);
   const { addToCart } = useCart();
   const { user, setUser} = useUser()
-  const { currentWorkerPrestation, setCurrentWorkerPrestation} = useCurrentWorkerPrestation()
+  const { currentUserPrestation, setCurrentUserPrestation} = useCurrentUserPrestation()
   const [isProfileInfoVisible, setProfileInfoVisible] = useState(false);
   const [availabilityByDate, setAvailabilityByDate] = useState<any>({});
   const [selectedDates, setSelectedDates] = useState<any>({});
@@ -248,7 +248,7 @@ const PrestationViewScreen = () => {
       {
         // Stocker les prestations dans l'état
         setPrestation(data.prestation);
-        setCurrentWorkerPrestation(data.prestation);
+        setCurrentUserPrestation(data.prestation);
         setProfilePictureUrl(data.account.profile_picture_url);
         setMetiers(data.metiers);
         setAccount(data.account);

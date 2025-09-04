@@ -2,33 +2,117 @@ import { BebasNeue_400Regular, useFonts } from '@expo-google-fonts/bebas-neue';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
 import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import config from '../config.json';
 
+
+
+
+
 type JobResult = { job: string; score: number; picture_url?: string };
 
 const StarSetScreen = () => {
-  const [situation, setSituation] = useState<string>('');
+  
   const [certifications, setCertifications] = useState<string[]>([]);
   const [newCertification, setNewCertification] = useState<string>('');
   const [softSkills, setSoftSkills] = useState<string[]>([]);
   const [passions, setPassions] = useState<string[]>([]);
   const [notLiked, setNotLiked] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<JobResult[]>([]);
   const [allMandatoryDocs, setAllMandatoryDocs] = useState<string[]>([]);
+  const [showCertificationsList, setShowCertificationsList] = useState(false);
+
+  const [situation, setSituation] = useState<string>('');
+  const [situationModalVisible, setSituationModalVisible] = useState(false);
+  const [certificationModalVisible, setCertificationModalVisible] = useState(false);
+
+  const situations = [
+    'Étudiant',
+    'Agriculteur',
+    'Salarié',
+    'Artisan',
+    'Commerçant',
+    'Chef d’entreprise',
+    'Auto-entrepreneur / Indépendant',
+    'Cadre',
+    'Profession intellectuelle supérieure (médecin, avocat, ingénieur, etc.)',
+    'Profession intermédiaire (technicien, infirmier, instituteur, contremaître, etc.)',
+    'Employé de bureau / administratif',
+    'Employé de commerce (vendeur, caissier, etc.)',
+    'Employé de service (aide-soignant, assistant maternel, etc.)',
+    'Ouvrier qualifié',
+    'Ouvrier non qualifié',
+    'Demandeur d’emploi / Chômeur',
+    'Retraité',
+    'Personne au foyer / Inactif',
+  ];
+
+  const softSkillsOptions = [
+    'Esprit d’équipe',
+    'Sociabilité/Aisance relationnelle',
+    'Communication orale / écrite',
+    'Prise de parole en public',
+    'Sens de l’organisation',
+    'Rigueur / précision',
+    'Autonomie',
+    'Capacité d’adaptation / flexibilité',
+    'Gestion du stress',
+    'Esprit d’initiative',
+    'Créativité',
+    'Sens des responsabilités',
+    'Leadership',
+    'Empathie / écoute active',
+    'Patience / pédagogie',
+    'Résolution de problèmes',
+    'Capacité d’analyse / esprit critique',
+    'Fiabilité / ponctualité',
+    'Motivation / implication',
+    'Curiosité / envie d’apprendre',
+  ];
+
+  const passionsOptions = [
+    'Jeux vidéos / e-sport',
+    'Collecte/loisir créatif',
+    'Écologie protection de l’environnement',
+    'Beauté/Esthétique',
+    'Informatique / Programmation / Développement web',
+    'Bureautique / Outils numériques',
+    'Graphisme / Design / Dessin / Illustration',
+    'Photographie / Vidéo / Montage',
+    'Musique / Chant / Instrument',
+    'Danse / Théâtre / Arts de la scène',
+    'Lecture / Écriture / Blog / Journalisme',
+    'Langues étrangères / Traduction',
+    'Cuisine / Pâtisserie / Gastronomie',
+    'Sports / Fitness / Yoga / Arts martiaux',
+    'Nature / Jardinage / Agriculture urbaine',
+    'Animaux / Soins animaliers / Protection animale',
+    'Voyage / Découverte de cultures',
+    'Sciences / Mathématiques / Expérimentation',
+    'Bricolage / DIY / Artisanat',
+    'Développement personnel / Méditation',
+    'Engagement associatif / Bénévolat',
+  ];
+
+  
+
+  // identique aux passions
+  const notLikedOptions = passionsOptions;
 
   let [fontsLoaded] = useFonts({
           LexendDeca : LexendDeca_400Regular,
@@ -45,13 +129,22 @@ const StarSetScreen = () => {
             });
             const data = await res.json();
             if (data.success) {
-              // Flatten et filtrage
-              const docs = data.data
-                .flatMap((d: any) => d.mandatory_documents)
-                .filter((doc: string) => {
-                  const lower = doc.toLowerCase();
-                  return !lower.includes('au moins') && !lower.includes('avoir');
-                });
+              // Flatten, nettoyage, filtrage et suppression des doublons
+              const docs : any = Array.from(
+                new Set(
+                  data.data
+                    .flatMap((d: any) => d.mandatory_documents)
+                    .map((doc: string) => doc.trim()) // supprime espaces inutiles
+                    .filter((doc: string) => {
+                      const lower = doc.toLowerCase();
+                      return (
+                        doc.length > 0 && // enlève les vides
+                        !lower.includes('au moins') &&
+                        !lower.includes('avoir')
+                      );
+                    })
+                )
+              );
         
               setAllMandatoryDocs(docs);
             }
@@ -126,58 +219,73 @@ const StarSetScreen = () => {
 
   // ——— VUE RESULTAT ———
   const ResultView = () => {
-    const top = useMemo(() => results.slice(0, 10), [results]); // on affiche jusqu’à 10 résultats
-    if (!fontsLoaded) return null;
+  const top = useMemo(() => results.slice(0, 10), [results]);
+  if (!fontsLoaded) return null;
 
-    const medal = (rank: number) => {
-      if (rank === 1) return { color: '#FFD700', text: '1' }; // or
-      if (rank === 2) return { color: '#C0C0C0', text: '2' }; // argent
-      if (rank === 3) return { color: '#CD7F32', text: '3' }; // bronze
-      return { color: '#E5E5E5', text: String(rank) };
-    };
-
-    return (
-      <View style={stylesR.container}>
-        <Text style={[stylesR.title, { fontFamily: 'BebasNeue' }]}>
-          VOICI LE RÉSULTAT 🏆
-        </Text>
-
-        <ScrollView contentContainerStyle={stylesR.list}>
-          {top.map((item, idx) => {
-            const r = idx + 1;
-            const m = medal(r);
-            return (
-              <View key={idx} style={stylesR.card}>
-                {/* rang / médaille */}
-                <View style={[stylesR.badge, { backgroundColor: m.color }]}>
-                  <Text style={stylesR.badgeText}>{m.text}</Text>
-                </View>
-
-                {/* icône/metier */}
-                {item.picture_url ? (
-                  <Image source={{ uri: item.picture_url }} style={stylesR.avatar} />
-                ) : (
-                  <View style={stylesR.iconWrap}>
-                    <Ionicons name="briefcase-outline" size={26} color="#555" />
-                  </View>
-                )}
-
-                {/* nom métier */}
-                <Text style={stylesR.job}>{item.job.toUpperCase()}</Text>
-
-                {/* score */}
-                <Text style={stylesR.score}>{item.score}/10</Text>
-              </View>
-            );
-          })}
-        </ScrollView>
-
-        <TouchableOpacity style={stylesR.nextBtn} onPress={() => setResults([])}>
-          <Text style={stylesR.nextTxt}>SUIVANT</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  const medal = (rank: number) => {
+    if (rank === 1) return require('../assets/images/first.png');
+    if (rank === 2) return require('../assets/images/second.png');
+    if (rank === 3) return require('../assets/images/third.png');
+    return null;
   };
+
+  return (
+    <View style={stylesR.container}>
+      <View style={stylesR.header}>
+      <Text style={[stylesR.title, { fontFamily: 'BebasNeue' }]}>
+        VOICI LE RÉSULTAT
+      </Text>
+      <Image
+        source={require('../assets/images/trophee.png')}
+        style={stylesR.trophy}
+      />
+    </View>
+
+      <ScrollView contentContainerStyle={stylesR.list}>
+        {top.map((item, idx) => {
+          const r = idx + 1;
+          const medalIcon = medal(r);
+
+          return (
+            <View key={idx} style={stylesR.card}>
+              {/* Médailles 1, 2, 3 */}
+              {medalIcon ? (
+                <Image source={medalIcon} style={stylesR.medalIcon} />
+              ) : (
+                <View style={stylesR.badge}>
+                  <Text style={stylesR.badgeText}>{r}</Text>
+                </View>
+              )}
+
+              {/* Icône métier */}
+              {item.picture_url ? (
+                <Image 
+  source={{ uri: item.picture_url }} 
+  style={stylesR.avatar} 
+  resizeMode="contain" 
+/>
+              ) : (
+                <View style={stylesR.iconWrap}>
+                  <Ionicons name="briefcase-outline" size={26} color="#555" />
+                </View>
+              )}
+
+              {/* Nom métier */}
+              <Text style={stylesR.job}>{item.job.toUpperCase()}</Text>
+
+              {/* Score */}
+              <Text style={stylesR.score}>{item.score}/10</Text>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      <TouchableOpacity style={stylesR.nextBtn} onPress={() => setResults([])}>
+        <Text style={stylesR.nextTxt}>SUIVANT</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
   // ——— RENDU PRINCIPAL ———
   if (loading) {
@@ -194,54 +302,189 @@ const StarSetScreen = () => {
 
   // ——— FORMULAIRE D'ANALYSE ———
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>QUELS MÉTIERS VOUS CORRESPONDENT LE MIEUX SUR STARSET ?</Text>
 
       {/* Situation */}
       <Text style={styles.sectionTitle}>QUELLE EST VOTRE SITUATION ACTUELLE ?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker style={{ color: 'white' , fontFamily : 'LexendDeca' }} selectedValue={situation} onValueChange={itemValue => setSituation(itemValue)}>
-          <Picker.Item label="Choisir..." value="" />
-          <Picker.Item label="Étudiant" value="etudiant" />
-          <Picker.Item label="Agriculteur" value="agriculteur" />
-          <Picker.Item label="Salarié" value="salarie" />
-        </Picker>
-      </View>
+      <TouchableOpacity
+        style={styles.pickerContainer}
+        onPress={() => setSituationModalVisible(true)}
+      >
+        <Text style={{ color: 'white', fontFamily: 'LexendDeca', marginHorizontal :10, marginVertical : 20 }}>
+          {situation || 'Choisir...'}
+        </Text>
+      </TouchableOpacity>
 
-      {/* Certifications */}
-      <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          style={{ color: 'white', fontFamily: 'LexendDeca' }}
-          selectedValue={newCertification}
-          onValueChange={(itemValue) => {
-            if (itemValue && !certifications.includes(itemValue)) {
-              setCertifications([...certifications, itemValue]);
-            }
-            setNewCertification('');
-          }}
-        >
-          <Picker.Item label="Choisir ici" value="" />
-          {allMandatoryDocs.map((doc, idx) => (
-            <Picker.Item key={idx} label={doc} value={doc} />
-          ))}
-        </Picker>
-      </View>
-      <View style={styles.tagsContainer}>
-        {certifications.map((cert, idx) => (
-          <TouchableOpacity
-            key={idx}
-            style={styles.tag}
-            onPress={() => setCertifications(certifications.filter(c => c !== cert))}
-          >
-            <Text style={styles.whiteText}>{cert} ✕</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {/* Modal de choix */}
+      <Modal
+        visible={situationModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSituationModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ScrollView>
+              {situations.map((sit, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  style={[
+                    styles.optionButton,
+                    situation === sit ? styles.selected : styles.unselected,
+                  ]}
+                  onPress={() => {
+                    setSituation(sit);
+                    setSituationModalVisible(false);
+                  }}
+                >
+                  <Text style={[
+    situation === sit ? styles.whiteText : styles.darkText,
+    { padding: 8 }
+  ]}
+>
+                    {sit}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {/* Bouton fermer */}
+            <TouchableOpacity
+              style={[styles.closeButton, { marginTop: 10 }]}
+              onPress={() => setSituationModalVisible(false)}
+            >
+              <Text style={styles.analyseText}>FERMER</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      <Modal
+  visible={certificationModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setCertificationModalVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      {/* Champ de recherche */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Rechercher une certification..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      <ScrollView>
+        {allMandatoryDocs
+          .filter(doc =>
+            doc.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((doc, idx) => {
+            const cleanDoc = doc.replace(/^-\s*/, '');
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={[
+                  styles.optionButton,
+                  certifications.includes(doc) ? styles.selected : styles.unselected,
+                ]}
+                onPress={() => {
+                  if (certifications.includes(doc)) {
+                    setCertifications(certifications.filter(c => c !== doc));
+                  } else {
+                    setCertifications([...certifications, doc]);
+                  }
+                }}
+              >
+                <Text
+                  style={[
+                    certifications.includes(doc) ? styles.whiteText : styles.darkText,
+                    { padding: 8 },
+                  ]}
+                >
+                  {cleanDoc}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+      </ScrollView>
+
+      {/* Bouton fermer */}
+      <TouchableOpacity
+        style={[styles.closeButton, { marginTop: 10 }]}
+        onPress={() => setCertificationModalVisible(false)}
+      >
+        <Text style={styles.analyseText}>FERMER</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
+{/* ✅ Section Certifications */}
+<Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
+
+<View style={{ position: 'relative' }}>
+  {/* Champ de recherche */}
+  <TextInput
+    style={styles.input}
+    placeholder="Rechercher une certification..."
+    value={searchQuery}
+    onChangeText={setSearchQuery}
+    placeholderTextColor="white"
+  />
+
+  {/* Suggestions qui apparaissent en dessous de l’input */}
+  {searchQuery.length > 0 && (
+    <View style={styles.suggestionsBox}>
+      <ScrollView keyboardShouldPersistTaps="handled">
+        {allMandatoryDocs
+          .filter((doc) =>
+            doc.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((doc, idx) => {
+            const cleanDoc = doc.replace(/^-\s*/, '');
+            return (
+              <TouchableOpacity
+                key={idx}
+                style={styles.item}
+                onPress={() => {
+                  if (!certifications.includes(doc)) {
+                    setCertifications([...certifications, doc]);
+                  }
+                  setSearchQuery(''); // ferme la liste
+                }}
+              >
+                <Text style={styles.suggestionText}>{cleanDoc}</Text>
+              </TouchableOpacity>
+            );
+          })}
+      </ScrollView>
+    </View>
+  )}
+</View>
+
+{/* ✅ Tags sélectionnés */}
+<View style={styles.tagsContainer}>
+  {certifications.map((cert, idx) => {
+    const cleanCert = cert.replace(/^-\s*/, '');
+    return (
+      <TouchableOpacity
+        key={idx}
+        style={styles.tag}
+        onPress={() =>
+          setCertifications(certifications.filter((c) => c !== cert))
+        }
+      >
+        <Text style={[styles.whiteText, { padding: 8 }]}>{cleanCert} ✕</Text>
+      </TouchableOpacity>
+    );
+  })}
+</View>
 
       {/* Soft skills */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS QUALITÉS ET SOFT SKILLS ?</Text>
-      {['Esprit d’équipe', 'Sociabilité/Aisance relationnelle', 'Communication orale / écrite'].map(
+      {softSkillsOptions.map(
         (skill, idx) => (
           <TouchableOpacity
             key={idx}
@@ -255,12 +498,7 @@ const StarSetScreen = () => {
 
       {/* Passions */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS PASSIONS ET CENTRES D’INTÉRÊTS ?</Text>
-      {[
-        'Jeux vidéos / e-sport',
-        'Collecte/loisir créatif',
-        'Écologie protection de l’environnement',
-        'Beauté/Esthétique',
-      ].map((passion, idx) => (
+      {passionsOptions.map((passion, idx) => (
         <TouchableOpacity
           key={idx}
           style={[styles.optionButton, passions.includes(passion) ? styles.selected : styles.unselected]}
@@ -278,7 +516,7 @@ const StarSetScreen = () => {
 
       {/* Ce que vous n’appréciez pas */}
       <Text style={styles.sectionTitle}>CE QUE VOUS N’APPRÉCIEZ PAS ?</Text>
-      {['Informatique', 'Bureautique', 'Graphisme', 'Photographie'].map((item, idx) => (
+      {notLikedOptions.map((item, idx) => (
         <TouchableOpacity
           key={idx}
           style={[styles.optionButton, notLiked.includes(item) ? styles.selected : styles.unselected]}
@@ -351,7 +589,80 @@ const styles = StyleSheet.create({
     marginTop: 30,
     alignItems: 'center',
   },
+
+  closeButton: {
+    backgroundColor: 'red',
+    paddingVertical: 15,
+    borderRadius: 10,
+    marginTop: 30,
+    alignItems: 'center',
+  },
   analyseText: { color: 'white', fontFamily : 'LeagueSpartanBold', fontSize: 16 },
+
+  modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  width: '80%',
+  maxHeight: '80%',
+  backgroundColor: '#fff',
+  borderRadius: 12,
+  padding: 20,
+},
+
+searchInput: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 8,
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  marginBottom: 12,
+  color : 'black'
+},
+
+input: {
+  height: 50,
+  
+  
+  borderRadius: 5,
+  paddingHorizontal: 10,
+  fontSize: 16,
+  backgroundColor: '#FFD700',
+  color: 'white',
+  fontFamily : 'LexendDeca'
+},
+
+suggestionsBox: {
+  position: 'absolute',
+  top: 50, // juste en dessous de l’input
+  left: 0,
+  right: 0,
+  backgroundColor: 'white',
+  borderWidth: 1,
+  borderColor: '#ddd',
+  borderRadius: 5,
+  maxHeight: 300,
+  
+   zIndex: 1000,     // iOS
+  elevation: 10,    // Android
+},
+
+item: {
+  paddingVertical: 10,
+  paddingHorizontal: 10,
+  borderBottomWidth: 1,
+  borderColor: '#ddd',
+  backgroundColor : 'white'
+},
+
+suggestionText: {
+  color: 'black',
+  fontFamily : 'LexendDeca'
+},
+
 });
 
 // ——— Styles de la vue résultat ———
@@ -360,6 +671,7 @@ const stylesR = StyleSheet.create({
     flex: 1,
     paddingTop: 60,
     paddingHorizontal: 20,
+    
     backgroundColor: '#fff',
   },
   title: {
@@ -378,26 +690,21 @@ const stylesR = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 12,
     marginBottom: 12,
+    marginHorizontal: 20,
+    marginTop : 10
   },
-  badge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  badgeText: { fontWeight: 'bold', color: '#000' },
+  
   iconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
+    
   },
-  avatar: { width: 44, height: 44, borderRadius: 22, marginRight: 12 },
+  avatar: { width: 44, height: 44, marginRight: 12 },
   job: { flex: 1, fontFamily : 'BebasNeue', color: '#000', fontSize : 20 },
   score: { fontWeight: 'bold', color: '#0F7B0F' },
   nextBtn: {
@@ -411,6 +718,50 @@ const stylesR = StyleSheet.create({
     alignItems: 'center',
   },
   nextTxt: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+
+  medalIcon: {
+  width: 40,
+  height: 40,
+  position: 'absolute',
+  top: -10,
+  left: -10,
+  resizeMode: 'contain',
+  zIndex: 10,
+},
+badge: {
+  position: 'absolute',
+  top: -5,
+  left: -5,
+  width: 28,
+  height: 28,
+  borderRadius: 14,
+  backgroundColor: '#E5E5E5',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 10,
+},
+badgeText: {
+  fontWeight: 'bold',
+  color: '#000',
+},
+
+header: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 20,
+},
+trophy: {
+  width: 30,
+  height: 30,
+  marginLeft: 10,
+  marginBottom : 15,
+  resizeMode: 'contain',
+},
+
+  
+
+  
 });
 
 export default StarSetScreen;
