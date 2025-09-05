@@ -26,7 +26,7 @@ export default function NifInfoModal({ visible, onClose }: NifInfoModalProps) {
               Si vous êtes encore rattaché à vos parents, c’est leur numéro fiscal qui s’applique.
             </Text>
 
-            <Button title="Fermer" onPress={onClose} color="#0ea5e9" />
+            <Button title="Fermer" onPress={onClose} color="#00C851" />
           </View>
         </View>
       </Modal>
