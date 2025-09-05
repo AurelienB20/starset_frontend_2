@@ -8,21 +8,41 @@ import config from '../config.json';
 const ModifyWorkerProfileScreen = () => {
   const navigation = useNavigation();
   const { user, setUser } = useUser();
+  const [haveCompany, setHaveCompany] = useState(false);
   const [selectedMode, setSelectedMode] = useState<'particulier' | 'company'>(
     user?.is_company ? 'company' : 'particulier'
   );
 
+const checkCompany = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/company/check-company-exists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.id, typeCompany: user?.is_company }),
+      });
+      if (!response.ok) throw new Error('Erreur de réseau');
+      const data = await response.json();
+      setHaveCompany(data.exists);
+      console.log('Company exists:', data);
+      return data.exists;
+    }
+    catch (e) {
+      console.error('Erreur lors de la vérification de l\'entreprise', e);
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setSelectedMode(user.is_company ? 'company' : 'particulier');
+      checkCompany();
     }
   }, [user]);
 
   const handleConfirm = () => {
     const isCompany = selectedMode === 'company';
 
-    // Si aucun changement, pas besoin d'alerte ni d'appel API
-    if (user?.is_company === isCompany) {
+    if (user?.is_company === isCompany && haveCompany) {
       navigation.goBack();
       return;
     }
@@ -47,7 +67,6 @@ const ModifyWorkerProfileScreen = () => {
 
               if (!response.ok) throw new Error('Erreur serveur');
 
-              Alert.alert('Succès', 'Votre type de profil a été mis à jour.');
               navigation.navigate(isCompany ? 'workerProForm' as never : 'workerPartiForm' as never);
             } catch (error) {
               console.error('Erreur de mise à jour:', error);

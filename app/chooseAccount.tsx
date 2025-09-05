@@ -15,25 +15,20 @@ export const saveMode = async (mode: string) => {
 
 const ChooseAccountScreen = () => {
   const [email, setEmail] = useState('');
-  const [isChecked, setIsChecked] = useState(false);
   const navigation = useNavigation();
 
   const handleEmail = (text: React.SetStateAction<string>) => {
     setEmail(text);
   };
 
-  const handleSubmit = async () => {
-    
-  };
-
   const handleWorkerPress = () => {
     saveMode('worker')
-    navigation.navigate('(tabs_worker)' as never);
+    navigation.navigate('workerProForm' as never);
   };
 
   const handleUserPress = () => {
     saveMode('user')
-    navigation.navigate('(tabs)' as never);
+    navigation.navigate('workerPartiForm' as never);
     // Vous pouvez ajouter une navigation similaire pour l'utilisateur ici si nécessaire
   };
 
