@@ -7,9 +7,11 @@ import CountryPicker from 'react-native-country-picker-modal'; // Importer la bi
 import PhoneInput from 'react-native-phone-number-input';
 import config from '../config.json';
 
+import * as Notifications from "expo-notifications";
 import { Platform } from 'react-native';
 import { LocaleConfig } from 'react-native-calendars';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
 
 LocaleConfig.locales.fr = {
   monthNames: ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'],
@@ -47,6 +49,22 @@ const AccountInfoScreen = () => {
   const handlePhoneNumberChange = (text : any) => setPhoneNumber(text);
 
   const TypedPhoneInput = PhoneInput as unknown as React.ComponentType<any>;
+
+
+  async function registerForPushToken() {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") return null;
+  
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+      });
+    }
+  
+    const token = await Notifications.getExpoPushTokenAsync();
+    return token.data;
+  }
 
   const getAccountId = async () => {
     try {
@@ -115,6 +133,18 @@ const handleConfirmBirthDate = (date: Date) => {
       saveData(data.account);
       setUser(data.account)
       if (data.success) {
+        const expoToken = await registerForPushToken();
+          if (expoToken) {
+            await fetch(`${config.backendUrl}/api/notifications/token`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: data.account.id,
+                token: expoToken,
+              }),
+            });
+          }
+
         navigation.navigate('chooseAccount' as never);
       } else {
         alert(data.message);
