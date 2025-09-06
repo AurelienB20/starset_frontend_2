@@ -78,7 +78,7 @@ const WorkerProForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1998-07-12"),
+    birthdate: user?.birthdate || new Date("1998-07-12").toISOString().split("T")[0],
     raisonSociale: "",
     formeJuridique: "",
     adresse: "",

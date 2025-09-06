@@ -91,7 +91,7 @@ const WorkerForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1994-10-06"),
+    birthdate: user?.birthdate || new Date("1994-10-06").toISOString().split("T")[0],
     adresse: user?.adresse || "",
     country: "FR",
     nif: "",
