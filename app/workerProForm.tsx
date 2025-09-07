@@ -130,6 +130,7 @@ const WorkerProForm = () => {
         value={form.raisonSociale}
         onChangeText={(text) => setForm({ ...form, raisonSociale: text })}
         placeholder='Raison sociale'
+        placeholderTextColor="#999"
       />
 
       <TextInput
@@ -137,6 +138,7 @@ const WorkerProForm = () => {
         value={form.formeJuridique}
         onChangeText={(text) => setForm({ ...form, formeJuridique: text })}
         placeholder='Forme juridique'
+        placeholderTextColor="#999"
       />
 
       <TextInput
@@ -144,6 +146,7 @@ const WorkerProForm = () => {
         value={form.adresse}
         onChangeText={(text) => setForm({ ...form, adresse: text })}
         placeholder='Adresse siège social'
+        placeholderTextColor="#999"
       />
 
        <View style={styles.pickerWrapper}>
@@ -151,13 +154,13 @@ const WorkerProForm = () => {
           selectedValue={form.country}
           onValueChange={(itemValue) => setForm({ ...form, country: itemValue })}
         >
-          <Picker.Item label="-- Sélectionnez un pays de résidence fiscale --" value="" />
-          <Picker.Item label="🇫🇷 France" value="FR" />
-          <Picker.Item label="🇧🇪 Belgique" value="BE" />
-          <Picker.Item label="🇨🇭 Suisse" value="CH" />
-          <Picker.Item label="🇨🇦 Canada" value="CA" />
-          <Picker.Item label="🇺🇸 États-Unis" value="US" />
-          <Picker.Item label="🇩🇪 Allemagne" value="DE" />
+          <Picker.Item label="-- Sélectionnez un pays de résidence fiscale --" value="" style={{ color: "#999" }} />
+          <Picker.Item label="🇫🇷 France" value="FR" style={{ color: "#999" }} />
+          <Picker.Item label="🇧🇪 Belgique" value="BE" style={{ color: "#999" }} />
+          <Picker.Item label="🇨🇭 Suisse" value="CH" style={{ color: "#999" }} />
+          <Picker.Item label="🇨🇦 Canada" value="CA" style={{ color: "#999" }} />
+          <Picker.Item label="🇺🇸 États-Unis" value="US" style={{ color: "#999" }} />
+          <Picker.Item label="🇩🇪 Allemagne" value="DE" style={{ color: "#999" }} />
         </Picker>
       </View>
 
@@ -166,6 +169,7 @@ const WorkerProForm = () => {
         value={form.siren}
         onChangeText={(text) => setForm({ ...form, siren: text })}
         placeholder='Numéro SIREN/SIRET'
+        placeholderTextColor="#999"
       />
 
        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
@@ -174,6 +178,7 @@ const WorkerProForm = () => {
               keyboardType="numeric"
               value={form.nif}
               placeholder="Numéro d’identification fiscale (NIF)"
+              placeholderTextColor="#999"
               onChangeText={(t) => setForm({ ...form, nif: t })}
             />
              <TouchableOpacity onPress={() => setVisible(true)}>
@@ -186,6 +191,7 @@ const WorkerProForm = () => {
         value={form.tva}
         onChangeText={(text) => setForm({ ...form, tva: text })}
         placeholder='Numéro de TVA (optionnel)'
+        placeholderTextColor="#999"
       />
 
       <TouchableOpacity onPress={() => pickDoc("kbis")}>
