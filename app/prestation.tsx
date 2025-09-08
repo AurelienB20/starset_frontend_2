@@ -11,6 +11,7 @@ import config from '../config.json';
 
 
 import PrestationDocumentModal from '@/components/documentPopup';
+import MissingDocModal from '@/components/missingDocModal';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { useFonts } from 'expo-font';
 import {
@@ -64,13 +65,15 @@ const [isCertificationFormVisible, setCertificationFormVisible] = useState(false
 const [experienceMenuVisibleId, setExperienceMenuVisibleId] = useState<string|null>(null);
 const [certificationMenuVisibleId, setCertificationMenuVisibleId] = useState<string|null>(null);
 
+const [isMissingDocModalVisible,setMissingDocModalVisible] = useState(false);
+
  let [fontsLoaded] = useFonts({
     BebasNeue : BebasNeue_400Regular,
     LeagueSpartanBold : LeagueSpartan_700Bold
   });
 
 
- 
+ const [haveCompany, setHaveCompany] = useState(false);
 
   // Ouvre le menu pour une certification spécifique
   const openMenu = (id: string) => setMenuVisibleId(id);
@@ -86,7 +89,24 @@ const [certificationMenuVisibleId, setCertificationMenuVisibleId] = useState<str
     navigation.navigate('availability' as never);
   };
 
-  
+  const checkCompany = async () => {
+    try {
+      const response = await fetch(`${config.backendUrl}/api/company/check-company-exists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user?.id, typeCompany: user?.is_company }),
+      });
+      if (!response.ok) throw new Error('Erreur de réseau');
+      const data = await response.json();
+      setHaveCompany(data.exists);
+      console.log('Company exists:', data);
+      return data.exists;
+    }
+    catch (e) {
+      console.error('Erreur lors de la vérification de l\'entreprise', e);
+      return false;
+    }
+  };
 
   const refreshMandatoryDocsStatus = async () => {
   if (!prestation_id) return;
@@ -699,6 +719,7 @@ const deleteCertification = (id: string) => {
     }).catch((error: any) => console.error(error));
     getAllCertification();
     fetchMetierDocuments();
+    checkCompany();
   }, []);
 
   useLayoutEffect(() => {
@@ -708,7 +729,7 @@ const deleteCertification = (id: string) => {
         <Text style={{ marginRight: 8, fontWeight: 'bold', fontSize: 12, color : 'black' }}>
           {prestation?.published ? 'Publié' : 'Non publié'}
         </Text>
-        <TouchableOpacity onPress={confirmTogglePrestationPublished}>
+        <TouchableOpacity onPress={haveCompany ? confirmTogglePrestationPublished : () => setMissingDocModalVisible(true)} disabled={!haveCompany} >
           <View
             style={{
               width: 40,
@@ -1219,6 +1240,10 @@ const deleteCertification = (id: string) => {
           </TouchableOpacity>
         </View>
       </Modal>
+      <MissingDocModal
+        visible={isMissingDocModalVisible}
+        onClose={() => setMissingDocModalVisible(false)}
+      />
     </ScrollView>
   );
 };
@@ -2050,7 +2075,6 @@ mandatoryBannerBtnText: {
   color: '#fff',
   fontWeight: '600',
 },
-
 });
 
 export default PrestationScreen;

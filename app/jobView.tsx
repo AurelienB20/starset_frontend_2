@@ -23,28 +23,6 @@ const JobViewScreen = () => {
   const {selectedJob} = route.params || ''; 
   // Fonction pour récupérer le métier "Professeur particulier à domicile"
 
-  const [haveCompany, setHaveCompany] = useState(false);
-
-const checkCompany = async () => {
-    try {
-      const accountId = await AsyncStorage.getItem('account_id');
-      const response = await fetch(`${config.backendUrl}/api/company/check-company-exists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId:accountId, typeCompany: user?.is_company }),
-      });
-      if (!response.ok) throw new Error('Erreur de réseau');
-      const data = await response.json();
-      setHaveCompany(data.exists);
-      console.log('Company exists:', data);
-      return data.exists;
-    }
-    catch (e) {
-      console.error('Erreur lors de la vérification de l\'entreprise', e);
-      return false;
-    }
-  };
-
   const handleValidation = async () => {
     if (isSubmitting) return;
   
@@ -129,7 +107,6 @@ const checkCompany = async () => {
   // Charger les données au montage du composant
   useEffect(() => {
     getMetierByName();
-    checkCompany();
   }, []);
 
   if (!metier) {
@@ -179,7 +156,7 @@ const checkCompany = async () => {
       <TouchableOpacity
         style={[
           styles.addButton,
-          (isJobAlreadyAdded || isSubmitting || !haveCompany) && styles.disabledButton,
+          (isJobAlreadyAdded || isSubmitting) && styles.disabledButton,
         ]}
         onPress={() => {
           if (!user || Object.keys(user).length === 0) {
@@ -190,7 +167,7 @@ const checkCompany = async () => {
             handleValidation();
           }
         }}
-        disabled={isJobAlreadyAdded || isSubmitting || !haveCompany}
+        disabled={isJobAlreadyAdded || isSubmitting}
       >
         <Text style={styles.addButtonText}>
           {isJobAlreadyAdded

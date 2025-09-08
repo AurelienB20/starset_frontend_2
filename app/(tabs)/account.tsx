@@ -740,7 +740,6 @@ console.log(prestationId);
                       >
                         <Text style={styles.doneButtonText}>La prestation est finie</Text>
                       </TouchableOpacity>
-                    
                   </>
                 )}
 
