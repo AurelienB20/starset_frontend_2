@@ -240,6 +240,7 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "center",
     marginBottom: 20,
+    fontFamily : 'LexendDeca'
   },
   link: {
     textDecorationLine: "underline",
@@ -252,7 +253,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
-    color: 'black'
+    color: 'black',
+    fontFamily : 'LexendDeca'
   },
    pickerWrapper: {
     width: "100%",
@@ -274,7 +276,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     marginBottom: 12,
-    color: 'black'
+    color: 'black',
+    fontFamily : 'LexendDeca'
   },
   
   file: {

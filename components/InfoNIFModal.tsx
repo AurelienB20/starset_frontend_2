@@ -58,12 +58,14 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10
+    marginBottom: 10,
+    fontFamily : 'LexendDeca'
   },
   text: {
     fontSize: 14,
     color: "#333",
     marginBottom: 20,
-    lineHeight: 20
+    lineHeight: 20,
+    fontFamily : 'LexendDeca'
   },
 });

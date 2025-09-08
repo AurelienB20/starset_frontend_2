@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     color: '#000',
+    fontFamily : 'LexendDeca'
   },
   premiereColor:{
     color: '#7ED957'
