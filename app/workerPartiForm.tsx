@@ -91,7 +91,7 @@ const WorkerForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1994-10-06"),
+    birthdate: user?.birthdate || new Date("1994-10-06").toISOString().split("T")[0],
     adresse: user?.adresse || "",
     country: "FR",
     nif: "",
@@ -139,13 +139,13 @@ const WorkerForm = () => {
           selectedValue={form.country}
           onValueChange={(itemValue) => setForm({ ...form, country: itemValue })}
         >
-          <Picker.Item label="-- Sélectionnez un pays de résidence fiscale --" value="" />
-          <Picker.Item label="🇫🇷 France" value="FR" />
-          <Picker.Item label="🇧🇪 Belgique" value="BE" />
-          <Picker.Item label="🇨🇭 Suisse" value="CH" />
-          <Picker.Item label="🇨🇦 Canada" value="CA" />
-          <Picker.Item label="🇺🇸 États-Unis" value="US" />
-          <Picker.Item label="🇩🇪 Allemagne" value="DE" />
+          <Picker.Item label="-- Sélectionnez un pays de résidence fiscale --" value=""  style={{ color: "#999" }} />
+          <Picker.Item label="🇫🇷 France" value="FR" style={{ color: "#999" }} />
+          <Picker.Item label="🇧🇪 Belgique" value="BE" style={{ color: "#999" }} />
+          <Picker.Item label="🇨🇭 Suisse" value="CH" style={{ color: "#999" }} />
+          <Picker.Item label="🇨🇦 Canada" value="CA" style={{ color: "#999" }} />
+          <Picker.Item label="🇺🇸 États-Unis" value="US" style={{ color: "#999" }} />
+          <Picker.Item label="🇩🇪 Allemagne" value="DE" style={{ color: "#999" }} />
         </Picker>
       </View>
       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 10}}>
@@ -154,6 +154,7 @@ const WorkerForm = () => {
         keyboardType="numeric"
         value={form.nif}
         placeholder="Numéro d’identification fiscale (NIF)"
+        placeholderTextColor="#999"
         onChangeText={(t) => setForm({ ...form, nif: t })}
       />
        <TouchableOpacity onPress={() => setVisible(true)}>
