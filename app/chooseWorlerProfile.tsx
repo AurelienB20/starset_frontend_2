@@ -17,12 +17,12 @@ const ChooseProfileScreen = () => {
   const handleParticulierPress = () => {
     saveMode('particulier');
     // Naviguer vers l'écran approprié, à adapter selon ta navigation
-    navigation.navigate('ParticulierTabs' as never);
+    navigation.navigate('workerPartiForm' as never);
   };
 
   const handleWorkerPress = () => {
     saveMode('worker');
-    navigation.navigate('WorkerTabs' as never);
+    navigation.navigate('workerProForm' as never);
   };
 
   return (

@@ -23,12 +23,12 @@ const ChooseAccountScreen = () => {
 
   const handleWorkerPress = () => {
     saveMode('worker')
-    navigation.navigate('workerProForm' as never);
+    navigation.navigate('chooseWorlerProfile' as never);
   };
 
   const handleUserPress = () => {
     saveMode('user')
-    navigation.navigate('workerPartiForm' as never);
+     navigation.navigate('(tabs)' as never);
     // Vous pouvez ajouter une navigation similaire pour l'utilisateur ici si nécessaire
   };
 

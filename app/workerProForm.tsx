@@ -1,5 +1,6 @@
 import NifInfoModal from '@/components/InfoNIFModal';
 import { useUser } from '@/context/userContext';
+import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
@@ -182,7 +183,7 @@ const WorkerProForm = () => {
               onChangeText={(t) => setForm({ ...form, nif: t })}
             />
              <TouchableOpacity onPress={() => setVisible(true)}>
-                  <Text style={{ marginLeft: 10, color: "blue" }}>?</Text>
+                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
               </TouchableOpacity>
             </View>
 
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
     color: "#555",
     textAlign: "center",
     marginBottom: 20,
+    fontFamily : 'LexendDeca'
   },
   link: {
     textDecorationLine: "underline",
@@ -251,7 +253,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
-    color: 'black'
+    color: 'black',
+    fontFamily : 'LexendDeca'
   },
    pickerWrapper: {
     width: "100%",
@@ -273,7 +276,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     marginBottom: 12,
-    color: 'black'
+    color: 'black',
+    fontFamily : 'LexendDeca'
   },
   
   file: {

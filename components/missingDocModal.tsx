@@ -1,12 +1,12 @@
 import React from "react";
 import { Button, Modal, StyleSheet, Text, View } from "react-native";
 
-type NifInfoModalProps = {
+type MissingDocModalProps = {
   visible: boolean;
   onClose: () => void;
 };
 
-export default function NifInfoModal({ visible, onClose }: NifInfoModalProps) {
+export default function MissingDocModal({ visible, onClose }: MissingDocModalProps) {
   return (
     <View style={styles.container}>
         <Modal
@@ -17,13 +17,9 @@ export default function NifInfoModal({ visible, onClose }: NifInfoModalProps) {
       >
         <View style={styles.overlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.title}>ℹ️  Numéro Fiscal (NIF)</Text>
+            <Text style={styles.title}>ℹ️  Document obligatoire manquant</Text>
             <Text style={styles.text}>
-              Le NIF (numéro fiscal) est un identifiant obligatoire demandé par les impôts
-              pour déclarer vos revenus.{"\n\n"}
-              Vous le trouvez sur votre avis d’imposition ou dans votre espace{" "}
-              <Text style={{ fontWeight: "bold" }}>impots.gouv.fr</Text>.{"\n\n"}
-              Si vous êtes encore rattaché à vos parents, c’est leur numéro fiscal qui s’applique.
+             Veuillez compléter votre profil en ajoutant les documents obligatoires pour pouvoir publier votre prestation.
             </Text>
 
             <Button title="Fermer" onPress={onClose} color="#00C851" />
