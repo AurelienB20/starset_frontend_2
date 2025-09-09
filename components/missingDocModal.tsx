@@ -1,5 +1,6 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { Button, Modal, StyleSheet, Text, View } from "react-native";
+import { Button, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type MissingDocModalProps = {
   visible: boolean;
@@ -7,6 +8,7 @@ type MissingDocModalProps = {
 };
 
 export default function MissingDocModal({ visible, onClose }: MissingDocModalProps) {
+  const navigation = useNavigation();
   return (
     <View style={styles.container}>
         <Modal
@@ -20,8 +22,11 @@ export default function MissingDocModal({ visible, onClose }: MissingDocModalPro
             <Text style={styles.title}>ℹ️  Document obligatoire manquant</Text>
             <Text style={styles.text}>
              Veuillez compléter votre profil en ajoutant les documents obligatoires pour pouvoir publier votre prestation.
+             Vous pouvez le faire dans en cliquant sur le lien ci-dessous :
             </Text>
-
+              <TouchableOpacity onPress={() => { navigation.navigate('modifyWorkerProfile' as never)}}>
+               <Text style={{ color: '#00C851', textAlign: 'center', marginBottom: 20 }}> Accedez ici</Text>
+             </TouchableOpacity>
             <Button title="Fermer" onPress={onClose} color="#00C851" />
           </View>
         </View>

@@ -501,8 +501,6 @@ const deleteCertification = (id: string) => {
     setIsEditing(false);
     // Vous pouvez ajouter ici le code pour sauvegarder la nouvelle description, si nécessaire
     try {
-      
-      
       const response = await fetch(`${config.backendUrl}/api/mission/save-prestation-description`, {
         method: 'POST',
         headers: {
@@ -729,7 +727,7 @@ const deleteCertification = (id: string) => {
         <Text style={{ marginRight: 8, fontWeight: 'bold', fontSize: 12, color : 'black' }}>
           {prestation?.published ? 'Publié' : 'Non publié'}
         </Text>
-        <TouchableOpacity onPress={haveCompany ? confirmTogglePrestationPublished : () => setMissingDocModalVisible(true)} disabled={!haveCompany} >
+        <TouchableOpacity onPress={!haveCompany ? () => setMissingDocModalVisible(true) : confirmTogglePrestationPublished} >
           <View
             style={{
               width: 40,
