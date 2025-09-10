@@ -1,3 +1,4 @@
+import B3InfoModal from '@/components/infoB3Modal';
 import NifInfoModal from '@/components/InfoNIFModal';
 import { useUser } from '@/context/userContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -58,6 +59,7 @@ const WorkerForm = () => {
   const navigation = useNavigation();
   const { user } = useUser();
   const [haveCompany, setHaveCompany] = useState(false);
+  const [visibleB3, setVisibleB3] = useState(false);
 
   useEffect(() => {
     const checkCompany = async () => {
@@ -87,6 +89,7 @@ const WorkerForm = () => {
     nif: string;
     recto: any;
     verso: any;
+    b3: any;
     consent: boolean;
   }>({
     userId: user?.id,
@@ -98,6 +101,7 @@ const WorkerForm = () => {
     nif: "",
     recto: null as PickedDocument,
     verso: null as PickedDocument,
+    b3: null as PickedDocument,
     consent: false,
   });
 
@@ -172,6 +176,15 @@ const WorkerForm = () => {
       </TouchableOpacity>
       {form.verso && <Text style={styles.file}>{form.verso.name || form.verso.uri}</Text>}
 
+       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
+                 <TouchableOpacity onPress={() => pickDoc("b3")}>
+                         <Text  style={styles.buttonb3}>upload du B3</Text>
+                  </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setVisible(true)}>
+                           <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
+                    </TouchableOpacity>
+                    </View>
+
       <View style={styles.checkboxContainer}>
         <Checkbox
           value={form.consent}
@@ -183,13 +196,16 @@ const WorkerForm = () => {
         </Text>
       </View>
 
-      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.nif || !form.recto || !form.verso || haveCompany} />
+      <Button title="Valider" onPress={validate} color="#00C851" disabled={
+        !form.consent || !form.nif || !form.recto || !form.verso || !form.b3 || haveCompany
+        } />
 
       <TouchableOpacity onPress={handleSkip}>
         <Text style={styles.skip}>Passer cette étape {">>"}</Text>
       </TouchableOpacity>
 
       <NifInfoModal visible={visible} onClose={() => setVisible(false)} />
+      <B3InfoModal visible={visibleB3} onClose={() => setVisibleB3(false)} />
     </ScrollView>
   );
 }
@@ -261,6 +277,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     marginBottom: 12,
+    backgroundColor: '#7ed957',
+    color: 'white',
+  },
+  buttonb3: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    width: 340,
+    padding: 10,
+    borderRadius: 6,
     backgroundColor: '#7ed957',
     color: 'white',
   },
