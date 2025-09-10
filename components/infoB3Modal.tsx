@@ -1,14 +1,12 @@
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { Button, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Button, Linking, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-type MissingDocModalProps = {
+type B3InfoModalProps = {
   visible: boolean;
   onClose: () => void;
 };
 
-export default function MissingDocModal({ visible, onClose }: MissingDocModalProps) {
-  const navigation = useNavigation();
+export default function B3InfoModal({ visible, onClose }: B3InfoModalProps) {
   return (
     <View style={styles.container}>
         <Modal
@@ -19,14 +17,14 @@ export default function MissingDocModal({ visible, onClose }: MissingDocModalPro
       >
         <View style={styles.overlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.title}>ℹ️  Document obligatoire manquant</Text>
+            <Text style={styles.title}>ℹ️  B3</Text>
             <Text style={styles.text}>
-             Veuillez compléter votre profil en ajoutant les documents obligatoires pour pouvoir publier votre prestation.
-             Vous pouvez le faire dans en cliquant sur le lien ci-dessous :
+              Vous pouvez obtenir le B3 en suivant le lien suivant.{"\n\n"}
+              <TouchableOpacity onPress={() => Linking.openURL('https://faq.casier-judiciaire.justice.gouv.fr/selfservice/fr-fr/193/h-donnees-personnelles/458/comment-verifier-l-authenticite-d-un-extrait-de-casier-judiciaire-bulletin-n-3')}>
+                <Text style={styles.link}>Acceder au B3</Text>
+              </TouchableOpacity>
             </Text>
-              <TouchableOpacity onPress={() => { navigation.navigate('modifyWorkerProfile' as never)}}>
-               <Text style={{ color: '#00C851', textAlign: 'center', marginBottom: 20 }}> Accedez ici</Text>
-             </TouchableOpacity>
+
             <Button title="Fermer" onPress={onClose} color="#00C851" />
           </View>
         </View>
@@ -68,5 +66,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     lineHeight: 20,
     fontFamily : 'LexendDeca'
+  },
+  link: {
+    color: "#0ea5e9",
+    textDecorationLine: "underline",
+    fontFamily: 'LexendDeca',
+    textAlign: 'center'
   },
 });

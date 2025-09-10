@@ -139,7 +139,8 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
   
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView bounces={false}>
+      <View style={styles.container}>
       <Text style={styles.enter}>Création par Email !</Text>
       <Text style={styles.subtitle}>
         Laissez-nous identifier votre profil, Star Set n'attend plus que vous !
@@ -439,7 +440,7 @@ const [isConfirmPasswordValid, setIsConfirmPasswordValid] = useState(true);
     </ScrollView>
   </View>
 </Modal>
-
+</View>
     </ScrollView>
   );
 };

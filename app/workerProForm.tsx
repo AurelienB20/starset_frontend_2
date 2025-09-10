@@ -1,3 +1,4 @@
+import B3InfoModal from '@/components/infoB3Modal';
 import NifInfoModal from '@/components/InfoNIFModal';
 import { useUser } from '@/context/userContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -75,6 +76,7 @@ const WorkerProForm = () => {
     [key: string]: any;
   } | null;
   const [visible, setVisible] = useState(false);
+  const [visibleB3, setVisibleB3] = useState(false);
   const [form, setForm] = useState({
     userId: user?.id,
     firstname: user?.firstname || "",
@@ -90,6 +92,7 @@ const WorkerProForm = () => {
     kbis: null as PickedDocument,
     recto: null as PickedDocument,
     verso: null as PickedDocument,
+    b3: null as PickedDocument,
     consent: false,
   });
 
@@ -208,6 +211,16 @@ const WorkerProForm = () => {
              <Text  style={styles.button}>Upload pièce d’identité (Verso)</Text>
            </TouchableOpacity>
            {form.verso && <Text style={styles.file}>{form.verso.name || form.verso.uri}</Text>}
+           
+           <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
+           <TouchableOpacity onPress={() => pickDoc("b3")}>
+                   <Text  style={styles.buttonb3}>upload du B3</Text>
+            </TouchableOpacity>
+              <TouchableOpacity onPress={() => setVisibleB3(true)}>
+                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
+              </TouchableOpacity>
+              </View>
+            {form.b3 && <Text style={styles.file}>{form.b3.name || form.b3.uri}</Text>}
 
        <View style={styles.checkboxContainer}>
               <Checkbox
@@ -227,6 +240,7 @@ const WorkerProForm = () => {
         </TouchableOpacity>
 
       <NifInfoModal visible={visible} onClose={() => setVisible(false)} />
+      <B3InfoModal visible={visibleB3} onClose={() => setVisibleB3(false)} />
     </ScrollView>
   );
 }
@@ -297,6 +311,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 6,
     marginBottom: 12,
+    backgroundColor: '#7ed957',
+    color: 'white',
+  },
+  buttonb3: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    width: 340,
+    padding: 10,
+    borderRadius: 6,
     backgroundColor: '#7ed957',
     color: 'white',
   },
