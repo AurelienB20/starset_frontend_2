@@ -130,10 +130,12 @@ let [fontsLoaded] = useFonts({
       setEvents([...events, newEvent]);
       setShowModal(false);
     } else {
-      console.warn('Erreur côté serveur :', data.message);
+       Alert.alert('Erreur côté serveur :', data.message);
+      setShowModal(false);
     }
   } catch (err) {
-    console.error('Erreur lors de l\'ajout de disponibilité :', err);
+     Alert.alert('Erreur lors de l\'ajout de disponibilité :', { err }.toString());
+    setShowModal(false);
   }
 };
 
@@ -255,6 +257,7 @@ let [fontsLoaded] = useFonts({
             <TextInput
   style={styles.input}
   placeholder="Heure de début (ex: 09:00 ou 9h00)"
+  placeholderTextColor={"#999"}
   value={timeRange.start}
   onChangeText={(text) => setTimeRange({ ...timeRange, start: text })}
 />
