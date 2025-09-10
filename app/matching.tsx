@@ -424,45 +424,14 @@ const StarSetScreen = () => {
 {/* ✅ Section Certifications */}
 <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
 
-<View style={{ position: 'relative' }}>
-  {/* Champ de recherche */}
-  <TextInput
-    style={styles.input}
-    placeholder="Rechercher une certification..."
-    value={searchQuery}
-    onChangeText={setSearchQuery}
-    placeholderTextColor="white"
-  />
-
-  {/* Suggestions qui apparaissent en dessous de l’input */}
-  {searchQuery.length > 0 && (
-    <View style={styles.suggestionsBox}>
-      <ScrollView keyboardShouldPersistTaps="handled">
-        {allMandatoryDocs
-          .filter((doc) =>
-            doc.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((doc, idx) => {
-            const cleanDoc = doc.replace(/^-\s*/, '');
-            return (
-              <TouchableOpacity
-                key={idx}
-                style={styles.item}
-                onPress={() => {
-                  if (!certifications.includes(doc)) {
-                    setCertifications([...certifications, doc]);
-                  }
-                  setSearchQuery(''); // ferme la liste
-                }}
-              >
-                <Text style={styles.suggestionText}>{cleanDoc}</Text>
-              </TouchableOpacity>
-            );
-          })}
-      </ScrollView>
-    </View>
-  )}
-</View>
+<TouchableOpacity
+  style={styles.pickerContainer}
+  onPress={() => setCertificationModalVisible(true)}
+>
+  <Text style={{ color: 'white', fontFamily: 'LexendDeca', marginHorizontal: 10, marginVertical: 20 }}>
+    {certifications.length > 0 ? `${certifications.length} sélectionnée(s)` : 'Choisir...'}
+  </Text>
+</TouchableOpacity>
 
 {/* ✅ Tags sélectionnés */}
 <View style={styles.tagsContainer}>
@@ -481,6 +450,82 @@ const StarSetScreen = () => {
     );
   })}
 </View>
+
+{/* ✅ Modal pour certifications */}
+<Modal
+  visible={certificationModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setCertificationModalVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      {/* Champ de recherche */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Rechercher une certification..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      {searchQuery.length > 0 ? (
+  <ScrollView
+    keyboardShouldPersistTaps="handled"
+    showsVerticalScrollIndicator={true}
+  >
+    {allMandatoryDocs
+      .filter((doc) =>
+        doc.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      .map((doc, idx) => {
+        const cleanDoc = doc.replace(/^-\s*/, '');
+        return (
+          <TouchableOpacity
+            key={idx}
+            style={[
+              styles.optionButton,
+              certifications.includes(doc)
+                ? styles.selected
+                : styles.unselected,
+            ]}
+            onPress={() => {
+              if (certifications.includes(doc)) {
+                setCertifications(certifications.filter((c) => c !== doc));
+              } else {
+                setCertifications([...certifications, doc]);
+              }
+            }}
+          >
+            <Text
+              style={[
+                certifications.includes(doc)
+                  ? styles.whiteText
+                  : styles.darkText,
+                { padding: 8 },
+              ]}
+            >
+              {cleanDoc}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+  </ScrollView>
+) : (
+  <Text style={{ textAlign: 'center', color: 'gray', fontFamily: 'LexendDeca' }}>
+    Tapez pour rechercher une certification...
+  </Text>
+)}
+
+      {/* Bouton fermer */}
+      <TouchableOpacity
+        style={[styles.closeButton, { marginTop: 10 }]}
+        onPress={() => setCertificationModalVisible(false)}
+      >
+        <Text style={styles.analyseText}>FERMER</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
       {/* Soft skills */}
       <Text style={styles.sectionTitle}>QUELLES SONT VOS QUALITÉS ET SOFT SKILLS ?</Text>
@@ -613,15 +658,7 @@ modalContent: {
   padding: 20,
 },
 
-searchInput: {
-  borderWidth: 1,
-  borderColor: '#ccc',
-  borderRadius: 8,
-  paddingHorizontal: 10,
-  paddingVertical: 8,
-  marginBottom: 12,
-  color : 'black'
-},
+
 
 input: {
   height: 50,
@@ -637,7 +674,7 @@ input: {
 
 suggestionsBox: {
   position: 'absolute',
-  top: 50, // juste en dessous de l’input
+  top: 50, 
   left: 0,
   right: 0,
   backgroundColor: 'white',
@@ -645,10 +682,16 @@ suggestionsBox: {
   borderColor: '#ddd',
   borderRadius: 5,
   maxHeight: 300,
-  
-   zIndex: 1000,     // iOS
-  elevation: 10,    // Android
+
+  // Ajout important 👇
+  zIndex: 1000,   // iOS
+  elevation: 10,  // Android
+  shadowColor: '#000', // pour iOS
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
 },
+
 
 item: {
   paddingVertical: 10,
@@ -662,6 +705,19 @@ suggestionText: {
   color: 'black',
   fontFamily : 'LexendDeca'
 },
+
+
+
+searchInput: {
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 8,
+  paddingHorizontal: 10,
+  paddingVertical: 8,
+  marginBottom: 12,
+  color: 'black',
+},
+
 
 });
 
