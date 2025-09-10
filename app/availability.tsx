@@ -255,6 +255,7 @@ let [fontsLoaded] = useFonts({
             <TextInput
   style={styles.input}
   placeholder="Heure de début (ex: 09:00 ou 9h00)"
+  placeholderTextColor={"#999"}
   value={timeRange.start}
   onChangeText={(text) => setTimeRange({ ...timeRange, start: text })}
 />
