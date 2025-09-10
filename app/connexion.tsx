@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import config from '../config.json';
 
 const ConnexionScreen = () => {
@@ -151,7 +151,7 @@ const getProfile = async (accountId: string) => {
         Laissez-nous identifier votre profil, Star Set n'attend plus que vous !
       </Text>
       <View style={styles.separator}></View>
-
+      <KeyboardAvoidingView  behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.passwordContainer}>
       <TextInput
         style={styles.input}
         onChangeText={handleEmailChange}
@@ -174,7 +174,7 @@ const getProfile = async (accountId: string) => {
           <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={22} color="#333" />
         </TouchableOpacity>
       </View>
-
+      </KeyboardAvoidingView>
       <TouchableOpacity onPress={goToForgotPassword} style={styles.forgotPassword}>
         <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
       </TouchableOpacity>
