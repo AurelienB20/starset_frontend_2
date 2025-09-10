@@ -131,9 +131,11 @@ let [fontsLoaded] = useFonts({
       setShowModal(false);
     } else {
       console.warn('Erreur côté serveur :', data.message);
+      setShowModal(false);
     }
   } catch (err) {
     console.error('Erreur lors de l\'ajout de disponibilité :', err);
+    setShowModal(false);
   }
 };
 
