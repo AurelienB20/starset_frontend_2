@@ -24,10 +24,10 @@ const ModifyPhoneScreen = () => {
       const updatedUser = { ...user, phone };
       setUser(updatedUser);
 
-      const response = await fetch(`${config.backendUrl}/api/auth/update-account-new`, {
+      const response = await fetch(`${config.backendUrl}/api/auth/update-phone-number`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ account: updatedUser }),
+        body: JSON.stringify({ accountId: user?.id, newNumber : phone }),
       });
 
       if (!response.ok) throw new Error('Erreur réseau');

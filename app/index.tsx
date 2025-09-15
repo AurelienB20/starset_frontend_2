@@ -142,13 +142,10 @@ const StarsetScreen = () => {
     setUser(data.account);
     console.log('[getProfile] Utilisateur mis à jour dans le contexte.');
 
-    if (!data.account.verified) {
-      console.log('[getProfile] Compte non vérifié. Redirection vers connexion.');
-      navigation.navigate('isVisitor' as never);
-    } else {
+    
       console.log('[getProfile] Compte vérifié. Redirection vers (tabs).');
       navigation.navigate('(tabs)' as never);
-    }
+    
   } catch (error) {
     console.error('[getProfile] Erreur attrapée :', error);
     await AsyncStorage.clear();

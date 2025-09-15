@@ -122,7 +122,7 @@ const ModifyAccountScreen = () => {
       
       <InfoRow label="Pseudo" value={user?.pseudo ? `@${user.pseudo}` : 'Ajouter un pseudo'} onPress={() => {navigation.navigate('modifyPseudo' as never)}} />
       <InfoRow label="Nom et prénom" value={`${user?.firstname} ${user?.lastname}`} onPress={() => {navigation.navigate('modifyName' as never)}} />
-      <InfoRow label="Téléphone" value={phone} onPress={() => {}} />
+      <InfoRow label="Téléphone" value={user?.number} onPress={() => {navigation.navigate('modifyPhoneNumber' as never)}} />
       <InfoRow label="E-mail" value={user?.email} onPress={() => {navigation.navigate('modifyEmail' as never)}} />
       <InfoRow label="Adresse" value={user?.address || 'Ajouter une adresse'} onPress={() => {navigation.navigate('modifyLocation' as never)}} />
       <InfoRow label="Description" value={user?.description || 'Ajouter une description'} onPress={() => {navigation.navigate('modifyDescription' as never)}} />

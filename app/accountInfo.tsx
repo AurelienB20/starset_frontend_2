@@ -78,7 +78,7 @@ const AccountInfoScreen = () => {
   };
 
   const today = new Date();
-    const minDob = new Date(1900, 0, 1);
+  const minDob = new Date(1900, 0, 1);
     const clampDate = (d: Date, min: Date, max: Date) => {
       if (!(d instanceof Date) || isNaN(d.getTime())) return max;
       if (d < min) return min;
@@ -269,6 +269,7 @@ const handleConfirmBirthDate = (date: Date) => {
         isVisible={isDatePickerVisible}
         mode="date"
         date={clampDate(birthDate, minDob, today)}
+        minimumDate={minDob}
         maximumDate={today}
         // iOS préfère fr_FR (underscore). Si doute, retire la prop locale.
         locale={Platform.OS === 'ios' ? 'fr_FR' : undefined}

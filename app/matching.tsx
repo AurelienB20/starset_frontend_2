@@ -359,67 +359,7 @@ const StarSetScreen = () => {
           </View>
         </View>
       </Modal>
-      <Modal
-  visible={certificationModalVisible}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setCertificationModalVisible(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      {/* Champ de recherche */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Rechercher une certification..."
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-
-      <ScrollView>
-        {allMandatoryDocs
-          .filter(doc =>
-            doc.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((doc, idx) => {
-            const cleanDoc = doc.replace(/^-\s*/, '');
-            return (
-              <TouchableOpacity
-                key={idx}
-                style={[
-                  styles.optionButton,
-                  certifications.includes(doc) ? styles.selected : styles.unselected,
-                ]}
-                onPress={() => {
-                  if (certifications.includes(doc)) {
-                    setCertifications(certifications.filter(c => c !== doc));
-                  } else {
-                    setCertifications([...certifications, doc]);
-                  }
-                }}
-              >
-                <Text
-                  style={[
-                    certifications.includes(doc) ? styles.whiteText : styles.darkText,
-                    { padding: 8 },
-                  ]}
-                >
-                  {cleanDoc}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-      </ScrollView>
-
-      {/* Bouton fermer */}
-      <TouchableOpacity
-        style={[styles.closeButton, { marginTop: 10 }]}
-        onPress={() => setCertificationModalVisible(false)}
-      >
-        <Text style={styles.analyseText}>FERMER</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
+      
 
 {/* ✅ Section Certifications */}
 <Text style={styles.sectionTitle}>QUELLES SONT VOS CERTIFICATIONS ?</Text>
@@ -652,7 +592,7 @@ const styles = StyleSheet.create({
 },
 modalContent: {
   width: '80%',
-  maxHeight: '80%',
+  height: '80%',
   backgroundColor: '#fff',
   borderRadius: 12,
   padding: 20,
