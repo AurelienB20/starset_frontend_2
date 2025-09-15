@@ -3,8 +3,13 @@ import { DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { Stack } from 'expo-router';
 import React from 'react';
+import { Platform } from "react-native";
 import { Provider as PaperProvider } from 'react-native-paper';
 import config from '../config.json';
+
+if (Platform.OS !== "web") {
+  require("@stripe/stripe-react-native");
+}
 
 function RootLayoutNav() {
   
