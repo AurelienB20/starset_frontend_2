@@ -4,8 +4,8 @@
     "slug": "frontend_starset_2",
     "owner": "starset77",
 
-    "version": "1.0.13",
-
+    "version": "1.0.14",
+    "runtimeVersion": "1.0.14",
     "orientation": "portrait",
     "icon": "./assets/images/starset-icon.png",
     "scheme": "starset",
@@ -16,6 +16,7 @@
       "bundleIdentifier": "com.starset.frontend",
       "ios.buildNumber": "0.2",
       "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"],
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "Cette application a besoin d'accéder à votre galerie pour sélectionner des documents.",
         "NSCameraUsageDescription": "Cette application a besoin d'accéder à votre caméra pour prendre des photos.",
@@ -75,9 +76,7 @@
         "projectId": "141e042a-184a-4b5c-a3be-c7f50835d0b7"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    
     "updates": {
       "url": "https://u.expo.dev/141e042a-184a-4b5c-a3be-c7f50835d0b7"
     }
