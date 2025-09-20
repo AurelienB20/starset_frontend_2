@@ -81,13 +81,12 @@ const WorkerProForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1998-07-12").toISOString().split("T")[0],
+    birthdate: user?.birthdate || "",
     raisonSociale: "",
     formeJuridique: "",
     adresse: "",
     country: "FR",
     siren: "",
-    nif: "",
     tva: "",
     kbis: null as PickedDocument,
     recto: null as PickedDocument,
@@ -175,21 +174,6 @@ const WorkerProForm = () => {
         placeholder='Numéro SIREN/SIRET'
         placeholderTextColor="#999"
       />
-
-       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              value={form.nif}
-              placeholder="Numéro d’identification fiscale (NIF)"
-              placeholderTextColor="#999"
-              onChangeText={(t) => setForm({ ...form, nif: t })}
-            />
-             <TouchableOpacity onPress={() => setVisible(true)}>
-                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
-              </TouchableOpacity>
-            </View>
-
       <TextInput
         style={styles.input}
         value={form.tva}
@@ -233,7 +217,7 @@ const WorkerProForm = () => {
               </Text>
         </View>
 
-      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.nif || !form.recto || !form.verso || haveCompany} />
+      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.recto || !form.verso || haveCompany} />
 
        <TouchableOpacity onPress={handleSkip}>
               <Text style={styles.skip}>Passer cette étape {">>"}</Text>
