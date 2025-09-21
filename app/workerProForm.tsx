@@ -4,7 +4,6 @@ import { useUser } from '@/context/userContext';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
-import * as FileSystem from "expo-file-system";
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
@@ -94,26 +93,38 @@ const WorkerProForm = () => {
   });
 
   const pickDoc = async (field: string) => {
-      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        
-      if (!permissionResult.granted) {
-        Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
-        return;
-      }
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
-      });
-  
-      if (result.canceled) {
-        Alert.alert('Erreur', 'Aucun fichier sélectionné');
-        return;
-      }
-      const file = result.assets[0];
-      console.log('Selected file:', file);
-      const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
-      setForm({ ...form, [field]: { ...file, data: base64 } });
-    };
+  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+  if (!permissionResult.granted) {
+    Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+    return;
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    quality: 1,
+  });
+
+  if (result.canceled) {
+    Alert.alert('Erreur', 'Aucun fichier sélectionné');
+    return;
+  }
+
+  const file = result.assets[0];
+
+  // 🔑 génère un "nom" de fichier robuste même si fileName est vide
+  const filename = file.fileName ?? file.uri.split('/').pop() ?? 'document.jpg';
+
+  // ⚠️ pas besoin de base64 pour juste afficher le fichier
+  setForm((prev) => ({
+    ...prev,
+    [field]: {
+      uri: file.uri,
+      name: filename,
+      type: file.mimeType ?? 'image/jpeg',
+    },
+  }));
+};
 
   const handleSkip = () => {
     navigation.navigate({
@@ -196,7 +207,7 @@ const WorkerProForm = () => {
       <TouchableOpacity onPress={() => pickDoc("kbis")}>
         <Text style={styles.button}>Upload extrait Kbis</Text>
       </TouchableOpacity>
-  {form.kbis && <Text style={styles.file}>{form.kbis.fileName || form.kbis.uri}</Text>}
+  {form.kbis && <Text style={styles.file}>📄 {form.kbis.name}</Text>}
      <TouchableOpacity onPress={() => pickDoc("recto")}>
              <Text  style={ styles.button}>Upload pièce d’identité (Recto)</Text>
            </TouchableOpacity>
