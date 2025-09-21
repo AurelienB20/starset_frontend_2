@@ -199,7 +199,7 @@ const WorkerForm = () => {
       </View>
 
       <Button title="Valider" onPress={validate} color="#00C851" disabled={
-        !form.consent || !form.nif || !form.recto || !form.verso || !form.b3 || haveCompany
+        !form.consent || !form.nif || !form.recto || !form.verso || haveCompany
         } />
 
       <TouchableOpacity onPress={handleSkip}>
