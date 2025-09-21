@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
@@ -125,13 +126,16 @@ const WorkerForm = () => {
   // 🔑 génère un "nom" de fichier robuste même si fileName est vide
   const filename = file.fileName ?? file.uri.split('/').pop() ?? 'document.jpg';
 
-  // 🔑 met uniquement les infos nécessaires (pas de base64)
+  // 🔄 ajoute la data en base64
+  const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
+
   setForm((prev) => ({
     ...prev,
     [field]: {
       uri: file.uri,
       name: filename,
       type: file.mimeType ?? 'image/jpeg',
+      data: base64, // ✅ envoyé au backend
     },
   }));
 };

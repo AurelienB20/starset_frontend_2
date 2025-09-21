@@ -4,6 +4,7 @@ import { useUser } from '@/context/userContext';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
+import * as FileSystem from "expo-file-system";
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
@@ -115,13 +116,16 @@ const WorkerProForm = () => {
   // 🔑 génère un "nom" de fichier robuste même si fileName est vide
   const filename = file.fileName ?? file.uri.split('/').pop() ?? 'document.jpg';
 
-  // ⚠️ pas besoin de base64 pour juste afficher le fichier
+  // 🔄 convertir en base64 (attendu par ton backend)
+  const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
+
   setForm((prev) => ({
     ...prev,
     [field]: {
       uri: file.uri,
       name: filename,
       type: file.mimeType ?? 'image/jpeg',
+      data: base64, // ✅ ajouté pour upload backend
     },
   }));
 };
