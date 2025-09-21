@@ -1,7 +1,6 @@
 import B3InfoModal from '@/components/infoB3Modal';
 import NifInfoModal from '@/components/InfoNIFModal';
 import { useUser } from '@/context/userContext';
-import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
@@ -91,7 +90,6 @@ const WorkerProForm = () => {
     kbis: null as PickedDocument,
     recto: null as PickedDocument,
     verso: null as PickedDocument,
-    b3: null as PickedDocument,
     consent: false,
   });
 
@@ -209,16 +207,6 @@ const WorkerProForm = () => {
            </TouchableOpacity>
            {form.verso && <Text style={styles.file}>{form.verso.fileName || form.verso.uri}</Text>}
            
-           <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-           <TouchableOpacity onPress={() => pickDoc("b3")}>
-                   <Text  style={styles.buttonb3}>upload du B3</Text>
-            </TouchableOpacity>
-              <TouchableOpacity onPress={() => setVisibleB3(true)}>
-                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
-              </TouchableOpacity>
-              </View>
-            {form.b3 && <Text style={styles.file}>{form.b3.fileName || form.b3.uri}</Text>}
-
        <View style={styles.checkboxContainer}>
               <Checkbox
                 value={form.consent}

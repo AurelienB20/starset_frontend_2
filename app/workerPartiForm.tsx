@@ -89,7 +89,6 @@ const WorkerForm = () => {
     nif: string;
     recto: any;
     verso: any;
-    b3: any;
     consent: boolean;
   }>({
     userId: user?.id,
@@ -101,7 +100,6 @@ const WorkerForm = () => {
     nif: "",
     recto: null as PickedDocument,
     verso: null as PickedDocument,
-    b3: null as PickedDocument,
     consent: false,
   });
 
@@ -188,16 +186,6 @@ const WorkerForm = () => {
         <Text  style={styles.button}>Upload pièce d’identité (Verso)</Text>
       </TouchableOpacity>
       {form.verso && <Text style={styles.file}>{form.verso.fileName || form.verso.uri}</Text>}
-
-       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-        <TouchableOpacity onPress={() => pickDoc("b3")}>
-          <Text style={styles.buttonb3}>upload du B3</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setVisible(true)}>
-          <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }} />
-        </TouchableOpacity>
-      </View>
-        {form.b3 && <Text style={styles.file}>{form.b3.fileName || form.b3.uri}</Text>}
 
       <View style={styles.checkboxContainer}>
         <Checkbox
