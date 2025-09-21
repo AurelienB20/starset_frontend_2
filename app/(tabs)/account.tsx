@@ -128,6 +128,10 @@ const AccountScreen = () => {
     navigation.navigate('about' as never);
   };
 
+  const goToNewVersion = async () => {
+    navigation.navigate('newVersion' as never);
+  };
+
   const getWorkerDocumentStatus = async () => {
     try {
       
@@ -522,8 +526,6 @@ console.log(prestationId);
     <Text style={styles.menuItemText}>A Propos</Text>
   </View>
 </TouchableOpacity>
-
-
 
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
   <View style={styles.iconWithText}>
