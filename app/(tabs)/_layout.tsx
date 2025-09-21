@@ -13,64 +13,32 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Image, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import config from '../../config.json';
 
-// 👉 import de ta fonction de notif
-import { registerForPushNotificationsAsync } from '@/notification';
-
 import NoteModal from '@/components/NoteModal';
-import { debugLog } from '../../api/prestationApi';
+import {
+  debugLog
+} from '../../api/prestationApi';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [isPopupVisible, setPopupVisible] = useState(false);
-  const { allWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
-  const { allUserPlannedPrestation } = useAllUserPlannedPrestation()
+  const { allWorkerPlannedPrestation, setAllWorkerPlannedPrestation } = useAllWorkerPlannedPrestation()
+  const { allUserPlannedPrestation, setAllUserPlannedPrestation } = useAllUserPlannedPrestation()
   const navigation = useNavigation();
   let [fontsLoaded] = useFonts({
       BebasNeue: BebasNeue_400Regular,
   });
   const [prestationModal, setPrestationModal] = useState(false);
-  const [prestation, setPrestation] = useState<any>(null);
-  const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
-  const [shownPrestationIds, setShownPrestationIds] = useState<any[]>([]);
-  const [isTime, setIsTime] = useState(false);
-  const { user } = useUser();
-  const [errorMessage, setErrorMessage] = useState('');
+      const [prestation, setPrestation] = useState<any>(null);
+      const [plannedPrestations, setPlannedPrestations] = useState<any[]>([]);
+      const [shownPrestationIds, setShownPrestationIds] = useState<any[]>([]);
+      const [isTime, setIsTime] = useState(false);
+      const { user } = useUser();
+       const [errorMessage, setErrorMessage] = useState('');
 
   const [noteModalVisible, setNoteModalVisible] = useState(false);
 
+
   const intervalRef : any = useRef<NodeJS.Timeout | null>(null);
-
-  // 🟢 Nouveau useEffect pour gérer les notifs
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const registerToken = async () => {
-      try {
-        const token = await registerForPushNotificationsAsync();
-        if (token) {
-          console.log("✅ Expo Push Token récupéré:", token);
-
-          // Envoi au backend
-          const res = await fetch(`${config.backendUrl}/api/notification/save-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: user.id, token }),
-          });
-
-          const data = await res.json();
-          if (!data.success) {
-            console.warn("❌ Impossible de sauvegarder le token:", data.message || data.error);
-          } else {
-            console.log("🎉 Token sauvegardé en base:", data);
-          }
-        }
-      } catch (err) {
-        console.error("Erreur lors de l'enregistrement du token:", err);
-      }
-    };
-
-    registerToken();
-  }, [user?.id]);
 
   const isPrestationExpired = (p: any): boolean => {
     const now = new Date();

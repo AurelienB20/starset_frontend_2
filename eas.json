@@ -12,10 +12,7 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true,
-      "env": {
-        "EXPO_USE_NEW_ARCHITECTURE": "1"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {

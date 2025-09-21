@@ -2,7 +2,6 @@ import NoteModal from '@/components/NoteModal';
 import { useUser } from '@/context/userContext';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { LeagueSpartan_700Bold } from '@expo-google-fonts/league-spartan';
-import { LexendDeca_400Regular } from '@expo-google-fonts/lexend-deca';
 import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions, useNavigation } from '@react-navigation/native';
@@ -69,7 +68,6 @@ const AccountScreen = () => {
   let [fontsLoaded] = useFonts({
     LeagueSpartanBold : LeagueSpartan_700Bold,
     BebasNeue: BebasNeue_400Regular,
-    LexendDeca: LexendDeca_400Regular,
   });
 
 
@@ -128,10 +126,6 @@ const AccountScreen = () => {
 
   const goToAbout = async () => {
     navigation.navigate('about' as never);
-  };
-
-  const goToNewVersion = async () => {
-    navigation.navigate('newVersion' as never);
   };
 
   const getWorkerDocumentStatus = async () => {
@@ -529,6 +523,8 @@ console.log(prestationId);
   </View>
 </TouchableOpacity>
 
+
+
 <TouchableOpacity style={styles.menuItem} onPress={goToConfidentiality}>
   <View style={styles.iconWithText}>
     <FontAwesome name="user" size={20} color="#000" style={styles.menuIcon} />
@@ -830,7 +826,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 5,
-    fontFamily: 'LexendDeca',
   },
   balanceCard: {
     flexDirection: 'row',
@@ -858,13 +853,11 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     color: '#000',
-    fontFamily: 'LexendDeca',
   },
 
   deconnectText: {
     fontSize: 16,
     color: 'red',
-    fontFamily: 'LexendDeca',
   },
 
   footer: {
@@ -997,7 +990,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-    fontFamily: 'LexendDeca',
   },
 
   missionTime: {
