@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
-import * as FileSystem from "expo-file-system";
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
@@ -104,26 +103,38 @@ const WorkerForm = () => {
   });
 
   const pickDoc = async (field: string) => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-    if (!permissionResult.granted) {
-      Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
-    });
+  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (result.canceled) {
-      Alert.alert('Erreur', 'Aucun fichier sélectionné');
-      return;
-    }
-    const file = result.assets[0];
-    console.log('Selected file:', file);
-    const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
-    setForm({ ...form, [field]: { ...file, data: base64 } });
-  };
+  if (!permissionResult.granted) {
+    Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+    return;
+  }
+
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    quality: 1,
+  });
+
+  if (result.canceled) {
+    Alert.alert('Erreur', 'Aucun fichier sélectionné');
+    return;
+  }
+
+  const file = result.assets[0];
+
+  // 🔑 génère un "nom" de fichier robuste même si fileName est vide
+  const filename = file.fileName ?? file.uri.split('/').pop() ?? 'document.jpg';
+
+  // 🔑 met uniquement les infos nécessaires (pas de base64)
+  setForm((prev) => ({
+    ...prev,
+    [field]: {
+      uri: file.uri,
+      name: filename,
+      type: file.mimeType ?? 'image/jpeg',
+    },
+  }));
+};
 
   const validate = () => {
     createCompanyProfile(form);
@@ -180,12 +191,12 @@ const WorkerForm = () => {
       <TouchableOpacity onPress={() => pickDoc("recto")}>
         <Text  style={ styles.button}>Upload pièce d’identité (Recto)</Text>
       </TouchableOpacity>
-      {form.recto && <Text style={styles.file}>{form.recto.fileName || form.recto.uri}</Text>}
+      {form.recto && <Text style={styles.file}>📄 {form.recto.name}</Text>}
 
       <TouchableOpacity onPress={() => pickDoc("verso")}>
         <Text  style={styles.button}>Upload pièce d’identité (Verso)</Text>
       </TouchableOpacity>
-      {form.verso && <Text style={styles.file}>{form.verso.fileName || form.verso.uri}</Text>}
+      {form.verso && <Text style={styles.file}>📄 {form.verso.name}</Text>}
 
       <View style={styles.checkboxContainer}>
         <Checkbox
