@@ -1,12 +1,11 @@
 import B3InfoModal from '@/components/infoB3Modal';
 import NifInfoModal from '@/components/InfoNIFModal';
 import { useUser } from '@/context/userContext';
-import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
-import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -66,11 +65,11 @@ const WorkerProForm = () => {
       };
       checkCompany();
     }, [user?.id]);
-  type PickedDocument = {
-    id: string;
-    name: string;
+ type PickedDocument = {
+    assetId: string;
+    fileName: string;
     uri: string;
-    size?: number;
+    fileSize?: number;
     mimeType?: string;
     data?: string;
     [key: string]: any;
@@ -81,29 +80,40 @@ const WorkerProForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1998-07-12").toISOString().split("T")[0],
+    birthdate: user?.birthdate || "",
     raisonSociale: "",
     formeJuridique: "",
     adresse: "",
     country: "FR",
     siren: "",
-    nif: "",
     tva: "",
     kbis: null as PickedDocument,
     recto: null as PickedDocument,
     verso: null as PickedDocument,
-    b3: null as PickedDocument,
     consent: false,
   });
 
   const pickDoc = async (field: string) => {
-    const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-        if (!result.canceled && result.assets && result.assets.length > 0) {
-          const img = result.assets[0];
-          const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: 'base64' });
-          setForm({ ...form, [field]: { ...img, data: base64 } });
-        }
-  };
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        
+      if (!permissionResult.granted) {
+        Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+      });
+  
+      if (result.canceled) {
+        Alert.alert('Erreur', 'Aucun fichier sélectionné');
+        return;
+      }
+      const file = result.assets[0];
+      console.log('Selected file:', file);
+      const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
+      setForm({ ...form, [field]: { ...file, data: base64 } });
+    };
 
   const handleSkip = () => {
     navigation.navigate({
@@ -175,21 +185,6 @@ const WorkerProForm = () => {
         placeholder='Numéro SIREN/SIRET'
         placeholderTextColor="#999"
       />
-
-       <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-            <TextInput
-              style={styles.input}
-              keyboardType="numeric"
-              value={form.nif}
-              placeholder="Numéro d’identification fiscale (NIF)"
-              placeholderTextColor="#999"
-              onChangeText={(t) => setForm({ ...form, nif: t })}
-            />
-             <TouchableOpacity onPress={() => setVisible(true)}>
-                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
-              </TouchableOpacity>
-            </View>
-
       <TextInput
         style={styles.input}
         value={form.tva}
@@ -201,27 +196,17 @@ const WorkerProForm = () => {
       <TouchableOpacity onPress={() => pickDoc("kbis")}>
         <Text style={styles.button}>Upload extrait Kbis</Text>
       </TouchableOpacity>
-
+  {form.kbis && <Text style={styles.file}>{form.kbis.fileName || form.kbis.uri}</Text>}
      <TouchableOpacity onPress={() => pickDoc("recto")}>
              <Text  style={ styles.button}>Upload pièce d’identité (Recto)</Text>
            </TouchableOpacity>
-           {form.recto && <Text style={styles.file}>{form.recto.name || form.recto.uri}</Text>}
+           {form.recto && <Text style={styles.file}>{form.recto.fileName || form.recto.uri}</Text>}
      
            <TouchableOpacity onPress={() => pickDoc("verso")}>
              <Text  style={styles.button}>Upload pièce d’identité (Verso)</Text>
            </TouchableOpacity>
-           {form.verso && <Text style={styles.file}>{form.verso.name || form.verso.uri}</Text>}
+           {form.verso && <Text style={styles.file}>{form.verso.fileName || form.verso.uri}</Text>}
            
-           <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-           <TouchableOpacity onPress={() => pickDoc("b3")}>
-                   <Text  style={styles.buttonb3}>upload du B3</Text>
-            </TouchableOpacity>
-              <TouchableOpacity onPress={() => setVisibleB3(true)}>
-                     <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
-              </TouchableOpacity>
-              </View>
-            {form.b3 && <Text style={styles.file}>{form.b3.name || form.b3.uri}</Text>}
-
        <View style={styles.checkboxContainer}>
               <Checkbox
                 value={form.consent}
@@ -233,7 +218,7 @@ const WorkerProForm = () => {
               </Text>
         </View>
 
-      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.nif || !form.recto || !form.verso || haveCompany} />
+      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.recto || !form.verso || haveCompany} />
 
        <TouchableOpacity onPress={handleSkip}>
               <Text style={styles.skip}>Passer cette étape {">>"}</Text>
