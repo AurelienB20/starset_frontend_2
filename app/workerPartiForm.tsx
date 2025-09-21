@@ -5,8 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import Checkbox from 'expo-checkbox';
-import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system";
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -71,10 +71,10 @@ const WorkerForm = () => {
 
   const [visible, setVisible] = useState(false);
     type PickedDocument = {
-    id: string;
-    name: string;
+    assetId: string;
+    fileName: string;
     uri: string;
-    size?: number;
+    fileSize?: number;
     mimeType?: string;
     data?: string;
     [key: string]: any;
@@ -95,7 +95,7 @@ const WorkerForm = () => {
     userId: user?.id,
     firstname: user?.firstname || "",
     lastname: user?.lastname || "",
-    birthdate: user?.birthdate || new Date("1994-10-06").toISOString().split("T")[0],
+    birthdate: user?.birthdate || "",
     adresse: user?.adresse || "",
     country: "FR",
     nif: "",
@@ -106,12 +106,25 @@ const WorkerForm = () => {
   });
 
   const pickDoc = async (field: string) => {
-    const result = await DocumentPicker.getDocumentAsync({ type: "*/*" });
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const img = result.assets[0];
-      const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: 'base64' });
-      setForm({ ...form, [field]: { ...img, data: base64 } });
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+    if (!permissionResult.granted) {
+      Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+      return;
     }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (result.canceled) {
+      Alert.alert('Erreur', 'Aucun fichier sélectionné');
+      return;
+    }
+    const file = result.assets[0];
+    console.log('Selected file:', file);
+    const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
+    setForm({ ...form, [field]: { ...file, data: base64 } });
   };
 
   const validate = () => {
@@ -169,21 +182,22 @@ const WorkerForm = () => {
       <TouchableOpacity onPress={() => pickDoc("recto")}>
         <Text  style={ styles.button}>Upload pièce d’identité (Recto)</Text>
       </TouchableOpacity>
-      {form.recto && <Text style={styles.file}>{form.recto.name || form.recto.uri}</Text>}
+      {form.recto && <Text style={styles.file}>{form.recto.fileName || form.recto.uri}</Text>}
 
       <TouchableOpacity onPress={() => pickDoc("verso")}>
         <Text  style={styles.button}>Upload pièce d’identité (Verso)</Text>
       </TouchableOpacity>
-      {form.verso && <Text style={styles.file}>{form.verso.name || form.verso.uri}</Text>}
+      {form.verso && <Text style={styles.file}>{form.verso.fileName || form.verso.uri}</Text>}
 
        <View style={{flexDirection: 'row', alignItems: 'center', marginBottom: 12}}>
-                 <TouchableOpacity onPress={() => pickDoc("b3")}>
-                         <Text  style={styles.buttonb3}>upload du B3</Text>
-                  </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setVisible(true)}>
-                           <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }}/>
-                    </TouchableOpacity>
-                    </View>
+        <TouchableOpacity onPress={() => pickDoc("b3")}>
+          <Text style={styles.buttonb3}>upload du B3</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setVisible(true)}>
+          <Ionicons name="information-circle-outline" size={22} color="#333" style={{ marginLeft: 10, marginBottom: 5 }} />
+        </TouchableOpacity>
+      </View>
+        {form.b3 && <Text style={styles.file}>{form.b3.fileName || form.b3.uri}</Text>}
 
       <View style={styles.checkboxContainer}>
         <Checkbox
