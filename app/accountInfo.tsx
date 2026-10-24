@@ -129,21 +129,12 @@ const handleConfirmBirthDate = (date: Date) => {
         }),
       });
       const data = await response.json();
+      console.log(data.account)
 
       saveData(data.account);
       setUser(data.account)
       if (data.success) {
-        const expoToken = await registerForPushToken();
-          if (expoToken) {
-            await fetch(`${config.backendUrl}/api/notifications/token`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                userId: data.account.id,
-                token: expoToken,
-              }),
-            });
-          }
+        
 
         navigation.navigate('chooseAccount' as never);
       } else {

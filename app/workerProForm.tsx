@@ -93,39 +93,48 @@ const WorkerProForm = () => {
     consent: false,
   });
 
-  const pickDoc = async (field: string) => {
+   const pickDoc = async (field: string) => {
+  // Demander permission
   const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
   if (!permissionResult.granted) {
-    Alert.alert('Permission refusée', 'Vous devez autoriser l\'accès à la galerie.');
+    Alert.alert("Permission refusée", "Vous devez autoriser l'accès à la galerie.");
     return;
   }
 
+  // Ouvrir la galerie
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     quality: 1,
+    base64: false, // ⚠️ je préfère lire le base64 avec FileSystem (plus fiable que base64: true)
   });
 
-  if (result.canceled) {
-    Alert.alert('Erreur', 'Aucun fichier sélectionné');
+  if (result.canceled || !result.assets?.length) {
+    Alert.alert("Erreur", "Aucun fichier sélectionné");
     return;
   }
 
   const file = result.assets[0];
 
-  // 🔑 génère un "nom" de fichier robuste même si fileName est vide
-  const filename = file.fileName ?? file.uri.split('/').pop() ?? 'document.jpg';
+  // Générer un nom robuste
+  const filename = file.fileName ?? file.uri.split("/").pop() ?? "document.jpg";
+  const mimeType = file.mimeType ?? "image/jpeg";
 
-  // 🔄 convertir en base64 (attendu par ton backend)
-  const base64 = await FileSystem.readAsStringAsync(file.uri, { encoding: 'base64' });
+  // Lire le base64 manuellement via FileSystem
+  let base64Data: string | undefined;
+  try {
+    base64Data = await FileSystem.readAsStringAsync(file.uri, { encoding: "base64" });
+  } catch (err) {
+    console.warn("Impossible de lire le fichier en base64 :", err);
+  }
 
+  // Normalisation => comme ExperienceModal (data + meta)
   setForm((prev) => ({
     ...prev,
     [field]: {
       uri: file.uri,
       name: filename,
-      type: file.mimeType ?? 'image/jpeg',
-      data: base64, // ✅ ajouté pour upload backend
+      type: mimeType,
+      data: base64Data, // 🔑 base64 prêt à envoyer si besoin
     },
   }));
 };
@@ -233,7 +242,9 @@ const WorkerProForm = () => {
               </Text>
         </View>
 
-      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.recto || !form.verso || haveCompany} />
+      <Button title="Valider" onPress={validate} color="#00C851" disabled={!form.consent || !form.recto || !form.verso// || haveCompany
+
+      } />
 
        <TouchableOpacity onPress={handleSkip}>
               <Text style={styles.skip}>Passer cette étape {">>"}</Text>

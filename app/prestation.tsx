@@ -90,23 +90,26 @@ const [isMissingDocModalVisible,setMissingDocModalVisible] = useState(false);
   };
 
   const checkCompany = async () => {
-    try {
-      const response = await fetch(`${config.backendUrl}/api/company/check-company-exists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user?.id, typeCompany: user?.is_company }),
-      });
-      if (!response.ok) throw new Error('Erreur de réseau');
-      const data = await response.json();
-      setHaveCompany(data.exists);
-      console.log('Company exists:', data);
-      return data.exists;
-    }
-    catch (e) {
-      console.error('Erreur lors de la vérification de l\'entreprise', e);
-      return false;
-    }
-  };
+  try {
+    const response = await fetch(`${config.backendUrl}/api/company/check-company-exists`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user?.id, typeCompany: user?.is_company }),
+    });
+
+    if (!response.ok) throw new Error('Erreur de réseau');
+
+    const data = await response.json();
+    console.log('Company exists (API):', data);
+
+    setHaveCompany(true); // 🔑 on force toujours true
+    return true;
+  } catch (e) {
+    console.error('Erreur lors de la vérification de l\'entreprise', e);
+    setHaveCompany(true); // 🔑 même en cas d'erreur, on force true
+    return true;
+  }
+};
 
   const refreshMandatoryDocsStatus = async () => {
   if (!prestation_id) return;
@@ -727,7 +730,16 @@ const deleteCertification = (id: string) => {
         <Text style={{ marginRight: 8, fontWeight: 'bold', fontSize: 12, color : 'black' }}>
           {prestation?.published ? 'Publié' : 'Non publié'}
         </Text>
-        <TouchableOpacity onPress={!haveCompany ? () => setMissingDocModalVisible(true) : confirmTogglePrestationPublished} >
+        <TouchableOpacity
+  // Ancien comportement :
+  // onPress={!haveCompany ? () => setMissingDocModalVisible(true) : confirmTogglePrestationPublished}
+
+  // Nouveau comportement : toujours lancer l'action
+  onPress={() => {
+    // Si tu veux réactiver plus tard le blocage, décommente au-dessus 👆
+    confirmTogglePrestationPublished();
+  }}
+>
           <View
             style={{
               width: 40,
