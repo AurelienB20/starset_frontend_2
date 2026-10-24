@@ -1,50 +1,47 @@
-# Welcome to your Expo app 👋
+# Starset — mobile app
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Starset is a mobile app that connects clients with independent service providers
+(babysitting, courier and other trades). Clients find a provider by trade or nearby, book a
+service, pay in the app and chat with the provider; providers manage their offers,
+availability, missions and payouts.
 
-## Get started
+This repository is the mobile app (Expo / React Native, iOS and Android). The API is a
+separate Node.js and PostgreSQL service.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- **Two roles in one app:** client and provider, each with its own tabs.
+- **Finding a provider:** search by trade, filters, providers nearby on a map (Google Maps,
+  Places autocomplete).
+- **Booking:** availability and calendar, one or several services per booking, summary,
+  history and ratings.
+- **Payments:** Stripe in the app; providers are onboarded to Stripe to receive payouts.
+- **Real time:** chat over Socket.IO, push notifications (Expo Notifications).
+- **Provider onboarding:** professional or individual profile, identity and mandatory
+  documents, camera and document upload.
+- **AI, through the API (Mistral):** MIRA, an in-app assistant that keeps the conversation's
+  context, and a questionnaire that suggests the trades matching a provider's situation and
+  certifications (`mistral-small-latest`).
 
-2. Start the app
+## Stack
 
-   ```bash
-   npx expo start
-   ```
+Expo SDK 54 · React Native 0.81 · TypeScript · Expo Router · Stripe React Native ·
+Socket.IO · React Native Maps · Expo Notifications · EAS Build
 
-In the output, you'll find options to open the app in a
+## Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- `app/`: screens (Expo Router); `(tabs)` for clients, `(tabs_worker)` for providers
+- `components/`, `context/`, `hooks/`, `constants/`
+- `config.json`: the API URL (`backendUrl`)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Run
 
 ```bash
-npm run reset-project
+npm install
+npx expo run:android   # a development build: Stripe and maps need native modules
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Team
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Built by [Aurélien Benoit](https://github.com/AurelienB20) and [Uneishi](https://github.com/Uneishi).
+In development (version 1.0.15).
